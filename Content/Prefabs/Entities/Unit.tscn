@@ -1,0 +1,59 @@
+[gd_scene load_steps=8 format=3 uid="uid://rc2326u6agtf"]
+
+[ext_resource type="Script" uid="uid://djimvajqu34qh" path="res://Systems/Entities/Unit.cs" id="1_igitp"]
+[ext_resource type="SpriteFrames" uid="uid://bws4xh16dlt3e" path="res://Content/Resources/SpriteFrames/Entities/Bases/SpriteFrame_Unit_Base_Debug.tres" id="2_jo3tn"]
+[ext_resource type="Script" uid="uid://5e2lglu1l111" path="res://Systems/Nodes/UnitSprite.cs" id="3_jo3tn"]
+[ext_resource type="Script" uid="uid://cd2hrmpbnnupp" path="res://Systems/Entities/Sensors/SightSensor.cs" id="4_8qol3"]
+[ext_resource type="Script" uid="uid://c83wmu6k0wt68" path="res://Systems/Entities/Sensors/UnitSensors.cs" id="4_xo887"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_j7grf"]
+height = 1.0
+radius = 0.4
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_jo3tn"]
+radius = 2.0
+
+[node name="Unit" type="CharacterBody3D" node_paths=PackedStringArray("CollisionShape", "CameraPosition", "AnimatedSprite")]
+axis_lock_angular_x = true
+axis_lock_angular_y = true
+axis_lock_angular_z = true
+script = ExtResource("1_igitp")
+CollisionShape = NodePath("CollisionShape3D")
+CameraPosition = NodePath("Camera Position")
+AnimatedSprite = NodePath("UnitSprite")
+_spriteFrames = Dictionary[int, SpriteFrames]({})
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CylinderShape3D_j7grf")
+
+[node name="UnitSprite" type="Node3D" parent="." node_paths=PackedStringArray("_baseLayer")]
+script = ExtResource("3_jo3tn")
+_baseLayer = NodePath("Base Layer")
+
+[node name="Base Layer" type="AnimatedSprite3D" parent="UnitSprite"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+offset = Vector2(0, 32)
+pixel_size = 0.0156
+texture_filter = 0
+sprite_frames = ExtResource("2_jo3tn")
+animation = &"walking_up"
+
+[node name="Camera Position" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="Sensors" type="Node3D" parent="."]
+script = ExtResource("4_xo887")
+
+[node name="Sight Sensor" type="Node3D" parent="Sensors" node_paths=PackedStringArray("_sensorsParent", "_fieldOfViewArea", "_lineOfSightRayCast")]
+script = ExtResource("4_8qol3")
+_sensorsParent = NodePath("..")
+_fieldOfViewArea = NodePath("Field of View")
+_lineOfSightRayCast = NodePath("RayCast3D")
+
+[node name="Field of View" type="Area3D" parent="Sensors/Sight Sensor"]
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Sensors/Sight Sensor/Field of View"]
+shape = SubResource("CylinderShape3D_jo3tn")
+
+[node name="RayCast3D" type="RayCast3D" parent="Sensors/Sight Sensor"]
