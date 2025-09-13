@@ -8,6 +8,11 @@ namespace Khepri.Entities.Sensors
     /// <summary> The controller or root node of a unit's sensors. </summary>
     public partial class UnitSensors : Node3D
     {
+        /// <summary> Whether the sensors are in debug mode. I.e. With visible gizmos. </summary>
+        [ExportGroup("Debug")]
+        [Export] public Boolean IsDebug { get; private set; } = false;
+
+
         /// <summary> The array of entities currently 'known' by the sensors. </summary>
         private HashSet<KnownEntity> _trackedEntities = new HashSet<KnownEntity>();
 
@@ -43,6 +48,46 @@ namespace Khepri.Entities.Sensors
         public KnownEntity[] FindTypeOfEntity(ISmartEntity entity)
         {
             return _trackedEntities.Where(x => x.SmartEntity.GetType() == entity.GetType()).ToArray();
+        }
+    }
+
+
+    /// <summary> A data object that is 'known' by an agent. </summary>
+    public class KnownEntity
+    {
+        /// <summary> A reference to the known entity. </summary>
+        public ISmartEntity SmartEntity { get; init; }
+
+        /// <summary> Whether the entity is visible. </summary>
+        public Boolean IsVisible { get; private set; } = false;
+
+        /// <summary> The last known position of the entity. </summary>
+        /// <remarks> A null value means that one isn't known. </remarks>
+        public Vector3 LastKnownPosition { get; private set; }
+
+
+        /// <summary> A data object that is 'known' by an agent. </summary>
+        /// <param name="entity"> A reference to the known entity. </param>
+        public KnownEntity(ISmartEntity entity)
+        {
+            SmartEntity = entity;
+            LastKnownPosition = entity.CollisionShape.GlobalPosition;
+        }
+
+
+        /// <summary> Set whether the entity is currently visible to the tracker. </summary>
+        /// <param name="isVisible"> Whether the smart entity is directly visible. </param>
+        public void SetIsVisible(Boolean isVisible)
+        {
+            IsVisible = isVisible;
+        }
+
+
+        /// <summary> Updates the last known position of the entity. </summary>
+        /// <param name="position"> An optional position. A null will use the smart entity's actual position, a value will override it. </param>
+        public void UpdateLastKnownPosition(Vector3? position = null)
+        {
+            LastKnownPosition = position == null ? SmartEntity.CollisionShape.GlobalPosition : position.Value;
         }
     }
 }
