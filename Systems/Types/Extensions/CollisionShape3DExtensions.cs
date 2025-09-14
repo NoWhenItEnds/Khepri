@@ -15,11 +15,17 @@ namespace Khepri.Types.Extensions
             switch (collisionShape.Shape)
             {
                 case BoxShape3D box:
-                    return new Aabb(collisionShape.GlobalPosition, box.Size);
+                    return new Aabb(collisionShape.GlobalPosition - (box.Size * 0.5f), box.Size);
                 case CylinderShape3D cylinder:
-                    return new Aabb(collisionShape.GlobalPosition, new Vector3(cylinder.Radius * 2f, cylinder.Height, cylinder.Radius * 2f));
+                    Vector3 cylinderSize = new Vector3(cylinder.Radius * 2f, cylinder.Height, cylinder.Radius * 2f);
+                    return new Aabb(collisionShape.GlobalPosition - (cylinderSize * 0.5f), cylinderSize);
                 case CapsuleShape3D capsule:
-                    return new Aabb(collisionShape.GlobalPosition, new Vector3(capsule.Radius * 2f, capsule.Height, capsule.Radius * 2f));
+                    Vector3 capsuleSize = new Vector3(capsule.Radius * 2f, capsule.Height, capsule.Radius * 2f);
+                    return new Aabb(collisionShape.GlobalPosition - (capsuleSize * 0.5f), capsuleSize);
+                case ConcavePolygonShape3D polygon:
+                    Aabb result = new Aabb();
+                    foreach (Vector3 face in polygon.GetFaces()) { result = result.Expand(face); }
+                    return result;
                 default:
                     throw new NotImplementedException($"The given collision shape, {collisionShape.Shape.GetType()}, hasn't been implemented.");
             }
