@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="PackedScene" uid="uid://rc2326u6agtf" path="res://Content/Prefabs/Entities/Unit.tscn" id="2_5p3x2"]
 [ext_resource type="Script" uid="uid://d1dxnpil1ufxm" path="res://Systems/Models/GOAP/AgentController.cs" id="2_fdsh7"]
-[ext_resource type="Script" uid="uid://bp8qlkofea5r8" path="res://Systems/Navigation/OctreeGenerator.cs" id="3_fdsh7"]
+[ext_resource type="Script" uid="uid://bp8qlkofea5r8" path="res://Systems/Navigation/NavigationController.cs" id="3_fdsh7"]
 [ext_resource type="PackedScene" uid="uid://c7668uo4460su" path="res://Content/Prefabs/Entities/Wall.tscn" id="3_sa7mi"]
 [ext_resource type="PackedScene" uid="uid://dm4tu3i0sn5s4" path="res://Content/Prefabs/Entities/Terrain.tscn" id="5_fdsh7"]
 
@@ -12,6 +12,12 @@
 [node name="Game" type="Node"]
 
 [node name="Controllers" type="Node" parent="."]
+
+[node name="Navigation Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("_entitiesParent")]
+script = ExtResource("3_fdsh7")
+_entitiesParent = NodePath("../../World/Entities")
+_showOctreeNodes = true
+_showNavigationWaypoints = true
 
 [node name="Player Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("_playerUnit", "_mainCamera")]
 script = ExtResource("1_5p3x2")
@@ -38,14 +44,12 @@ projection = 1
 size = 8.0
 
 [node name="Entities" type="Node3D" parent="World"]
-script = ExtResource("3_fdsh7")
-_isDebug = true
 
 [node name="Player Unit" parent="World/Entities" instance=ExtResource("2_5p3x2")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.935364, 0.372986, -0.317719)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.935, 0, -0.318)
 
 [node name="Enemy Unit" parent="World/Entities" instance=ExtResource("2_5p3x2")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.06464, 0.372986, -0.317719)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.065, 0, -0.318)
 
 [node name="Walls" type="Node3D" parent="World/Entities"]
 
