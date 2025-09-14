@@ -7,33 +7,39 @@
 [ext_resource type="Script" uid="uid://c83wmu6k0wt68" path="res://Systems/Entities/Sensors/UnitSensors.cs" id="4_xo887"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_j7grf"]
-height = 1.0
+height = 0.5
 radius = 0.4
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_jo3tn"]
 radius = 2.0
 
-[node name="Unit" type="CharacterBody3D" node_paths=PackedStringArray("CollisionShape", "CameraPosition", "AnimatedSprite")]
+[node name="Unit" type="CharacterBody3D" node_paths=PackedStringArray("CollisionShape", "NavigationAgent", "CameraPosition", "AnimatedSprite")]
 axis_lock_angular_x = true
 axis_lock_angular_y = true
 axis_lock_angular_z = true
 script = ExtResource("1_igitp")
 CollisionShape = NodePath("CollisionShape3D")
+NavigationAgent = NodePath("NavigationAgent3D")
 CameraPosition = NodePath("Camera Position")
 AnimatedSprite = NodePath("UnitSprite")
 _spriteFrames = Dictionary[int, SpriteFrames]({})
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
 shape = SubResource("CylinderShape3D_j7grf")
 
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+
 [node name="UnitSprite" type="Node3D" parent="." node_paths=PackedStringArray("_baseLayer")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
 script = ExtResource("3_jo3tn")
 _baseLayer = NodePath("Base Layer")
 
 [node name="Base Layer" type="AnimatedSprite3D" parent="UnitSprite"]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
 offset = Vector2(0, 32)
 pixel_size = 0.0156
+axis = 1
+shaded = true
 texture_filter = 0
 sprite_frames = ExtResource("2_jo3tn")
 animation = &"walking_up"

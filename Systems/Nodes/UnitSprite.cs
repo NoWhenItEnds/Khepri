@@ -58,7 +58,7 @@ namespace Khepri.Nodes
         {
             _previousDirection = direction != Direction.NONE ? direction : _previousDirection;
             String animationName = state.AnimationPrefix + _previousDirection.ToString().ToLower();
-            _baseLayer.Animation = animationName;
+            _baseLayer.Animation = _baseLayer.SpriteFrames.HasAnimation(animationName) ? animationName : throw new ArgumentException($"Animation '{animationName}' does not exist in the sprite frames!");
         }
     }
 

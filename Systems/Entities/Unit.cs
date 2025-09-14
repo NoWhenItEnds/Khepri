@@ -15,15 +15,20 @@ namespace Khepri.Entities
         [ExportGroup("Nodes")]
         [Export] public CollisionShape3D CollisionShape { get; private set; }
 
+        /// <summary> A reference to the unit's navigation agent. </summary>
+        [Export] public NavigationAgent3D NavigationAgent { get; private set; }
+
         /// <summary> The position to position a camera when it's following this unit. </summary>
         [Export] public Marker3D CameraPosition { get; private set; }
 
         /// <summary> A reference to the unit's sprite. </summary>
         [Export] public UnitSprite AnimatedSprite { get; private set; }
 
+        /// <inheritdoc/>
+        [ExportGroup("Stats")]
+        public Single NavigationCost { get; private set; } = 1f;
 
         /// <summary> The speed modifier for walking. </summary>
-        [ExportGroup("Stats")]
         [Export] private Single _walkSpeed = 3f;
 
         /// <summary> The speed modifier for sprinting. </summary>
@@ -34,8 +39,12 @@ namespace Khepri.Entities
         [ExportGroup("Resources")]
         [Export] private Dictionary<UnitSpriteLayer, SpriteFrames> _spriteFrames;
 
+
         /// <inheritdoc/>
-        public Guid UId { get; private set; } = Guid.NewGuid(); // TODO - This should be set by a factory rather than the object itself.
+        public Guid UId { get; private set; } = Guid.NewGuid();
+
+        /// <inheritdoc/>
+        public Vector3 WorldPosition => GlobalPosition;
 
 
         /// <summary> The current state of the unit. </summary>
@@ -81,6 +90,13 @@ namespace Khepri.Entities
                 _currentState = new IdleState();
                 AnimatedSprite.TransitionAnimation(_currentState);
             }
+        }
+
+
+        /// <inheritdoc/>
+        public int CompareTo(IPersistent other)
+        {
+            return UId.CompareTo(other.UId);
         }
     }
 }

@@ -1,5 +1,6 @@
 using Godot;
 using Khepri.Entities;
+using Khepri.Models.Input;
 using System;
 using System.Collections.Generic;
 
@@ -8,6 +9,13 @@ namespace Khepri.Models.GOAP
     /// <summary> Uses a GOAP implementation to control an entity. The AI brain that controls a unit. </summary>
     public partial class AgentController : Node
     {
+        /// <summary> The entity this controller is responsible for controlling. </summary>
+        [ExportGroup("Nodes")]
+        [Export] private Unit _controlledEntity;
+
+        [Export] private Unit _player;
+
+
         /// <summary> The current goal the agent is trying to accomplish. </summary>
         public AgentGoal CurrentGoal { get; private set; }
 
@@ -31,15 +39,22 @@ namespace Khepri.Models.GOAP
         /// <summary> The potential actions this agent has access to. </summary>
         private HashSet<AgentAction> _availableAction;
 
-        /// <summary> The entity this controller is responsible for controlling. </summary>
-        private Unit _controlledEntity;
-
 
         /// <inheritdoc/>
         public override void _Ready()
         {
-            base._Ready();
+
         }
+
+        public override void _PhysicsProcess(Double delta)
+        {
+            _controlledEntity.NavigationAgent.TargetPosition = _player.WorldPosition;
+            Vector3 nextPosition = _controlledEntity.NavigationAgent.GetNextPathPosition();
+            Vector3 direction = _controlledEntity.WorldPosition.DirectionTo(nextPosition);
+            direction = new Vector3(direction.X, 0f, direction.Z);  // Strip the Z as the navigation is plane-specific.
+            _controlledEntity.HandleInput(new MoveInput(direction, MoveType.WALKING));
+        }
+
 
 
         /// <summary> Set's the agent's initial beliefs. </summary>

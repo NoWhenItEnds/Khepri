@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://cb8qy6w5yygoy" path="res://Systems/Nodes/KSprite3D.cs" id="2_7xhrh"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_j7grf"]
+size = Vector3(1, 0.5, 1)
 
 [node name="Terrain" type="StaticBody3D"]
 axis_lock_angular_x = true
@@ -11,11 +12,14 @@ axis_lock_angular_y = true
 axis_lock_angular_z = true
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
 shape = SubResource("BoxShape3D_j7grf")
 
 [node name="Sprite3D" type="Sprite3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
 pixel_size = 0.0313
+axis = 1
+shaded = true
 texture_filter = 0
 texture = ExtResource("1_6tpcl")
 script = ExtResource("2_7xhrh")
