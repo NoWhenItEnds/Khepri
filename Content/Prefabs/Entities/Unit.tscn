@@ -13,13 +13,12 @@ radius = 0.4
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_jo3tn"]
 radius = 2.0
 
-[node name="Unit" type="CharacterBody3D" node_paths=PackedStringArray("CollisionShape", "NavigationAgent", "CameraPosition", "AnimatedSprite")]
+[node name="Unit" type="CharacterBody3D" node_paths=PackedStringArray("CollisionShape", "CameraPosition", "AnimatedSprite")]
 axis_lock_angular_x = true
 axis_lock_angular_y = true
 axis_lock_angular_z = true
 script = ExtResource("1_igitp")
 CollisionShape = NodePath("CollisionShape3D")
-NavigationAgent = NodePath("")
 CameraPosition = NodePath("Camera Position")
 AnimatedSprite = NodePath("UnitSprite")
 _spriteFrames = Dictionary[int, SpriteFrames]({})

@@ -25,6 +25,12 @@ namespace Khepri.Nodes
 
             _octree = new Octree(_worldEntities, _minimumNodeSize);
         }
+
+        public override void _Process(double delta)
+        {
+            DebugDraw3D.DrawBox(Vector3.Zero, Quaternion.Identity, Vector3.One, Colors.Red);
+        }
+
     }
 
 
