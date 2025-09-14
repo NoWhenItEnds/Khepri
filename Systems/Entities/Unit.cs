@@ -24,11 +24,9 @@ namespace Khepri.Entities
         /// <summary> A reference to the unit's sprite. </summary>
         [Export] public UnitSprite AnimatedSprite { get; private set; }
 
-        /// <inheritdoc/>
-        [ExportGroup("Stats")]
-        public Single NavigationCost { get; private set; } = 1f;
 
         /// <summary> The speed modifier for walking. </summary>
+        [ExportGroup("Stats")]
         [Export] private Single _walkSpeed = 3f;
 
         /// <summary> The speed modifier for sprinting. </summary>
@@ -94,7 +92,7 @@ namespace Khepri.Entities
 
 
         /// <inheritdoc/>
-        public int CompareTo(IPersistent other)
+        public int CompareTo(IEntity other)
         {
             return UId.CompareTo(other.UId);
         }

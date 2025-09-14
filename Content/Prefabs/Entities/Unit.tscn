@@ -19,7 +19,7 @@ axis_lock_angular_y = true
 axis_lock_angular_z = true
 script = ExtResource("1_igitp")
 CollisionShape = NodePath("CollisionShape3D")
-NavigationAgent = NodePath("NavigationAgent3D")
+NavigationAgent = NodePath("")
 CameraPosition = NodePath("Camera Position")
 AnimatedSprite = NodePath("UnitSprite")
 _spriteFrames = Dictionary[int, SpriteFrames]({})
@@ -27,8 +27,6 @@ _spriteFrames = Dictionary[int, SpriteFrames]({})
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
 shape = SubResource("CylinderShape3D_j7grf")
-
-[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
 
 [node name="UnitSprite" type="Node3D" parent="." node_paths=PackedStringArray("_baseLayer")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)

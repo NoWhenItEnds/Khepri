@@ -24,8 +24,3 @@ shaded = true
 texture_filter = 0
 texture = ExtResource("1_7s8w7")
 script = ExtResource("2_yh8v0")
-
-[node name="NavigationObstacle3D" type="NavigationObstacle3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
-radius = 0.2
-affect_navigation_mesh = true

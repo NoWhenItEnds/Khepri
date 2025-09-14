@@ -48,11 +48,13 @@ namespace Khepri.Models.GOAP
 
         public override void _PhysicsProcess(Double delta)
         {
+            /*
             _controlledEntity.NavigationAgent.TargetPosition = _player.WorldPosition;
             Vector3 nextPosition = _controlledEntity.NavigationAgent.GetNextPathPosition();
             Vector3 direction = _controlledEntity.WorldPosition.DirectionTo(nextPosition);
             direction = new Vector3(direction.X, 0f, direction.Z);  // Strip the Z as the navigation is plane-specific.
             _controlledEntity.HandleInput(new MoveInput(direction, MoveType.WALKING));
+            */
         }
 
 
