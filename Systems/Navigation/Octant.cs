@@ -12,7 +12,7 @@ namespace Khepri.Navigation
         /// <summary> The internal id of the next octant generated. </summary>
         private static Int32 _nextId;
 
-        /// <summary> The unique identifier of tis octant. </summary>
+        /// <summary> The unique identifier of this octant. </summary>
         public readonly Int32 Id;
 
         /// <summary> The boundary of this octant. </summary>
