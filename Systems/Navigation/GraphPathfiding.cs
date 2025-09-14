@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Khepri.Navigation
 {
@@ -19,14 +20,15 @@ namespace Khepri.Navigation
         /// <summary> The actual cost from the start to the current node. Also known as 'G'. </summary>
         public Single ActualPathCost = 0f;
 
-        /// <summary> The actual cost from the start to the current node. Also known as 'H'. </summary>
+        /// <summary> The estimated cost from the current node to the goal node. Also known as 'H'. </summary>
         public Single EstimatedPathRemainingCost = 0f;
 
         /// <summary> The estimated cost from the start node to the goal node. Also known as 'F'. </summary>
         public Single EstimatedPathTotalCost = 0f;
 
         /// <summary> The previous node we travelled from to reach this one. </summary>
-        public Node PreviousNode;
+        /// <remarks> A null means that this node is the root. </remarks>
+        public Node? PreviousNode;
 
         /// <summary> A reference to the octant this node represents in the graph. </summary>
         public Octant Octant;
@@ -86,11 +88,19 @@ namespace Khepri.Navigation
 
     public class Graph
     {
+        /// <summary> How many nodes there are in the current path. </summary>
+        public Int32 PathLength => _finalPath.Count;
+
+
         /// <summary> All the nodes in the path keyed against the octant they represent. </summary>
         public readonly Dictionary<Octant, Node> Nodes = new Dictionary<Octant, Node>();
 
         /// <summary> All the edges in the graph. </summary>
         public readonly HashSet<Edge> Edges = new HashSet<Edge>();
+
+
+        /// <summary> How many iterations the navigation allows before canceling prematurely. </summary>
+        private const Int32 MAX_ITERATIONS = 10000;
 
 
         /// <summary> The final path through the nodes resulting from our calculations. </summary>
@@ -113,8 +123,8 @@ namespace Khepri.Navigation
         /// <param name="octantB"> The second node to connect. </param>
         public void AddEdge(Octant octantA, Octant octantB)
         {
-            Node nodeA = FindNode(octantA);
-            Node nodeB = FindNode(octantB);
+            Node? nodeA = FindNode(octantA);
+            Node? nodeB = FindNode(octantB);
 
             // Make sure that we find a node.
             if (nodeA != null && nodeB != null)
@@ -144,6 +154,88 @@ namespace Khepri.Navigation
         }
 
 
+        /// <summary> Find a path through the graph. </summary>
+        /// <param name="startOctant"> The beginning octant. </param>
+        /// <param name="endOctant"> The destination octant. </param>
+        /// <returns> Whether a path was found. </returns>
+        /// <exception cref="ArgumentNullException"> The given nodes were not in the graph. </exception>
+        /// <exception cref="OverflowException"> There were too many iterations without finding a path. </exception>
+        public Boolean AStar(Octant startOctant, Octant endOctant)
+        {
+            _finalPath.Clear();
+            Node? startNode = FindNode(startOctant);
+            Node? endNode = FindNode(endOctant);
+
+            if (startNode == null || endNode == null)
+            {
+                throw new ArgumentNullException("Unable to find either start or end node in the navigation graph!");
+            }
+
+            SortedSet<Node> openSet = new SortedSet<Node>(new NodeComparer());  // The nodes to investigate while building the route.
+            HashSet<Node> closedSet = new HashSet<Node>();                      // The nodes that have already been visited.
+            Int32 iterationCount = 0;
+
+            startNode.ActualPathCost = 0f;
+            startNode.EstimatedPathRemainingCost = CalculateHeuristic(startNode, endNode);
+            startNode.EstimatedPathTotalCost = startNode.ActualPathCost + startNode.EstimatedPathRemainingCost;
+
+            startNode.PreviousNode = null;
+            openSet.Add(startNode);
+
+            while (openSet.Count > 0)
+            {
+                if (++iterationCount > MAX_ITERATIONS)
+                {
+                    throw new OverflowException("The navigation graph has performed too many iterations while building!");
+                }
+
+                // Remove the cheapest node from the set to investigate. This will be the first as it's sorted.
+                Node current = openSet.First();
+                openSet.Remove(current);
+
+                if (current.Equals(endNode))    // If the next node is the end, then we're done!
+                {
+                    ReconstructPath(current);
+                    return true;
+                }
+
+                closedSet.Add(current);
+                foreach (Edge edge in current.Edges)
+                {
+                    Node neighbour = Equals(edge.NodeA, current) ? edge.NodeB : edge.NodeA; // Find the 'other' node this one connects to.
+
+                    if (!closedSet.Contains(neighbour))
+                    {
+                        Single estimatedPathCost = current.ActualPathCost + CalculateHeuristic(current, neighbour);
+
+                        if (estimatedPathCost < neighbour.ActualPathCost || !openSet.Contains(neighbour))
+                        {
+                            neighbour.ActualPathCost = estimatedPathCost;
+                            neighbour.EstimatedPathRemainingCost = CalculateHeuristic(neighbour, endNode);
+                            neighbour.EstimatedPathTotalCost = neighbour.ActualPathCost + neighbour.EstimatedPathRemainingCost;
+                            neighbour.PreviousNode = current;
+                            openSet.Add(neighbour);
+                        }
+                    }
+                }
+            }
+
+            GD.Print("No path between the given nodes could be found.");
+            return false;
+        }
+
+
+        /// <summary> Attempt to get the node at a given position along the path. </summary>
+        /// <param name="index"> The index of the node to retrieve. </param>
+        /// <returns> The octant associated with the index. </returns>
+        public Octant GetPathNode(Int32 index)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(index);
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, _finalPath.Count);
+            return _finalPath[index].Octant;
+        }
+
+
         /// <summary> Find the node associated with the given octant. </summary>
         /// <param name="octant"> The octant to search for. </param>
         /// <returns> The graph node keyed against the octant. A null means that one wasn't found. </returns>
@@ -151,6 +243,41 @@ namespace Khepri.Navigation
         {
             Nodes.TryGetValue(octant, out Node node);
             return node;
+        }
+
+
+        /// <summary> Build the final path through the graph. </summary>
+        /// <param name="current"> The node to begin iterating back from. </param>
+        private void ReconstructPath(Node current)
+        {
+            while (current != null)
+            {
+                _finalPath.Add(current);
+                current = current.PreviousNode;
+            }
+            _finalPath.Reverse();
+        }
+
+
+        /// <summary> Calculate the heuristic between the two nodes. </summary>
+        /// <param name="nodeA"> The first node. </param>
+        /// <param name="nodeB"> The second node. </param>
+        /// <returns> The heuristic. </returns>
+        private Single CalculateHeuristic(Node nodeA, Node nodeB) => (nodeA.Octant.Bounds.GetCenter() - nodeB.Octant.Bounds.GetCenter()).LengthSquared();
+
+
+        /// <summary> Allows us to order nodes by their total cost. </summary>
+        private class NodeComparer : IComparer<Node>
+        {
+            /// <inheritdoc/>
+            public Int32 Compare(Node x, Node y)
+            {
+                if (x == null || y == null) return 0;
+
+                Int32 compare = x.EstimatedPathTotalCost.CompareTo(y.EstimatedPathTotalCost);
+                if (compare == 0) { return x.Id.CompareTo(y.Id); }
+                return compare;
+            }
         }
     }
 }
