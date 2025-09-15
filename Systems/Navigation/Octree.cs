@@ -50,7 +50,7 @@ namespace Khepri.Navigation
 
             //  Square the box to make is a perfect cube.
             Vector3 size = Vector3.One * Math.Max(Math.Max(Bounds.Size.X, Bounds.Size.Y), Bounds.Size.Z);
-            Bounds = new Aabb(Bounds.GetCenter() - (size * 0.5f), size);
+            Bounds = new Aabb(Bounds.GetCenter() - (size * 0.6f), size * 1.2f); // Make it a bit larger to allow for overlap.
         }
 
 
@@ -111,7 +111,7 @@ namespace Khepri.Navigation
                 {
                     Aabb current = leaf.Bounds;
                     Aabb other = otherLeaf.Bounds;
-                    if (current.Grow(current.Size.X * 0.1f).Intersects(other.Grow(other.Size.X * 0.1f)))
+                    if (current.Grow(current.Size.X).Intersects(other.Grow(other.Size.X)))
                     {
                         NavigationGraph.AddEdge(leaf, otherLeaf);
                     }

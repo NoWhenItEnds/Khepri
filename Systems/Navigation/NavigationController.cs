@@ -58,7 +58,7 @@ namespace Khepri.Navigation
             if (_octree != null)
             {
                 if (_showOctreeNodes) { _octree.Root.DrawNode(); }
-                if (_showOctreeNodes) { NavigationGraph.DrawGraph(); }
+                if (_showNavigationWaypoints) { NavigationGraph.DrawGraph(); }
             }
         }
     }
