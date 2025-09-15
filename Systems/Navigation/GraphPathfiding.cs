@@ -195,7 +195,7 @@ namespace Khepri.Navigation
 
                 if (current.Equals(endNode))    // If the next node is the end, then we're done!
                 {
-                    ReconstructPath(current);
+                    ReconstructPath(current);   // TODO - This should return the constructed path for consumption by the caller rather than caching it.
                     return true;
                 }
 

@@ -16,8 +16,6 @@
 [node name="Navigation Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("_entitiesParent")]
 script = ExtResource("3_fdsh7")
 _entitiesParent = NodePath("../../World/Entities")
-_showOctreeNodes = true
-_showNavigationWaypoints = true
 
 [node name="Player Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("_playerUnit", "_mainCamera")]
 script = ExtResource("1_5p3x2")
