@@ -86,7 +86,8 @@ namespace Khepri.Entities
             // Apply gravity if this unit cannot fly.
             if (!IsOnFloor() && !_canFly)    // TODO - Move to the unit states.
             {
-                Velocity -= new Vector3(0f, 9.81f, 0f);
+                // TODO - This breaks the navigation agent?
+                //Velocity -= new Vector3(0f, 9.81f, 0f); // TODO - Gravity should be halves for half tiles and delta applied.
             }
 
             MoveAndSlide();

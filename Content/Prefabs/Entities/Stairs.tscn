@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://cb8qy6w5yygoy" path="res://Systems/Nodes/KSprite3D.cs" id="2_o650q"]
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ftimg"]
-points = PackedVector3Array(-0.5, -0.25, 0.5, 0.5, -0.25, 0.5, 0.5, 0.25, -0.5, 0.5, -0.25, -0.5, -0.5, 0.25, -0.5, -0.5, -0.25, -0.5)
+points = PackedVector3Array(-0.5, -0.25, 0.5, 0.5, -0.25, 0.5, 0.5, 0.75, -0.5, 0.5, -0.25, -0.5, -0.5, 0.75, -0.5, -0.5, -0.25, -0.5)
 
 [node name="Stairs" type="StaticBody3D"]
 
