@@ -32,6 +32,9 @@ namespace Khepri.Entities
         /// <summary> The speed modifier for sprinting. </summary>
         [Export] private Single _sprintingSpeed = 6f;
 
+        /// <summary> If the unit has the ability to fly. </summary>
+        [Export] private Boolean _canFly = false;
+
 
         /// <summary> The animation sheets to use for the unit's animations. </summary>
         [ExportGroup("Resources")]
@@ -59,6 +62,18 @@ namespace Khepri.Entities
             }
             AnimatedSprite.Play();
         }
+
+
+        /// <inheritdoc/>
+        public override void _PhysicsProcess(Double delta)
+        {
+            // Apply gravity if this unit cannot fly.
+            if (!_canFly)    // TODO - Move to the unit states.
+            {
+                Velocity -= new Vector3(0f, 9.81f, 0f); // TODO - Not working. Use raycast to push down to closest tile?
+            }
+        }
+
 
 
         public void HandleInput(IInput input)

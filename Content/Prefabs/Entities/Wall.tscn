@@ -7,7 +7,7 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_j7grf"]
 size = Vector3(1, 0.5, 1)
 
-[node name="Wall" type="RigidBody3D" node_paths=PackedStringArray("CollisionShape")]
+[node name="Wall" type="StaticBody3D" node_paths=PackedStringArray("CollisionShape")]
 axis_lock_angular_x = true
 axis_lock_angular_y = true
 axis_lock_angular_z = true

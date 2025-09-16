@@ -17,6 +17,8 @@ namespace Khepri.Models.Input
         /// <param name="movementType"> The kind of movement that is being input / desired. </param>
         public MoveInput(Vector3 direction, MoveType movementType)
         {
+            // Unless the unit is flying, ensure that is up-down axis is stripped.
+            if (movementType != MoveType.FLYING) { direction = new Vector3(direction.X, 0f, direction.Z).Normalized(); }
             Direction = direction;
             MovementType = movementType;
         }
