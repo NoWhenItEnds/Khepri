@@ -1,12 +1,12 @@
 [gd_scene load_steps=4 format=3 uid="uid://c5oukv8uq6kbj"]
 
-[ext_resource type="Texture2D" uid="uid://lpeb3mx4pgb6" path="res://Content/Textures/Tilesets/Debug/Debug_Wall_Full.png" id="1_o0ioe"]
+[ext_resource type="Texture2D" uid="uid://u2r5xymtfknt" path="res://Content/Textures/Tilesets/Debug/Debug_Stairs.png" id="1_o0ioe"]
 [ext_resource type="Script" uid="uid://cb8qy6w5yygoy" path="res://Systems/Nodes/KSprite3D.cs" id="2_o650q"]
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ftimg"]
 points = PackedVector3Array(-0.5, -0.25, 0.5, 0.5, -0.25, 0.5, 0.5, 0.25, -0.5, 0.5, -0.25, -0.5, -0.5, 0.25, -0.5, -0.5, -0.25, -0.5)
 
-[node name="Stairs" type="RigidBody3D"]
+[node name="Stairs" type="StaticBody3D"]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
@@ -14,7 +14,6 @@ shape = SubResource("ConvexPolygonShape3D_ftimg")
 
 [node name="Sprite3D" type="Sprite3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
-offset = Vector2(0, 16)
 pixel_size = 0.0313
 axis = 1
 shaded = true
