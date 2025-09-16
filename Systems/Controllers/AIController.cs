@@ -1,6 +1,7 @@
 using Godot;
 using Khepri.Controllers;
 using Khepri.Entities;
+using Khepri.Entities.Sensors;
 using Khepri.Models.Input;
 using System;
 
@@ -27,10 +28,14 @@ namespace Khepri.Navigation
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
-            _unit.NavigationAgent.TargetPosition = _playerController.PlayerUnit.GlobalPosition;
-            Vector3 nextPosition = _unit.NavigationAgent.GetNextPathPosition();
-            Vector3 direction = _unit.GlobalPosition.DirectionTo(nextPosition).Normalized();
-            _unit.HandleInput(new MoveInput(direction, MoveType.WALKING));
+            KnownEntity? targetEntity = _unit.Sensors.FindEntity(_playerController.PlayerUnit);
+            if (targetEntity != null)
+            {
+                _unit.NavigationAgent.TargetPosition = targetEntity.LastKnownPosition;
+                Vector3 nextPosition = _unit.NavigationAgent.GetNextPathPosition();
+                Vector3 direction = _unit.GlobalPosition.DirectionTo(nextPosition).Normalized() * 0.5f;
+                _unit.HandleInput(new MoveInput(direction, MoveType.WALKING));
+            }
         }
     }
 }

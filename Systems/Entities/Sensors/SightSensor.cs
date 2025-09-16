@@ -9,7 +9,7 @@ namespace Khepri.Entities.Sensors
     {
         /// <summary> A reference to the unit sensor parent. Contains the unit's persistent memory. </summary>
         [ExportGroup("Nodes")]
-        [Export] private UnitSensors _sensorsParent;
+        [Export] private UnitSensors _unitSensors;
 
         /// <summary> The area representing the observer's field of view. Items in here are potentially visible. </summary>
         [Export] private Area3D _fieldOfViewArea;
@@ -39,7 +39,7 @@ namespace Khepri.Entities.Sensors
         /// <param name="body"> A reference to the new body. </param>
         private void OnBodyEntered(Node3D body)
         {
-            if (body is ISmartEntity entity)
+            if (body is ISmartEntity entity && entity != Owner)
             {
                 _nearbyEntities.Add(entity);
             }
@@ -52,6 +52,10 @@ namespace Khepri.Entities.Sensors
         {
             if (body is ISmartEntity entity)
             {
+                // Remove the entity from visibility.
+                KnownEntity? trackedObject = _unitSensors.FindEntity(entity);
+                if (trackedObject != null) { trackedObject.SetIsVisible(false); }
+
                 _nearbyEntities.Remove(entity);
             }
         }
@@ -66,19 +70,23 @@ namespace Khepri.Entities.Sensors
                 _lineOfSightRayCast.TargetPosition = targetPosition;
                 _lineOfSightRayCast.ForceRaycastUpdate();
 
-                //  Update whether the object is visible.
-                if (_lineOfSightRayCast.IsColliding() && _lineOfSightRayCast.GetCollider() is ISmartEntity entity)
+
+                if (_lineOfSightRayCast.IsColliding())
                 {
-                    KnownEntity? trackedObject = _sensorsParent.FindEntity(current);
-                    if (trackedObject == null)  // If the entity isn't already known, add it.
+                    KnownEntity? trackedObject = _unitSensors.FindEntity(current);
+                    if (_lineOfSightRayCast.GetCollider() is ISmartEntity entity && entity == current)  // Is the entity directly visible.
                     {
-                        KnownEntity createdEntity = _sensorsParent.RememberEntity(entity);
-                        createdEntity.SetIsVisible(entity == current);
-                    }
-                    else    // Update the knowledge about it.
-                    {
-                        trackedObject.SetIsVisible(entity == current);
+                        if (trackedObject == null)  // If the entity isn't already known, add it.
+                        {
+                            trackedObject = _unitSensors.RememberEntity(current);
+                        }
+
+                        trackedObject.SetIsVisible(true);
                         trackedObject.UpdateLastKnownPosition();
+                    }
+                    else    // If the entity is hidden.
+                    {
+                        trackedObject.SetIsVisible(false);
                     }
 
                     // Render the debug helpers.

@@ -1,5 +1,6 @@
 using Godot;
 using Godot.Collections;
+using Khepri.Entities.Sensors;
 using Khepri.Models.Input;
 using Khepri.Models.UnitStates;
 using Khepri.Nodes;
@@ -23,6 +24,9 @@ namespace Khepri.Entities
 
         /// <summary> A reference to the unit's sprite. </summary>
         [Export] public UnitSprite AnimatedSprite { get; private set; }
+
+        /// <summary> A reference to the sensors the unit uses to see the world. </summary>
+        [Export] public UnitSensors Sensors { get; private set; }
 
 
         /// <summary> The speed modifier for walking. </summary>
