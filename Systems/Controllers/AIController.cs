@@ -29,7 +29,7 @@ namespace Khepri.Navigation
         {
             _unit.NavigationAgent.TargetPosition = _playerController.PlayerUnit.GlobalPosition;
             Vector3 nextPosition = _unit.NavigationAgent.GetNextPathPosition();
-            Vector3 direction = (nextPosition - _unit.GlobalPosition).Normalized();
+            Vector3 direction = _unit.GlobalPosition.DirectionTo(nextPosition).Normalized();
             _unit.HandleInput(new MoveInput(direction, MoveType.WALKING));
         }
     }
