@@ -1,5 +1,7 @@
 using Godot;
+using Khepri.Controllers;
 using Khepri.Entities;
+using Khepri.Models.Input;
 using System;
 
 namespace Khepri.Navigation
@@ -11,27 +13,24 @@ namespace Khepri.Navigation
         [ExportGroup("Nodes")]
         [Export] private Unit _unit;
 
-        private Single _speed = 5f;
-
-        private Single _accuracy = 1f;
-
-        private Single _turnSpeed = 5f;
-
-
-        /// <summary> The index of the current destination node along the path. </summary>
-        private Int32 _currentDestinationPathIndex;
+        /// <summary> A reference to the player's controller. </summary>
+        private PlayerController _playerController;
 
 
         /// <inheritdoc/>
         public override void _Ready()
         {
-
+            _playerController = PlayerController.Instance;
         }
 
 
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
+            _unit.NavigationAgent.TargetPosition = _playerController.PlayerUnit.GlobalPosition;
+            Vector3 nextPosition = _unit.NavigationAgent.GetNextPathPosition();
+            Vector3 direction = (nextPosition - _unit.GlobalPosition).Normalized();
+            _unit.HandleInput(new MoveInput(direction, MoveType.WALKING));
         }
     }
 }
