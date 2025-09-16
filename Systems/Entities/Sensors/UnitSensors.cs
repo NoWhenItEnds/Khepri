@@ -1,4 +1,5 @@
 using Godot;
+using Khepri.Types.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,21 +9,38 @@ namespace Khepri.Entities.Sensors
     /// <summary> The controller or root node of a unit's sensors. </summary>
     public partial class UnitSensors : Node3D
     {
-        /// <summary> Whether the sensors are in debug mode. I.e. With visible gizmos. </summary>
+        /// <summary> Whether the debug tools should be shown. </summary>
         [ExportGroup("Debug")]
-        [Export] public Boolean IsDebug { get; private set; } = false;
+        [Export] private Boolean _showDebug = false;
 
 
         /// <summary> The array of entities currently 'known' by the sensors. </summary>
         private HashSet<KnownEntity> _trackedEntities = new HashSet<KnownEntity>();
 
 
+        /// <inheritdoc/>
+        public override void _PhysicsProcess(double delta)
+        {
+            // Render debug gizmos.
+            if (_showDebug)
+            {
+                foreach (KnownEntity entity in _trackedEntities)
+                {
+                    DebugDraw3D.DrawAabb(entity.SmartEntity.CollisionShape.GetAabb(),
+                        entity.IsVisible ? Colors.DarkViolet : Colors.MediumPurple);
+                }
+            }
+        }
+
+
         /// <summary> Adds an entity to the ones being tracked by the unit. Represents its memory. </summary>
         /// <param name="entity"> The object to begin tracking. </param>
-        /// <returns> Whether the object was successfully tracked. </returns>
-        public Boolean RememberEntity(ISmartEntity entity)
+        /// <returns> A reference to the newly remembered know entity. </returns>
+        public KnownEntity RememberEntity(ISmartEntity entity)
         {
-            return _trackedEntities.Add(new KnownEntity(entity));
+            KnownEntity newEntity = new KnownEntity(entity);
+            _trackedEntities.Add(newEntity);
+            return newEntity;
         }
 
 

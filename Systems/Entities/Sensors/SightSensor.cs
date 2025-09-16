@@ -18,6 +18,11 @@ namespace Khepri.Entities.Sensors
         [Export] private RayCast3D _lineOfSightRayCast;
 
 
+        /// <summary> Whether the debug tools should be shown. </summary>
+        [ExportGroup("Debug")]
+        [Export] private Boolean _showDebug = false;
+
+
         /// <summary> The array of entities that are potentially visible. </summary>
         private HashSet<ISmartEntity> _nearbyEntities = new HashSet<ISmartEntity>();
 
@@ -65,10 +70,21 @@ namespace Khepri.Entities.Sensors
                 if (_lineOfSightRayCast.IsColliding() && _lineOfSightRayCast.GetCollider() is ISmartEntity entity)
                 {
                     KnownEntity? trackedObject = _sensorsParent.FindEntity(current);
-                    if (trackedObject != null)
+                    if (trackedObject == null)  // If the entity isn't already known, add it.
+                    {
+                        KnownEntity createdEntity = _sensorsParent.RememberEntity(entity);
+                        createdEntity.SetIsVisible(entity == current);
+                    }
+                    else    // Update the knowledge about it.
                     {
                         trackedObject.SetIsVisible(entity == current);
                         trackedObject.UpdateLastKnownPosition();
+                    }
+
+                    // Render the debug helpers.
+                    if (_showDebug)
+                    {
+                        DebugDraw3D.DrawLineHit(_lineOfSightRayCast.GlobalPosition, ToGlobal(_lineOfSightRayCast.TargetPosition), _lineOfSightRayCast.GetCollisionPoint(), true);
                     }
                 }
             }
