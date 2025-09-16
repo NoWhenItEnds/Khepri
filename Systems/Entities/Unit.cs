@@ -68,18 +68,6 @@ namespace Khepri.Entities
         }
 
 
-        /// <inheritdoc/>
-        public override void _PhysicsProcess(Double delta)
-        {
-            // Apply gravity if this unit cannot fly.
-            if (!_canFly)    // TODO - Move to the unit states.
-            {
-                Velocity -= new Vector3(0f, 9.81f, 0f); // TODO - Not working. Use raycast to push down to closest tile?
-            }
-        }
-
-
-
         public void HandleInput(IInput input)
         {
             switch (input)
@@ -94,6 +82,13 @@ namespace Khepri.Entities
         {
             Single speedModifier = input.MovementType == MoveType.WALKING ? _walkSpeed : _sprintingSpeed;
             Velocity = input.Direction * speedModifier;
+
+            // Apply gravity if this unit cannot fly.
+            if (!IsOnFloor() && !_canFly)    // TODO - Move to the unit states.
+            {
+                Velocity -= new Vector3(0f, 9.81f, 0f);
+            }
+
             MoveAndSlide();
 
             if (input.Direction != Vector3.Zero)
