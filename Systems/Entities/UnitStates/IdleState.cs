@@ -41,21 +41,18 @@ namespace Khepri.Entities.UnitStates
         {
             if (input is MoveInput move)
             {
-                if (move.Direction != Vector3.Zero)
+                switch (move.MovementType)
                 {
-                    if (move.MovementType == MoveType.WALKING)
-                    {
+                    case MoveType.WALKING:
                         _unit.TrySetUnitState(typeof(WalkingState));
-                    }
-                    else if (move.MovementType == MoveType.SPRINTING)
-                    {
+                        break;
+                    case MoveType.SPRINTING:
                         _unit.TrySetUnitState(typeof(SprintingState));
-                    }
-                }
-                else
-                {
-                    // TODO - This direction needs to be set... Somehow. Maybe mouse direction?
-                    _unit.AnimatedSprite.TransitionAnimation(this, move.Direction.ToDirection());
+                        break;
+                    default:
+                        // TODO - This direction needs to be set... Somehow. Maybe mouse direction?
+                        _unit.AnimatedSprite.TransitionAnimation(this, move.Direction.ToDirection());
+                        break;
                 }
             }
         }

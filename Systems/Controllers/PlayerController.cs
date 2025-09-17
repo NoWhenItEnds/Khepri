@@ -27,7 +27,7 @@ namespace Khepri.Controllers
             Single vertical = Input.GetAxis("action_move_up", "action_move_down");
             Vector3 direction = new Vector3(horizontal, 0f, vertical).Normalized();
 
-            MoveType movementType = MoveType.NONE;
+            MoveType movementType = MoveType.IDLE;
             if (direction != Vector3.Zero)
             {
                 movementType = Input.IsActionPressed("action_move_sprint") ? MoveType.SPRINTING : MoveType.WALKING;

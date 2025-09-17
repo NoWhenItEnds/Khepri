@@ -40,20 +40,19 @@ namespace Khepri.Entities.UnitStates
         {
             if (input is MoveInput move)
             {
-                if (move.Direction != Vector3.Zero)
+                switch (move.MovementType)
                 {
-                    if (move.MovementType == MoveType.WALKING)
-                    {
+                    case MoveType.IDLE:
+                        _unit.TrySetUnitState(typeof(IdleState));
+                        break;
+                    case MoveType.WALKING:
                         _unit.TrySetUnitState(typeof(WalkingState));
-                    }
-
-                    _unit.Velocity = move.Direction * _unit.Stats.BaseSpeed * _unit.Stats.SprintModifier;
-                    _unit.MoveAndSlide();
-                    _unit.AnimatedSprite.TransitionAnimation(this, move.Direction.ToDirection());
-                }
-                else
-                {
-                    _unit.TrySetUnitState(typeof(IdleState));
+                        break;
+                    default:
+                        _unit.Velocity = move.Direction * _unit.Stats.BaseSpeed * _unit.Stats.SprintModifier;
+                        _unit.MoveAndSlide();
+                        _unit.AnimatedSprite.TransitionAnimation(this, move.Direction.ToDirection());
+                        break;
                 }
             }
         }
