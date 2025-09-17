@@ -1,10 +1,11 @@
 using Godot;
 using Godot.Collections;
+using Khepri.Entities.Interfaces;
 using Khepri.Entities.Sensors;
+using Khepri.Entities.UnitStates;
 using Khepri.Models.Input;
-using Khepri.Models.UnitStates;
+using Khepri.Models.Persistent;
 using Khepri.Nodes;
-using Khepri.Types;
 using System;
 
 namespace Khepri.Entities
@@ -28,16 +29,8 @@ namespace Khepri.Entities
         /// <summary> A reference to the sensors the unit uses to see the world. </summary>
         [Export] public UnitSensors Sensors { get; private set; }
 
-
-        /// <summary> The speed modifier for walking. </summary>
-        [ExportGroup("Stats")]
-        [Export] private Single _walkSpeed = 3f;
-
-        /// <summary> The speed modifier for sprinting. </summary>
-        [Export] private Single _sprintingSpeed = 6f;
-
-        /// <summary> If the unit has the ability to fly. </summary>
-        [Export] private Boolean _canFly = false;
+        /// <summary> The stats used by the unit to set its state. </summary>
+        public readonly UnitStats Stats = new UnitStats();  // TODO - Turn into godot resources, somehow.
 
 
         /// <summary> The animation sheets to use for the unit's animations. </summary>
@@ -46,19 +39,21 @@ namespace Khepri.Entities
 
 
         /// <inheritdoc/>
-        public Guid UId { get; private set; } = Guid.NewGuid();
+        public Guid UId { get; private set; } = Guid.NewGuid(); // TODO - This should be a part of persistent stats.
 
         /// <inheritdoc/>
         public Vector3 WorldPosition => GlobalPosition;
 
 
         /// <summary> The current state of the unit. </summary>
-        private IUnitState _currentState = new IdleState();
+        private UnitState _currentState;
 
 
         /// <inheritdoc/>
         public override void _Ready()
         {
+            _currentState = new IdleState(this);
+
             // Setup the sprite animations.
             foreach (var frames in _spriteFrames)
             {
@@ -68,41 +63,14 @@ namespace Khepri.Entities
         }
 
 
+        /// <summary> Attempts to set the unit's state. </summary>
+        /// <param name="state"> The state to set the unit. </param>
+        public void TrySetUnitState(Type state) => _currentState = _currentState.TryTransitionTo(state);
+
+
         public void HandleInput(IInput input)
         {
-            switch (input)
-            {
-                case MoveInput moveInput:
-                    HandleMovement(moveInput);
-                    break;
-            }
-        }
-
-        private void HandleMovement(MoveInput input)
-        {
-            Single speedModifier = input.MovementType == MoveType.WALKING ? _walkSpeed : _sprintingSpeed;
-            Velocity = input.Direction * speedModifier;
-
-            // Apply gravity if this unit cannot fly.
-            if (!IsOnFloor() && !_canFly)    // TODO - Move to the unit states.
-            {
-                // TODO - This breaks the navigation agent?
-                //Velocity -= new Vector3(0f, 9.81f, 0f); // TODO - Gravity should be halves for half tiles and delta applied.
-            }
-
-            MoveAndSlide();
-
-            if (input.Direction != Vector3.Zero)
-            {
-                _currentState = new WalkingState();
-                Direction direction = input.Direction.ToDirection();
-                AnimatedSprite.TransitionAnimation(_currentState, direction);
-            }
-            else
-            {
-                _currentState = new IdleState();
-                AnimatedSprite.TransitionAnimation(_currentState);
-            }
+            _currentState.HandleInput(input);
         }
 
 

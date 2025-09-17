@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-namespace Khepri.Entities
+namespace Khepri.Entities.Interfaces
 {
     /// <summary> The entity is persistent, meaning that its information should be remembered between game sessions. </summary>
     public interface IEntity : IComparable<IEntity>

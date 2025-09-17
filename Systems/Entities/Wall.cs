@@ -1,4 +1,5 @@
 using Godot;
+using Khepri.Entities.Interfaces;
 using System;
 
 namespace Khepri.Entities
