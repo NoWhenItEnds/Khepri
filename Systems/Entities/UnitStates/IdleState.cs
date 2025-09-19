@@ -27,6 +27,9 @@ namespace Khepri.Entities.UnitStates
         /// <inheritdoc/>
         public override void Update(Double delta)
         {
+            // TODO - This direction needs to be set... Somehow. Maybe mouse direction?
+            _unit.AnimatedSprite.TransitionAnimation(this, Vector3.Zero.ToDirection());
+
             // TODO - Have a timer here to do a fidget animation.
             // Apply gravity if we're not on the ground.
             if (!_unit.IsOnFloor())
@@ -48,10 +51,6 @@ namespace Khepri.Entities.UnitStates
                         break;
                     case MoveType.SPRINTING:
                         _unit.TrySetUnitState(typeof(SprintingState));
-                        break;
-                    default:
-                        // TODO - This direction needs to be set... Somehow. Maybe mouse direction?
-                        _unit.AnimatedSprite.TransitionAnimation(this, move.Direction.ToDirection());
                         break;
                 }
             }

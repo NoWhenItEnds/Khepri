@@ -1,5 +1,8 @@
 using System;
+using Godot;
+using Khepri.Controllers;
 using Khepri.Entities;
+using Khepri.Models.Input;
 
 namespace Khepri.Models.GOAP.ActionStrategies
 {
@@ -10,8 +13,10 @@ namespace Khepri.Models.GOAP.ActionStrategies
         public bool IsValid => !IsComplete;
 
         /// <inheritdoc/>
-        public bool IsComplete => throw new NotImplementedException();
+        public bool IsComplete => _unit.NavigationAgent.IsNavigationFinished();
 
+        /// <summary> A reference to the random class used by the strategy. </summary>
+        private readonly Random _random = new Random();
 
         /// <summary> A reference to the unit being manipulated. </summary>
         private readonly Unit _unit;
@@ -33,21 +38,37 @@ namespace Khepri.Models.GOAP.ActionStrategies
         /// <inheritdoc/>
         public void Start()
         {
-            throw new NotImplementedException();
+            for (Int32 i = 0; i < 100; i++)   // Attempt "several" times to find a reachable location.
+            {
+                Single xPos = _random.NextSingle() * _radius * 2f - _radius;
+                Single zPos = _random.NextSingle() * _radius * 2f - _radius;
+                Vector3 targetPosition = _unit.GlobalPosition + new Vector3(xPos, 0f, zPos);
+                _unit.NavigationAgent.TargetPosition = targetPosition;
+                if (_unit.NavigationAgent.IsTargetReachable())  // If we find one, stop trying.
+                {
+                    break;
+                }
+                _unit.NavigationAgent.TargetPosition = _unit.GlobalPosition;    // Else, reset it.
+            }
         }
 
 
         /// <inheritdoc/>
-        public void Update(Single delta)
+        public void Update(Double delta)
         {
-            throw new NotImplementedException();
+            if (!_unit.NavigationAgent.IsNavigationFinished())
+            {
+                Vector3 nextPosition = _unit.NavigationAgent.GetNextPathPosition();
+                Vector3 direction = _unit.GlobalPosition.DirectionTo(nextPosition).Normalized();
+                _unit.HandleInput(new MoveInput(direction, MoveType.WALKING));
+            }
         }
 
 
         /// <inheritdoc/>
         public void Stop()
         {
-            throw new NotImplementedException();
+            _unit.HandleInput(new MoveInput(Vector3.Zero, MoveType.IDLE));
         }
     }
 }

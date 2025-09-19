@@ -30,7 +30,7 @@ namespace Khepri.Models.GOAP
         /// <param name="condition"> The function the belief uses to evaluate the nature of the condition. </param>
         public void AddBelief(String key, Func<Boolean> condition)
         {
-            _beliefs.Add(key, new AgentBelief.AgentBeliefBuilder(key)
+            _beliefs.Add(key, new AgentBelief.Builder(key)
                 .WithCondition(condition)
                 .Build());
         }
@@ -63,7 +63,7 @@ namespace Khepri.Models.GOAP
         /// <param name="targetLocation"> The target position. </param>
         public void AddLocationBelief(String key, Single distance, Vector3 targetLocation)
         {
-            _beliefs.Add(key, new AgentBelief.AgentBeliefBuilder(key)
+            _beliefs.Add(key, new AgentBelief.Builder(key)
                 .WithCondition(() => InRangeOf(targetLocation, distance))
                 .WithLocation(() => targetLocation)
                 .Build());
@@ -108,7 +108,7 @@ namespace Khepri.Models.GOAP
 
 
         /// <summary> A builder for creating and modifying beliefs. </summary>
-        public class AgentBeliefBuilder
+        public class Builder
         {
             /// <summary> The belief the builder is associated with. </summary>
             private readonly AgentBelief _belief;
@@ -116,7 +116,7 @@ namespace Khepri.Models.GOAP
 
             /// <summary> A builder for creating and modifying beliefs. </summary>
             /// <param name="name"> The identifying name or key of the belief. </param>
-            public AgentBeliefBuilder(String name)
+            public Builder(String name)
             {
                 _belief = new AgentBelief(name);
             }
@@ -124,7 +124,7 @@ namespace Khepri.Models.GOAP
 
             /// <summary> Add a condition to the belief. </summary>
             /// <param name="condition"> The delegate used to evaluate the condition. </param>
-            public AgentBeliefBuilder WithCondition(Func<Boolean> condition)
+            public Builder WithCondition(Func<Boolean> condition)
             {
                 _belief._condition = condition;
                 return this;
@@ -133,7 +133,7 @@ namespace Khepri.Models.GOAP
 
             /// <summary> Add an observed location to the belief. </summary>
             /// <param name="location"> The delegate used to evaluate the location. </param>
-            public AgentBeliefBuilder WithLocation(Func<Vector3> location)
+            public Builder WithLocation(Func<Vector3> location)
             {
                 _belief._observedLocation = location;
                 return this;

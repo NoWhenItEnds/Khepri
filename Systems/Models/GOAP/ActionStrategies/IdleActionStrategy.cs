@@ -17,7 +17,10 @@ namespace Khepri.Models.GOAP.ActionStrategies
         private readonly Unit _unit;
 
         /// <summary> How long the action has remaining before it's complete. </summary>
-        private Single _timeRemaining;
+        private Single _duration;
+
+        /// <summary> The current amount of time remaining before the action is complete. </summary>
+        private Single _currentTimeRemaining;
 
 
         /// <summary> Stand around. Look pretty. </summary>
@@ -26,19 +29,22 @@ namespace Khepri.Models.GOAP.ActionStrategies
         public IdleActionStrategy(Unit unit, Single duration)
         {
             _unit = unit;   // TODO - This should play an idle animation.
-            _timeRemaining = duration;
+            _duration = duration;
         }
 
 
         /// <inheritdoc/>
-        public void Start() { }
+        public void Start()
+        {
+            _currentTimeRemaining = _duration;
+        }
 
 
         /// <inheritdoc/>
-        public void Update(Single delta)
+        public void Update(Double delta)
         {
-            _timeRemaining -= delta;
-            IsComplete = _timeRemaining <= 0f;
+            _currentTimeRemaining -= (Single)delta;
+            IsComplete = _currentTimeRemaining <= 0f;
         }
 
 

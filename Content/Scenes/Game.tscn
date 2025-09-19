@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="PackedScene" uid="uid://rc2326u6agtf" path="res://Content/Prefabs/Entities/Unit.tscn" id="2_5p3x2"]
-[ext_resource type="Script" uid="uid://ccd7icg64g5os" path="res://Systems/Controllers/AIController.cs" id="3_8fov1"]
+[ext_resource type="Script" uid="uid://d1dxnpil1ufxm" path="res://Systems/Models/GOAP/AgentController.cs" id="3_md4fn"]
 [ext_resource type="PackedScene" uid="uid://c7668uo4460su" path="res://Content/Prefabs/Entities/Wall.tscn" id="3_sa7mi"]
 [ext_resource type="PackedScene" uid="uid://dm4tu3i0sn5s4" path="res://Content/Prefabs/Entities/Terrain.tscn" id="5_fdsh7"]
 [ext_resource type="PackedScene" uid="uid://c5oukv8uq6kbj" path="res://Content/Prefabs/Entities/Stairs.tscn" id="7_8fov1"]
@@ -27,9 +27,9 @@ script = ExtResource("1_5p3x2")
 PlayerUnit = NodePath("../../World/Entities/Player Unit")
 MainCamera = NodePath("../../World/Main Camera")
 
-[node name="Enemy Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("_unit")]
-script = ExtResource("3_8fov1")
-_unit = NodePath("../../World/Entities/Enemy Unit")
+[node name="Agent Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("_controlledEntity")]
+script = ExtResource("3_md4fn")
+_controlledEntity = NodePath("../../World/Entities/Enemy Unit")
 
 [node name="World" type="Node3D" parent="."]
 

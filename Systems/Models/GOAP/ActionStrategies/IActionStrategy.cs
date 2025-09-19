@@ -17,7 +17,7 @@ namespace Khepri.Models.GOAP.ActionStrategies
 
         /// <summary> Called every 'frame' the action is being processed. </summary>
         /// <param name="delta"> The time since the action was last updated. </param>
-        public void Update(Single delta);
+        public void Update(Double delta);
 
 
         /// <summary> Called to cancelled or stop the action. </summary>

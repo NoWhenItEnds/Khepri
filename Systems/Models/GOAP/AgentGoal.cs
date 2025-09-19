@@ -26,7 +26,7 @@ namespace Khepri.Models.GOAP
 
 
         /// <summary> A helpful builder that allows for easy construction of agent goals. </summary>
-        public class AgentGoalBuilder
+        public class Builder
         {
             /// <summary> A reference to the goal being constructed. </summary>
             private readonly AgentGoal _goal;
@@ -34,7 +34,7 @@ namespace Khepri.Models.GOAP
 
             /// <summary> A helpful builder that allows for easy construction of agent goals. </summary>
             /// <param name="name"> The name or key identifying the goal. </param>
-            public AgentGoalBuilder(String name)
+            public Builder(String name)
             {
                 _goal = new AgentGoal(name);
             }
@@ -42,7 +42,7 @@ namespace Khepri.Models.GOAP
 
             /// <summary> Sets the goal's priority. </summary>
             /// <param name="priority"> The importance of the goal the agent. More important goals will be tackled before less. </param>
-            public AgentGoalBuilder WithPriority(Single priority)
+            public Builder WithPriority(Single priority)
             {
                 _goal.Priority = priority;
                 return this;
@@ -51,7 +51,7 @@ namespace Khepri.Models.GOAP
 
             /// <summary> Adds a desired outcome to the goal. </summary>
             /// <param name="outcome"> The desired state of the world for the goal to be considered complete. </param>
-            public AgentGoalBuilder WithDesiredOutcome(AgentBelief outcome)
+            public Builder WithDesiredOutcome(AgentBelief outcome)
             {
                 _goal.DesiredOutcomes.Add(outcome);
                 return this;
@@ -60,7 +60,7 @@ namespace Khepri.Models.GOAP
 
             /// <summary> Adds a desired outcome to the goal. </summary>
             /// <param name="outcomes"> The desired states of the world for the goal to be considered complete. </param>
-            public AgentGoalBuilder WithDesiredOutcome(AgentBelief[] outcomes)
+            public Builder WithDesiredOutcome(AgentBelief[] outcomes)
             {
                 foreach (AgentBelief outcome in outcomes)
                 {

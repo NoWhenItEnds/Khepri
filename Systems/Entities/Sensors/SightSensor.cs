@@ -82,12 +82,12 @@ namespace Khepri.Entities.Sensors
                             trackedObject = _unitSensors.RememberEntity(current);
                         }
 
-                        trackedObject.SetIsVisible(true);
-                        trackedObject.UpdateLastKnownPosition();
+                        trackedObject?.SetIsVisible(true);
+                        trackedObject?.UpdateLastKnownPosition();
                     }
                     else    // If the entity is hidden.
                     {
-                        trackedObject.SetIsVisible(false);
+                        trackedObject?.SetIsVisible(false);
                     }
 
                     // Render the debug helpers.

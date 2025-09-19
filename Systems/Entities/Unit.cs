@@ -63,11 +63,20 @@ namespace Khepri.Entities
         }
 
 
+        /// <inheritdoc/>
+        public override void _PhysicsProcess(Double delta)
+        {
+            _currentState.Update(delta);
+        }
+
+
         /// <summary> Attempts to set the unit's state. </summary>
         /// <param name="state"> The state to set the unit. </param>
         public void TrySetUnitState(Type state) => _currentState = _currentState.TryTransitionTo(state);
 
 
+        /// <summary> Handle the input sent to the unit by it's controller. </summary>
+        /// <param name="input"> The input data class to interpret. </param>
         public void HandleInput(IInput input)
         {
             _currentState.HandleInput(input);
