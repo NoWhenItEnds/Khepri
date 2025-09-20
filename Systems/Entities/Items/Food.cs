@@ -1,0 +1,28 @@
+using Godot;
+using Khepri.Entities.Interfaces;
+using System;
+
+namespace Khepri.Entities.Items
+{
+    /// <summary> A food item that can be used to reduce hunger. </summary>
+    public partial class Food : RigidBody3D, ISmartEntity
+    {
+        /// <inheritdoc/>
+        [ExportGroup("Nodes")]
+        [Export] public CollisionShape3D CollisionShape { get; private set; }
+
+
+        /// <inheritdoc/>
+        public Guid UId { get; private set; } = Guid.NewGuid(); // TODO - This should be a part of persistent stats.
+
+        /// <inheritdoc/>
+        public Vector3 WorldPosition => GlobalPosition;
+
+
+        /// <inheritdoc/>
+        public int CompareTo(IEntity other)
+        {
+            return UId.CompareTo(other.UId);
+        }
+    }
+}

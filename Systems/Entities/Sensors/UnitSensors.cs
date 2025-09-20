@@ -56,7 +56,7 @@ namespace Khepri.Entities.Sensors
 
         /// <summary> Searches the tracked entity's for a particular smart object. </summary>
         /// <param name="entity"> A reference to the tracked entity. A null means that one wasn't found. </param>
-        public KnownEntity? FindEntity(ISmartEntity entity)
+        public KnownEntity? KnowsEntity(ISmartEntity entity)
         {
             return _trackedEntities.FirstOrDefault(x => x.SmartEntity == entity);
         }
@@ -64,9 +64,9 @@ namespace Khepri.Entities.Sensors
 
         /// <summary> Searches the tracked entities for an entity of a particular type. This is to search for a kind rather than a specific instance. </summary>
         /// <param name="entity"> An array of entities sharing the given type. An empty array indicates that there are none of the desired type. </param>
-        public KnownEntity[] FindTypeOfEntity(ISmartEntity entity)
+        public KnownEntity[] KnowsEntityKind(Type entity)
         {
-            return _trackedEntities.Where(x => x.SmartEntity.GetType() == entity.GetType()).ToArray();
+            return _trackedEntities.Where(x => x.SmartEntity.GetType() == entity).ToArray();
         }
     }
 

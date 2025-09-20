@@ -28,6 +28,18 @@ namespace Khepri.Models.Persistent
         [JsonPropertyName("health")]
         public Single CurrentHealth { get; private set; } = 100f;
 
+        /// <summary> A value between 0-100 representing the unit's current hunger. </summary>
+        [JsonPropertyName("hunger")]
+        public Single CurrentHunger { get; private set; } = 100f;
+
+        /// <summary> A value between 0-100 representing the unit's current fatigue / tiredness. </summary>
+        [JsonPropertyName("stamina")]
+        public Single CurrentStamina { get; private set; } = 100f;
+
+        /// <summary> A value between 0-100 representing the unit's current entertainment / boredom. </summary>
+        [JsonPropertyName("entertainment")]
+        public Single CurrentEntertainment { get; private set; } = 100f;
+
 
         /// <inheritdoc/>
         public void SaveAsync(CancellationToken cancellationToken)

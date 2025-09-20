@@ -1,5 +1,7 @@
 using Godot;
 using Khepri.Entities;
+using Khepri.Entities.Interfaces;
+using Khepri.Entities.Sensors;
 using System;
 using System.Collections.Generic;
 
@@ -36,15 +38,28 @@ namespace Khepri.Models.GOAP
         }
 
 
-        // TODO - Need to implement || https://www.youtube.com/watch?v=T_sBYgP7_2k || 6:45
-        /*
-        public void AddSensorBelief(string key, Sensor sensor)
+        /// <summary> Adds a new belief relating to information stored in an entity's sensors. </summary>
+        /// <param name="key"> The name of belief. </param>
+        /// <param name="sensor"> A reference to the sensor. </param>
+        /// <param name="entity"> A reference to the entity we're concerned with. </param>
+        public void AddSensorBelief(String key, UnitSensors sensor, ISmartEntity entity)
         {
-            _beliefs.Add(key, new AgentBelief.AgentBeliefBuilder(key)
-                .WithCondition(() => sensor.IsTargetInRange)
-                .WithLocation(() => sensor.TargetPosition)
+            _beliefs.Add(key, new AgentBelief.Builder(key)
+                .WithCondition(() => sensor.KnowsEntity(entity) != null)
                 .Build());
-        }*/
+        }
+
+
+        /// <summary> Adds a new belief relating to information stored in an entity's sensors. </summary>
+        /// <param name="key"> The name of belief. </param>
+        /// <param name="sensor"> A reference to the sensor. </param>
+        /// <param name="entityType"> The type of entity we're concerned with. </param>
+        public void AddSensorBelief(String key, UnitSensors sensor, Type entityType)
+        {
+            _beliefs.Add(key, new AgentBelief.Builder(key)
+                .WithCondition(() => sensor.KnowsEntityKind(entityType).Length > 0)
+                .Build());
+        }
 
 
         /// <summary> Add a new locational belief that requires the unit to be in range of a target node. </summary>

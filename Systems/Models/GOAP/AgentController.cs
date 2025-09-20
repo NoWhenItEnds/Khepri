@@ -1,6 +1,7 @@
 using Godot;
 using Khepri.Controllers;
 using Khepri.Entities;
+using Khepri.Entities.Items;
 using Khepri.Models.GOAP.ActionStrategies;
 using System;
 using System.Collections.Generic;
@@ -65,10 +66,21 @@ namespace Khepri.Models.GOAP
             BeliefFactory factory = new BeliefFactory(_controlledEntity, _availableBeliefs);
 
             factory.AddBelief("Nothing", () => false);  // Always has a belief, even if it never will successfully evaluate.
-            factory.AddBelief("AgentIdle", () => _controlledEntity.NavigationAgent.IsNavigationFinished());
-            factory.AddBelief("AgentMoving", () => !_controlledEntity.NavigationAgent.IsNavigationFinished());
-            factory.AddBelief("AgentHealthLow", () => _controlledEntity.Stats.CurrentHealth < 80f); // TODO - Set to more reasonable number.
+
+            factory.AddBelief("AgentIsIdle", () => _controlledEntity.NavigationAgent.IsNavigationFinished());
+            factory.AddBelief("AgentIsMoving", () => !_controlledEntity.NavigationAgent.IsNavigationFinished());
+
             factory.AddBelief("AgentIsHealthy", () => _controlledEntity.Stats.CurrentHealth >= 90f);
+            factory.AddBelief("AgentIsHurt", () => _controlledEntity.Stats.CurrentHealth < 50);
+            factory.AddBelief("AgentIsFed", () => _controlledEntity.Stats.CurrentHunger >= 90f);
+            factory.AddBelief("AgentIsHungry", () => _controlledEntity.Stats.CurrentHunger < 50f);
+            factory.AddBelief("AgentIsRested", () => _controlledEntity.Stats.CurrentStamina >= 90f);
+            factory.AddBelief("AgentIsTired", () => _controlledEntity.Stats.CurrentStamina < 50f);
+            factory.AddBelief("AgentIsEntertained", () => _controlledEntity.Stats.CurrentEntertainment >= 90f);
+            factory.AddBelief("AgentIsBored", () => _controlledEntity.Stats.CurrentEntertainment < 50f);
+
+            factory.AddSensorBelief("AgentKnowsPlayer", _controlledEntity.Sensors, _playerController.PlayerUnit);
+            factory.AddSensorBelief("AgentKnowsFood", _controlledEntity.Sensors, typeof(Food));
         }
 
 
@@ -84,7 +96,23 @@ namespace Khepri.Models.GOAP
 
             AvailableActions.Add(new AgentAction.Builder("Wander Around")
                 .WithStrategy(new WanderActionStrategy(_controlledEntity, 5f))
-                .AddOutcome(_availableBeliefs["AgentMoving"])
+                .AddOutcome(_availableBeliefs["AgentIsIdle"])
+                .Build());
+
+            AvailableActions.Add(new AgentAction.Builder("Find Food")
+                .WithStrategy(new FindActionStrategy(_controlledEntity, typeof(Food)))
+                .AddOutcome(_availableBeliefs["AgentKnowsPlayer"])
+                .Build());
+
+            AvailableActions.Add(new AgentAction.Builder("Locate Player")
+                .WithStrategy(new LocateActionStrategy(_controlledEntity, PlayerController.Instance.PlayerUnit))
+                .AddOutcome(_availableBeliefs["AgentKnowsPlayer"])
+                .Build());
+
+            AvailableActions.Add(new AgentAction.Builder("Stalk Player")
+                .WithStrategy(new StalkActionStrategy(_controlledEntity, _playerController.PlayerUnit))
+                .AddPrecondition(_availableBeliefs["AgentKnowsPlayer"])
+                .AddOutcome(_availableBeliefs["AgentKnowsPlayer"])  // TODO - Until bored. Add boredom
                 .Build());
         }
 
@@ -102,7 +130,11 @@ namespace Khepri.Models.GOAP
 
             _availableGoals.Add(new AgentGoal.Builder("Wander")
                 .WithPriority(0)
-                .WithDesiredOutcome(_availableBeliefs["AgentMoving"])
+                .WithDesiredOutcome(_availableBeliefs["AgentIsMoving"])
+                .Build());
+            _availableGoals.Add(new AgentGoal.Builder("Stalk")
+                .WithPriority(1)
+                .WithDesiredOutcome(_availableBeliefs["AgentKnowsPlayer"])
                 .Build());
 
             /*

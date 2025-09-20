@@ -1,6 +1,5 @@
 using System;
 using Godot;
-using Khepri.Controllers;
 using Khepri.Entities;
 using Khepri.Models.Input;
 
