@@ -27,12 +27,6 @@ namespace Khepri.Entities.UnitStates
         /// <inheritdoc/>
         public override void Update(Double delta)
         {
-            // Apply gravity if we're not on the ground.
-            if (!_unit.IsOnFloor())
-            {
-                // TODO - Use tilemaps.
-                _unit.Velocity -= new Vector3(0f, 9.81f, 0f) * 0.5f * (Single)delta;
-            }
         }
 
 
@@ -51,7 +45,9 @@ namespace Khepri.Entities.UnitStates
                         break;
                     default:
                         _unit.Velocity = move.Direction * _unit.Stats.BaseSpeed;
+                        if (!_unit.IsOnFloor()) { _unit.Velocity -= new Vector3(0f, 9.81f, 0f) * 0.5f; }    // Apply gravity if we're not on the ground.
                         _unit.MoveAndSlide();
+
                         _unit.AnimatedSprite.TransitionAnimation(this, move.Direction.ToDirection());
                         break;
                 }

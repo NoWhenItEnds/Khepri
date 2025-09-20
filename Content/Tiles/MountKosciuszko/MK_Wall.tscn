@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://dbsl418re8pu4"]
+[gd_scene load_steps=4 format=3 uid="uid://dbsl418re8pu4"]
 
 [ext_resource type="Texture2D" uid="uid://lpeb3mx4pgb6" path="res://Content/Textures/Tilesets/Debug/Debug_Wall_Full.png" id="2_7tnjr"]
+[ext_resource type="Script" uid="uid://cb8qy6w5yygoy" path="res://Systems/Nodes/KSprite3D.cs" id="2_q2mkl"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_j3tjn"]
 size = Vector3(1, 0.5, 1)
@@ -12,9 +13,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 shape = SubResource("BoxShape3D_j3tjn")
 
 [node name="Sprite3D" type="Sprite3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+transform = Transform3D(1, 0, 0, 0, 0.9998477, -0.017452406, 0, 0.017452406, 0.9998477, 0, 0.75, 0)
 offset = Vector2(0, 16)
 pixel_size = 0.0313
 axis = 1
 texture_filter = 0
 texture = ExtResource("2_7tnjr")
+script = ExtResource("2_q2mkl")

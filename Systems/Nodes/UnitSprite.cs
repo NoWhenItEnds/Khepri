@@ -19,7 +19,7 @@ namespace Khepri.Nodes
         /// <inheritdoc/>
         public override void _PhysicsProcess(double delta)
         {
-            _baseLayer.SortingOffset = GlobalPosition.Z;
+            _baseLayer.SortingOffset = (Int32)GlobalPosition.Y * 10000 + GlobalPosition.Z;
         }
 
 

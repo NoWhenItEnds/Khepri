@@ -34,7 +34,8 @@ namespace Khepri.Entities.UnitStates
             // Apply gravity if we're not on the ground.
             if (!_unit.IsOnFloor())
             {
-                _unit.Velocity -= new Vector3(0f, 9.81f, 0f) * 0.5f * (Single)delta;
+                _unit.Velocity = new Vector3(0f, 9.81f, 0f) * 0.5f * (Single)delta;
+                _unit.MoveAndSlide();
             }
         }
 
