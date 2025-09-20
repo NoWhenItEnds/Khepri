@@ -6,7 +6,7 @@ using Godot;
 namespace Khepri.Models.Persistent
 {
     /// <summary> The persistent stats of a unit. These are saved and loaded to keep track of the world. </summary>
-    public record UnitStats : IPersistent
+    public record UnitData : IPersistent
     {
         /// <inheritdoc/>
         [JsonPropertyName("uid")]

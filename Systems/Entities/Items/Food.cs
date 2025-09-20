@@ -1,5 +1,6 @@
 using Godot;
 using Khepri.Entities.Interfaces;
+using Khepri.Models.Persistent;
 using System;
 
 namespace Khepri.Entities.Items
@@ -17,6 +18,9 @@ namespace Khepri.Entities.Items
 
         /// <inheritdoc/>
         public Vector3 WorldPosition => GlobalPosition;
+
+        /// <inheritdoc/>
+        public ItemData Data { get; private set; } = new ItemData();
 
 
         /// <inheritdoc/>

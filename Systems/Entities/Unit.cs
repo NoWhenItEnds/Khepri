@@ -30,7 +30,7 @@ namespace Khepri.Entities
         [Export] public UnitSensors Sensors { get; private set; }
 
         /// <summary> The stats used by the unit to set its state. </summary>
-        public readonly UnitStats Stats = new UnitStats();  // TODO - Turn into godot resources, somehow.
+        public readonly UnitData Data = new UnitData();
 
 
         /// <summary> The animation sheets to use for the unit's animations. </summary>

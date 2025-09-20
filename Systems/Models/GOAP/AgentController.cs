@@ -70,14 +70,14 @@ namespace Khepri.Models.GOAP
             factory.AddBelief("AgentIsIdle", () => _controlledEntity.NavigationAgent.IsNavigationFinished());
             factory.AddBelief("AgentIsMoving", () => !_controlledEntity.NavigationAgent.IsNavigationFinished());
 
-            factory.AddBelief("AgentIsHealthy", () => _controlledEntity.Stats.CurrentHealth >= 90f);
-            factory.AddBelief("AgentIsHurt", () => _controlledEntity.Stats.CurrentHealth < 50);
-            factory.AddBelief("AgentIsFed", () => _controlledEntity.Stats.CurrentHunger >= 90f);
-            factory.AddBelief("AgentIsHungry", () => _controlledEntity.Stats.CurrentHunger < 50f);
-            factory.AddBelief("AgentIsRested", () => _controlledEntity.Stats.CurrentStamina >= 90f);
-            factory.AddBelief("AgentIsTired", () => _controlledEntity.Stats.CurrentStamina < 50f);
-            factory.AddBelief("AgentIsEntertained", () => _controlledEntity.Stats.CurrentEntertainment >= 90f);
-            factory.AddBelief("AgentIsBored", () => _controlledEntity.Stats.CurrentEntertainment < 50f);
+            factory.AddBelief("AgentIsHealthy", () => _controlledEntity.Data.CurrentHealth >= 90f);
+            factory.AddBelief("AgentIsHurt", () => _controlledEntity.Data.CurrentHealth < 50);
+            factory.AddBelief("AgentIsFed", () => _controlledEntity.Data.CurrentHunger >= 90f);
+            factory.AddBelief("AgentIsHungry", () => _controlledEntity.Data.CurrentHunger < 50f);
+            factory.AddBelief("AgentIsRested", () => _controlledEntity.Data.CurrentStamina >= 90f);
+            factory.AddBelief("AgentIsTired", () => _controlledEntity.Data.CurrentStamina < 50f);
+            factory.AddBelief("AgentIsEntertained", () => _controlledEntity.Data.CurrentEntertainment >= 90f);
+            factory.AddBelief("AgentIsBored", () => _controlledEntity.Data.CurrentEntertainment < 50f);
 
             factory.AddSensorBelief("AgentKnowsPlayer", _controlledEntity.Sensors, _playerController.PlayerUnit);
             factory.AddSensorBelief("AgentKnowsFood", _controlledEntity.Sensors, typeof(Food));

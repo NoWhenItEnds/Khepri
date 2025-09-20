@@ -44,7 +44,7 @@ namespace Khepri.Entities.UnitStates
                         _unit.TrySetUnitState(typeof(WalkingState));
                         break;
                     default:
-                        _unit.Velocity = move.Direction * _unit.Stats.BaseSpeed * _unit.Stats.SprintModifier;
+                        _unit.Velocity = move.Direction * _unit.Data.BaseSpeed * _unit.Data.SprintModifier;
                         if (!_unit.IsOnFloor()) { _unit.Velocity -= new Vector3(0f, 9.81f, 0f) * 0.5f; }    // Apply gravity if we're not on the ground.
                         _unit.MoveAndSlide();
 
