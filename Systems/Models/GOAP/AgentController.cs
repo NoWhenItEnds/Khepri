@@ -79,8 +79,10 @@ namespace Khepri.Models.GOAP
             factory.AddBelief("AgentIsEntertained", () => _controlledEntity.Data.CurrentEntertainment >= 90f);
             factory.AddBelief("AgentIsBored", () => _controlledEntity.Data.CurrentEntertainment < 50f);
 
-            factory.AddSensorBelief("AgentKnowsPlayer", _controlledEntity.Sensors, _playerController.PlayerUnit);
-            factory.AddSensorBelief("AgentKnowsFood", _controlledEntity.Sensors, typeof(Food));
+            factory.AddSensorBelief("AgentKnowsPlayer", _controlledEntity.Brain, _playerController.PlayerUnit);
+            factory.AddSensorBelief("AgentKnowsFood", _controlledEntity.Brain, typeof(Food));
+
+            factory.AddBelief("AgentSeesPlayer", () => true);   // TODO - Tie this to something inside the sensor, or have a new AddSensorBelief.
         }
 
 
@@ -104,17 +106,19 @@ namespace Khepri.Models.GOAP
                 .WithStrategy(new FindActionStrategy(_controlledEntity, typeof(Food)))
                 .AddOutcome(_availableBeliefs["AgentKnowsPlayer"])
                 .Build());
-
+*/
             AvailableActions.Add(new AgentAction.Builder("Locate Player")
                 .WithStrategy(new LocateActionStrategy(_controlledEntity, PlayerController.Instance.PlayerUnit))
-                .AddOutcome(_availableBeliefs["AgentKnowsPlayer"])
+                .AddOutcome(_availableBeliefs["AgentKnowsPlayer"])  // TODO - Should this be broken down further. I.e. have a separate strategy to find the player if they're not known vs. move to where they were last seen? YES!
+                .AddOutcome(_availableBeliefs["AgentSeesPlayer"])
                 .Build());
 
             AvailableActions.Add(new AgentAction.Builder("Stalk Player")
                 .WithStrategy(new StalkActionStrategy(_controlledEntity, _playerController.PlayerUnit))
-                .AddPrecondition(_availableBeliefs["AgentKnowsPlayer"])
-                .AddOutcome(_availableBeliefs["AgentKnowsPlayer"])  // TODO - Until bored. Add boredom
-                .Build());*/
+                .AddPrecondition(_availableBeliefs["AgentSeesPlayer"])
+                .AddPrecondition(_availableBeliefs["AgentIsBored"])
+                .AddOutcome(_availableBeliefs["AgentIsEntertained"])
+                .Build());
         }
 
 
@@ -130,16 +134,16 @@ namespace Khepri.Models.GOAP
                 .Build());
 
             _availableGoals.Add(new AgentGoal.Builder("Wander")
-                .WithPriority(1)
+                .WithPriority(0)
                 .WithDesiredOutcome(_availableBeliefs["AgentIsMoving"])
                 .Build());
-            /*
-            _availableGoals.Add(new AgentGoal.Builder("Stalk")
+
+            _availableGoals.Add(new AgentGoal.Builder("Find Entertainment")
                 .WithPriority(1)
-                .WithDesiredOutcome(_availableBeliefs["AgentKnowsPlayer"])
+                .WithDesiredOutcome(_availableBeliefs["AgentIsEntertained"])
                 .Build());
 
-
+            /*
             _availableGoals.Add(new AgentGoal.Builder("KeepHealthUp")
                 .WithPriority(2)
                 .WithDesiredOutcome(_availableBeliefs["AgentIsHealthy"])

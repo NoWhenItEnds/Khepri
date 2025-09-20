@@ -3,14 +3,14 @@ using Khepri.Entities.Interfaces;
 using System;
 using System.Collections.Generic;
 
-namespace Khepri.Entities.Sensors
+namespace Khepri.Entities.UnitComponents.Sensors
 {
     /// <summary> A sensor used to find visual information about the surrounding environment. </summary>
     public partial class SightSensor : Node3D, ISensor
     {
         /// <summary> A reference to the unit sensor parent. Contains the unit's persistent memory. </summary>
         [ExportGroup("Nodes")]
-        [Export] private UnitSensors _unitSensors;
+        [Export] private UnitBrain _unitSensors;
 
         /// <summary> The area representing the observer's field of view. Items in here are potentially visible. </summary>
         [Export] private Area3D _fieldOfViewArea;

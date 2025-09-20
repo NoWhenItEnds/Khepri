@@ -1,15 +1,21 @@
 using Godot;
+using Khepri.Controllers;
 using Khepri.Entities.Interfaces;
 using Khepri.Types.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Khepri.Entities.Sensors
+namespace Khepri.Entities.UnitComponents
 {
     /// <summary> The controller or root node of a unit's sensors. </summary>
-    public partial class UnitSensors : Node3D
+    public partial class UnitBrain : Node3D
     {
+        /// <summary> How long, in hours, a unit should remember an entity before forgetting it if it hasn't been seen (in that period of time). </summary>
+        [ExportGroup("Settings")]
+        [Export] private Single _memoryLength = 6f;
+
+
         /// <summary> Whether the debug tools should be shown. </summary>
         [ExportGroup("Debug")]
         [Export] private Boolean _showDebug = false;
@@ -18,10 +24,23 @@ namespace Khepri.Entities.Sensors
         /// <summary> The array of entities currently 'known' by the sensors. </summary>
         private HashSet<KnownEntity> _trackedEntities = new HashSet<KnownEntity>();
 
+        /// <summary> A reference to the global world controller. </summary>
+        private WorldController _worldController;
+
+
+        /// <inheritdoc/>
+        public override void _Ready()
+        {
+            _worldController = WorldController.Instance;
+        }
+
 
         /// <inheritdoc/>
         public override void _PhysicsProcess(double delta)
         {
+            // Remove entities that the unit hasn't seen for a while.
+            _trackedEntities.RemoveWhere(x => x.LastSeenTimestamp < _worldController.CurrentTime - TimeSpan.FromHours(_memoryLength));
+
             // Render debug gizmos.
             if (_showDebug)
             {
@@ -84,13 +103,22 @@ namespace Khepri.Entities.Sensors
         /// <remarks> A null value means that one isn't known. </remarks>
         public Vector3 LastKnownPosition { get; private set; }
 
+        /// <summary> When the object was last seen. </summary>
+        public DateTimeOffset LastSeenTimestamp { get; private set; }
+
+        /// <summary> A reference to the global world controller. </summary>
+        private WorldController _worldController;
+
 
         /// <summary> A data object that is 'known' by an agent. </summary>
         /// <param name="entity"> A reference to the known entity. </param>
         public KnownEntity(ISmartEntity entity)
         {
+            _worldController = WorldController.Instance;
+
             SmartEntity = entity;
             LastKnownPosition = entity.CollisionShape.GlobalPosition;
+            LastSeenTimestamp = _worldController.CurrentTime;
         }
 
 
@@ -106,6 +134,7 @@ namespace Khepri.Entities.Sensors
         /// <param name="position"> An optional position. A null will use the smart entity's actual position, a value will override it. </param>
         public void UpdateLastKnownPosition(Vector3? position = null)
         {
+            LastSeenTimestamp = _worldController.CurrentTime;
             LastKnownPosition = position == null ? SmartEntity.CollisionShape.GlobalPosition : position.Value;
         }
     }

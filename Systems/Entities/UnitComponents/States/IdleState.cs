@@ -3,30 +3,40 @@ using Godot;
 using Khepri.Models.Input;
 using Khepri.Types;
 
-namespace Khepri.Entities.UnitStates
+namespace Khepri.Entities.UnitComponents.States
 {
-    /// <summary> The unit is walking across the ground. </summary>
-    public class WalkingState : UnitState
+    /// <summary> The unit is standing idle, waiting for an action. </summary>
+    public class IdleState : UnitState
     {
         /// <inheritdoc/>
-        public override String AnimationPrefix { get; } = "walking_";
+        public override String AnimationPrefix { get; } = "idle_";
 
         /// <inheritdoc/>
         protected override Type[] _connectingStates { get; } =
         [
-            typeof(IdleState),
+            typeof(WalkingState),
             typeof(SprintingState)
         ];
 
 
-        /// <summary> The unit is walking across the ground. </summary>
+        /// <summary> The unit is standing idle, waiting for an action. </summary>
         /// <param name="unit"> A reference to the unit. </param>
-        public WalkingState(Unit unit) : base(unit) { }
+        public IdleState(Unit unit) : base(unit) { }
 
 
         /// <inheritdoc/>
         public override void Update(Double delta)
         {
+            // TODO - This direction needs to be set... Somehow. Maybe mouse direction?
+            _unit.AnimatedSprite.TransitionAnimation(this, Vector3.Zero.ToDirection());
+
+            // TODO - Have a timer here to do a fidget animation.
+            // Apply gravity if we're not on the ground.
+            if (!_unit.IsOnFloor())
+            {
+                _unit.Velocity = new Vector3(0f, 9.81f, 0f) * 0.5f * (Single)delta;
+                _unit.MoveAndSlide();
+            }
         }
 
 
@@ -37,18 +47,11 @@ namespace Khepri.Entities.UnitStates
             {
                 switch (move.MovementType)
                 {
-                    case MoveType.IDLE:
-                        _unit.TrySetUnitState(typeof(IdleState));
+                    case MoveType.WALKING:
+                        _unit.TrySetUnitState(typeof(WalkingState));
                         break;
                     case MoveType.SPRINTING:
                         _unit.TrySetUnitState(typeof(SprintingState));
-                        break;
-                    default:
-                        _unit.Velocity = move.Direction * _unit.Data.BaseSpeed;
-                        if (!_unit.IsOnFloor()) { _unit.Velocity -= new Vector3(0f, 9.81f, 0f) * 0.5f; }    // Apply gravity if we're not on the ground.
-                        _unit.MoveAndSlide();
-
-                        _unit.AnimatedSprite.TransitionAnimation(this, move.Direction.ToDirection());
                         break;
                 }
             }

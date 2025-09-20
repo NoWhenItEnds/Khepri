@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using Khepri.Models.Input;
 
-namespace Khepri.Entities.UnitStates
+namespace Khepri.Entities.UnitComponents.States
 {
     /// <summary> The basic data object representing a unit's potential state. </summary>
     public abstract class UnitState

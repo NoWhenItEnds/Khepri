@@ -3,25 +3,25 @@ using Godot;
 using Khepri.Models.Input;
 using Khepri.Types;
 
-namespace Khepri.Entities.UnitStates
+namespace Khepri.Entities.UnitComponents.States
 {
-    /// <summary> The unit is moving quickly along the ground. </summary>
-    public class SprintingState : UnitState
+    /// <summary> The unit is walking across the ground. </summary>
+    public class WalkingState : UnitState
     {
         /// <inheritdoc/>
-        public override String AnimationPrefix { get; } = "sprinting_";
+        public override String AnimationPrefix { get; } = "walking_";
 
         /// <inheritdoc/>
         protected override Type[] _connectingStates { get; } =
         [
             typeof(IdleState),
-            typeof(WalkingState)
+            typeof(SprintingState)
         ];
 
 
-        /// <summary> The unit is moving quickly along the ground. </summary>
+        /// <summary> The unit is walking across the ground. </summary>
         /// <param name="unit"> A reference to the unit. </param>
-        public SprintingState(Unit unit) : base(unit) { }
+        public WalkingState(Unit unit) : base(unit) { }
 
 
         /// <inheritdoc/>
@@ -40,11 +40,11 @@ namespace Khepri.Entities.UnitStates
                     case MoveType.IDLE:
                         _unit.TrySetUnitState(typeof(IdleState));
                         break;
-                    case MoveType.WALKING:
-                        _unit.TrySetUnitState(typeof(WalkingState));
+                    case MoveType.SPRINTING:
+                        _unit.TrySetUnitState(typeof(SprintingState));
                         break;
                     default:
-                        _unit.Velocity = move.Direction * _unit.Data.BaseSpeed * _unit.Data.SprintModifier;
+                        _unit.Velocity = move.Direction * _unit.Data.BaseSpeed;
                         if (!_unit.IsOnFloor()) { _unit.Velocity -= new Vector3(0f, 9.81f, 0f) * 0.5f; }    // Apply gravity if we're not on the ground.
                         _unit.MoveAndSlide();
 

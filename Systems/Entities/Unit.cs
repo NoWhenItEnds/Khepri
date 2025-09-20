@@ -1,8 +1,8 @@
 using Godot;
 using Godot.Collections;
 using Khepri.Entities.Interfaces;
-using Khepri.Entities.Sensors;
-using Khepri.Entities.UnitStates;
+using Khepri.Entities.UnitComponents;
+using Khepri.Entities.UnitComponents.States;
 using Khepri.Models.Input;
 using Khepri.Models.Persistent;
 using Khepri.Nodes;
@@ -26,8 +26,8 @@ namespace Khepri.Entities
         /// <summary> A reference to the unit's sprite. </summary>
         [Export] public UnitSprite AnimatedSprite { get; private set; }
 
-        /// <summary> A reference to the sensors the unit uses to see the world. </summary>
-        [Export] public UnitSensors Sensors { get; private set; }
+        /// <summary> A reference to the unit's long term memory and senses. </summary>
+        [Export] public UnitBrain Brain { get; private set; }
 
         /// <summary> The stats used by the unit to set its state. </summary>
         public readonly UnitData Data = new UnitData();

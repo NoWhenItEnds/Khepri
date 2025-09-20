@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using Khepri.Controllers;
 using Khepri.Entities;
 using Khepri.Models.Input;
 
@@ -37,7 +38,7 @@ namespace Khepri.Models.GOAP.ActionStrategies
         /// <inheritdoc/>
         public void Start()
         {
-            for (Int32 i = 0; i < 100; i++)   // Attempt "several" times to find a reachable location.
+            /*for (Int32 i = 0; i < 100; i++)   // Attempt "several" times to find a reachable location.
             {
                 Single xPos = _random.NextSingle() * _radius * 2f - _radius;
                 Single zPos = _random.NextSingle() * _radius * 2f - _radius;
@@ -48,7 +49,8 @@ namespace Khepri.Models.GOAP.ActionStrategies
                     break;
                 }
                 _unit.NavigationAgent.TargetPosition = _unit.GlobalPosition;    // Else, reset it.
-            }
+            }*/
+            _unit.NavigationAgent.TargetPosition = PlayerController.Instance.PlayerUnit.GlobalPosition;
         }
 
 

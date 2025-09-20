@@ -1,7 +1,7 @@
 using Godot;
 using Khepri.Entities;
 using Khepri.Entities.Interfaces;
-using Khepri.Entities.Sensors;
+using Khepri.Entities.UnitComponents;
 using System;
 using System.Collections.Generic;
 
@@ -40,21 +40,21 @@ namespace Khepri.Models.GOAP
 
         /// <summary> Adds a new belief relating to information stored in an entity's sensors. </summary>
         /// <param name="key"> The name of belief. </param>
-        /// <param name="sensor"> A reference to the sensor. </param>
+        /// <param name="unitBrain"> A reference to the unit's long term memory. </param>
         /// <param name="entity"> A reference to the entity we're concerned with. </param>
-        public void AddSensorBelief(String key, UnitSensors sensor, ISmartEntity entity)
+        public void AddSensorBelief(String key, UnitBrain unitBrain, ISmartEntity entity)
         {
             _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => sensor.KnowsEntity(entity) != null)
+                .WithCondition(() => unitBrain.KnowsEntity(entity) != null)
                 .Build());
         }
 
 
         /// <summary> Adds a new belief relating to information stored in an entity's sensors. </summary>
         /// <param name="key"> The name of belief. </param>
-        /// <param name="sensor"> A reference to the sensor. </param>
+        /// <param name="unitBrain"> A reference to the unit's long term memory. </param>
         /// <param name="entityType"> The type of entity we're concerned with. </param>
-        public void AddSensorBelief(String key, UnitSensors sensor, Type entityType)
+        public void AddSensorBelief(String key, UnitBrain sensor, Type entityType)
         {
             _beliefs.Add(key, new AgentBelief.Builder(key)
                 .WithCondition(() => sensor.KnowsEntityKind(entityType).Length > 0)
