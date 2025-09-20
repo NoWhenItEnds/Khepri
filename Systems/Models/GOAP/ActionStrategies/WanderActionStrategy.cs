@@ -43,7 +43,6 @@ namespace Khepri.Models.GOAP.ActionStrategies
                 Single zPos = _random.NextSingle() * _radius * 2f - _radius;
                 Vector3 targetPosition = _unit.GlobalPosition + new Vector3(xPos, 0f, zPos);
                 _unit.NavigationAgent.TargetPosition = targetPosition;
-                GD.Print(_unit.NavigationAgent.TargetPosition);
                 if (_unit.NavigationAgent.IsTargetReachable())  // If we find one, stop trying.
                 {
                     break;

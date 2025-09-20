@@ -26,15 +26,18 @@ Sensors = NodePath("Sensors")
 _spriteFrames = Dictionary[int, SpriteFrames]({})
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 shape = SubResource("CapsuleShape3D_xo887")
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
-path_desired_distance = 0.3
+path_desired_distance = 0.25
 target_desired_distance = 0.25
+path_height_offset = 1.0
 debug_enabled = true
 debug_path_custom_color = Color(1, 0, 1, 1)
 
 [node name="UnitSprite" type="Node3D" parent="." node_paths=PackedStringArray("_baseLayer")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 script = ExtResource("3_jo3tn")
 _baseLayer = NodePath("Base Layer")
 
@@ -48,9 +51,10 @@ sprite_frames = ExtResource("2_jo3tn")
 animation = &"walking_up"
 
 [node name="Camera Position" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
 
 [node name="Sensors" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 script = ExtResource("4_xo887")
 
 [node name="Sight Sensor" type="Node3D" parent="Sensors" node_paths=PackedStringArray("_unitSensors", "_fieldOfViewArea", "_lineOfSightRayCast")]
