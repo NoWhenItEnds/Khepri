@@ -96,9 +96,10 @@ namespace Khepri.Models.GOAP
 
             AvailableActions.Add(new AgentAction.Builder("Wander Around")
                 .WithStrategy(new WanderActionStrategy(_controlledEntity, 5f))
-                .AddOutcome(_availableBeliefs["AgentIsIdle"])
+                .AddOutcome(_availableBeliefs["AgentIsMoving"])
                 .Build());
 
+            /*
             AvailableActions.Add(new AgentAction.Builder("Find Food")
                 .WithStrategy(new FindActionStrategy(_controlledEntity, typeof(Food)))
                 .AddOutcome(_availableBeliefs["AgentKnowsPlayer"])
@@ -113,7 +114,7 @@ namespace Khepri.Models.GOAP
                 .WithStrategy(new StalkActionStrategy(_controlledEntity, _playerController.PlayerUnit))
                 .AddPrecondition(_availableBeliefs["AgentKnowsPlayer"])
                 .AddOutcome(_availableBeliefs["AgentKnowsPlayer"])  // TODO - Until bored. Add boredom
-                .Build());
+                .Build());*/
         }
 
 
@@ -129,15 +130,16 @@ namespace Khepri.Models.GOAP
                 .Build());
 
             _availableGoals.Add(new AgentGoal.Builder("Wander")
-                .WithPriority(0)
+                .WithPriority(1)
                 .WithDesiredOutcome(_availableBeliefs["AgentIsMoving"])
                 .Build());
+            /*
             _availableGoals.Add(new AgentGoal.Builder("Stalk")
                 .WithPriority(1)
                 .WithDesiredOutcome(_availableBeliefs["AgentKnowsPlayer"])
                 .Build());
 
-            /*
+
             _availableGoals.Add(new AgentGoal.Builder("KeepHealthUp")
                 .WithPriority(2)
                 .WithDesiredOutcome(_availableBeliefs["AgentIsHealthy"])

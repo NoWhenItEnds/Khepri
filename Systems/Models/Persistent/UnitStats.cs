@@ -6,7 +6,7 @@ using Godot;
 namespace Khepri.Models.Persistent
 {
     /// <summary> The persistent stats of a unit. These are saved and loaded to keep track of the world. </summary>
-    public class UnitStats : IPersistent
+    public record UnitStats : IPersistent
     {
         /// <inheritdoc/>
         [JsonPropertyName("uid")]
@@ -39,6 +39,10 @@ namespace Khepri.Models.Persistent
         /// <summary> A value between 0-100 representing the unit's current entertainment / boredom. </summary>
         [JsonPropertyName("entertainment")]
         public Single CurrentEntertainment { get; private set; } = 100f;
+
+        /// <summary> The data structure representing the unit's inventory. </summary>
+        [JsonPropertyName("inventory")]
+        public EntityInventory Inventory { get; private set; } = new EntityInventory();
 
 
         /// <inheritdoc/>

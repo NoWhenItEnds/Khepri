@@ -1,19 +1,17 @@
-[gd_scene load_steps=9 format=3 uid="uid://ko6nvcupfcf4"]
+[gd_scene load_steps=7 format=3 uid="uid://ko6nvcupfcf4"]
 
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="PackedScene" uid="uid://rc2326u6agtf" path="res://Content/Prefabs/Entities/Unit.tscn" id="2_5p3x2"]
 [ext_resource type="Script" uid="uid://d1dxnpil1ufxm" path="res://Systems/Models/GOAP/AgentController.cs" id="3_md4fn"]
-[ext_resource type="PackedScene" uid="uid://c7668uo4460su" path="res://Content/Prefabs/Entities/Wall.tscn" id="3_sa7mi"]
-[ext_resource type="PackedScene" uid="uid://dm4tu3i0sn5s4" path="res://Content/Prefabs/Entities/Terrain.tscn" id="5_fdsh7"]
-[ext_resource type="PackedScene" uid="uid://c5oukv8uq6kbj" path="res://Content/Prefabs/Entities/Stairs.tscn" id="7_8fov1"]
+[ext_resource type="MeshLibrary" uid="uid://b7h3v1jb2de6u" path="res://Content/Resources/GridMaps/GridMap_MountKosciuszko.tres" id="7_md4fn"]
 
 [sub_resource type="Environment" id="Environment_5p3x2"]
 
-[sub_resource type="NavigationMesh" id="NavigationMesh_sa7mi"]
-vertices = PackedVector3Array(-5.3, 0.29999998, -0.5, -1.7, 0.29999998, -0.5, -1.5, 0.29999998, -0.6999998, -1.5, 0.29999998, -5.3, -5.3, 0.29999998, -5.3, 0.7000003, 0.29999998, -0.6999998, 0.8000002, 0.29999998, 0, 1.3000002, 0.29999998, 0, 1.4000001, 0.29999998, -0.6999998, 3.6999998, 0.29999998, -0.6999998, 3.8000002, 0.29999998, 0, 5.3, 0.29999998, -0.099999905, 5.3, 0.29999998, -5.3, -1.7, 0.29999998, 2.4, -1, 0.29999998, 2.3000002, -1, 0.29999998, 1.8000002, -1.7, 0.29999998, 1.7000003, -5.3, 0.29999998, 5.3, -1.0999999, 0.29999998, 5.3, -1, 0.29999998, 3.8000002, -1.7, 0.29999998, 3.6999998, -0.5, 0.78, 0.4000001, 0.4000001, 0.78, 0.4000001, 0.4000001, 0.78, -0.2999997, -1.2999997, 0.78, -0.2999997, -1.2999997, 0.78, 1.4000001, -0.5999999, 0.78, 1.4000001, 1.7000003, 0.78, -0.2999997, 1.7000003, 0.78, 0.4000001, 2.6999998, 0.78, 0.5, 3.4000006, 0.78, -0.2999997, -1.2999997, 0.78, 3.4000006, 3.4000006, 0.78, 3.3000002, 2.6000004, 0.78, 2.6999998, -1.2999997, 0.78, 2.6999998, 3.8000002, 0.29999998, 4.3, 3.9000006, 0.29999998, 5.3, 5.3, 0.29999998, 5.3, 0.8000002, 0.29999998, 0.5999999, 1.4000001, 0.29999998, 0.8000002, -0.19999981, 0.29999998, 1.5999999, -0.4000001, 0.29999998, 1.8000002, 0.5999999, 0.29999998, 0.8000002, -0.19999981, 0.29999998, 0.8000002, 2.3000002, 0.29999998, 2.3000002, 2.3000002, 0.29999998, 0.8000002, 3.3000002, 0.45999995, 4.3, 3.3000002, 1.0999999, 3.6999998, 2.6999998, 1.0999999, 3.6999998, 2.6999998, 0.45999995, 4.3, 2.3000002, 0.29999998, 4.3, 2.3000002, 0.29999998, 3.8000002)
-polygons = [PackedInt32Array(1, 0, 2), PackedInt32Array(2, 0, 3), PackedInt32Array(3, 0, 4), PackedInt32Array(6, 5, 7), PackedInt32Array(7, 5, 8), PackedInt32Array(8, 5, 3), PackedInt32Array(10, 9, 11), PackedInt32Array(11, 9, 12), PackedInt32Array(9, 8, 12), PackedInt32Array(12, 8, 3), PackedInt32Array(5, 2, 3), PackedInt32Array(14, 13, 15), PackedInt32Array(15, 13, 16), PackedInt32Array(16, 13, 0), PackedInt32Array(0, 13, 17), PackedInt32Array(19, 18, 20), PackedInt32Array(20, 18, 17), PackedInt32Array(17, 13, 20), PackedInt32Array(0, 1, 16), PackedInt32Array(22, 21, 23), PackedInt32Array(23, 21, 24), PackedInt32Array(26, 25, 21), PackedInt32Array(21, 25, 24), PackedInt32Array(28, 27, 29), PackedInt32Array(29, 27, 30), PackedInt32Array(34, 33, 31), PackedInt32Array(31, 33, 32), PackedInt32Array(33, 29, 32), PackedInt32Array(32, 29, 30), PackedInt32Array(36, 35, 37), PackedInt32Array(37, 35, 10), PackedInt32Array(37, 10, 11), PackedInt32Array(6, 7, 38), PackedInt32Array(38, 7, 39), PackedInt32Array(40, 39, 41), PackedInt32Array(14, 15, 41), PackedInt32Array(42, 38, 39), PackedInt32Array(40, 43, 42), PackedInt32Array(45, 44, 39), PackedInt32Array(39, 44, 41), PackedInt32Array(41, 44, 14), PackedInt32Array(40, 42, 39), PackedInt32Array(49, 48, 46), PackedInt32Array(46, 48, 47), PackedInt32Array(19, 50, 18), PackedInt32Array(18, 50, 36), PackedInt32Array(46, 35, 36), PackedInt32Array(49, 46, 36), PackedInt32Array(50, 49, 36), PackedInt32Array(19, 51, 50)]
+[sub_resource type="NavigationMesh" id="NavigationMesh_fdsh7"]
+vertices = PackedVector3Array(-4.8, 0.5, 1.7000003, 0.8000002, 0.5, 1.7000003, 0.8000002, 0.5, 0.9000001, 1.7000003, 0.5, 0.8000002, 1.7000003, 0.5, -4.8, -4.8, 0.5, -4.8, 4.1000004, 0.5, 0.8000002, 4.2, 0.5, 1.7000003, 4.8, 0.5, 1.7000003, 4.8, 0.5, -4.8, 1.2000003, 1, 1.2000003, 1.2000003, 1, 1.8000002, 3.8000002, 1, 1.8000002, 3.8000002, 1, 1.2000003, 1.5, 0.5, 5.8, 1.5, 0.5, 5.2, 0.8000002, 0.5, 5.1000004, -4.8, 0.5, 5.8, 2.2000003, 0.5, 5.1000004, 2.9, 0.5, 5.2, 2.8000002, 0.5, 3.1999998, 2.2000003, 0.5, 3.1999998, 4.2, 0.5, 5.1000004, 4.8, 0.5, 5.8, 1.2000003, 1.5, 2.2000003, 1.2000003, 1.5, 4.8, 3.8000002, 1.5, 4.8, 3.8000002, 1.5, 2.2000003)
+polygons = [PackedInt32Array(2, 1, 0), PackedInt32Array(4, 3, 2), PackedInt32Array(0, 5, 2), PackedInt32Array(2, 5, 4), PackedInt32Array(7, 6, 8), PackedInt32Array(8, 6, 9), PackedInt32Array(3, 4, 6), PackedInt32Array(6, 4, 9), PackedInt32Array(13, 12, 10), PackedInt32Array(10, 12, 11), PackedInt32Array(15, 14, 16), PackedInt32Array(16, 14, 17), PackedInt32Array(1, 16, 0), PackedInt32Array(0, 16, 17), PackedInt32Array(15, 18, 14), PackedInt32Array(14, 18, 19), PackedInt32Array(21, 20, 18), PackedInt32Array(18, 20, 19), PackedInt32Array(7, 8, 22), PackedInt32Array(22, 8, 23), PackedInt32Array(22, 23, 19), PackedInt32Array(19, 23, 14), PackedInt32Array(27, 26, 24), PackedInt32Array(24, 26, 25)]
 cell_size = 0.1
-cell_height = 0.16
+agent_height = 0.5
 agent_radius = 0.2
 agent_max_climb = 0.2
 agent_max_slope = 60.0
@@ -24,12 +22,12 @@ agent_max_slope = 60.0
 
 [node name="Player Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("PlayerUnit", "MainCamera")]
 script = ExtResource("1_5p3x2")
-PlayerUnit = NodePath("../../World/Entities/Player Unit")
+PlayerUnit = NodePath("../../World/Player Unit")
 MainCamera = NodePath("../../World/Main Camera")
 
 [node name="Agent Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("_controlledEntity")]
 script = ExtResource("3_md4fn")
-_controlledEntity = NodePath("../../World/Entities/Enemy Unit")
+_controlledEntity = NodePath("../../World/Enemy Unit")
 
 [node name="World" type="Node3D" parent="."]
 
@@ -41,487 +39,24 @@ transform = Transform3D(0.358177, 0.880592, -0.310271, 0.573737, 0.0545764, 0.81
 shadow_enabled = true
 
 [node name="Main Camera" type="Camera3D" parent="World"]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 1, 0.5, 0)
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 1, 1, 0)
 projection = 1
 size = 8.0
 
-[node name="Entities" type="Node3D" parent="World"]
+[node name="Player Unit" parent="World" instance=ExtResource("2_5p3x2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.935, 0.5, -0.318)
 
-[node name="Player Unit" parent="World/Entities" instance=ExtResource("2_5p3x2")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.935, 0, -0.318)
-
-[node name="Enemy Unit" parent="World/Entities" instance=ExtResource("2_5p3x2")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.065, 0, -0.318)
+[node name="Enemy Unit" parent="World" instance=ExtResource("2_5p3x2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.065, 0.5, -0.318)
 
 [node name="Playground" type="NavigationRegion3D" parent="World"]
-navigation_mesh = SubResource("NavigationMesh_sa7mi")
-
-[node name="000" type="Node3D" parent="World/Playground"]
-
-[node name="Walls" type="Node3D" parent="World/Playground/000"]
-
-[node name="Wall0" parent="World/Playground/000/Walls" instance=ExtResource("3_sa7mi")]
-
-[node name="Wall1" parent="World/Playground/000/Walls" instance=ExtResource("3_sa7mi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0)
-
-[node name="Wall2" parent="World/Playground/000/Walls" instance=ExtResource("3_sa7mi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
-
-[node name="Wall3" parent="World/Playground/000/Walls" instance=ExtResource("3_sa7mi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 1)
-
-[node name="Wall4" parent="World/Playground/000/Walls" instance=ExtResource("3_sa7mi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 2)
-
-[node name="Wall5" parent="World/Playground/000/Walls" instance=ExtResource("3_sa7mi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 3)
-
-[node name="Wall6" parent="World/Playground/000/Walls" instance=ExtResource("3_sa7mi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 3)
-
-[node name="Wall7" parent="World/Playground/000/Walls" instance=ExtResource("3_sa7mi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0)
-
-[node name="Wall8" parent="World/Playground/000/Walls" instance=ExtResource("3_sa7mi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 1)
-
-[node name="Wall9" parent="World/Playground/000/Walls" instance=ExtResource("3_sa7mi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 3)
-
-[node name="Wall10" parent="World/Playground/000/Walls" instance=ExtResource("3_sa7mi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 3)
-
-[node name="Wall11" parent="World/Playground/000/Walls" instance=ExtResource("3_sa7mi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
-
-[node name="Terrain" type="Node3D" parent="World/Playground/000"]
-
-[node name="Terrain0" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -5)
-
-[node name="Terrain1" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -5)
-
-[node name="Terrain2" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -5)
-
-[node name="Terrain3" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -5)
-
-[node name="Terrain4" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -5)
-
-[node name="Terrain5" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
-
-[node name="Terrain6" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -5)
-
-[node name="Terrain7" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -5)
-
-[node name="Terrain8" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -5)
-
-[node name="Terrain9" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -5)
-
-[node name="Terrain10" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -5)
-
-[node name="Terrain11" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -4)
-
-[node name="Terrain12" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -4)
-
-[node name="Terrain13" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -4)
-
-[node name="Terrain14" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -4)
-
-[node name="Terrain15" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -4)
-
-[node name="Terrain16" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4)
-
-[node name="Terrain17" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -4)
-
-[node name="Terrain18" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -4)
-
-[node name="Terrain19" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -4)
-
-[node name="Terrain20" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -4)
-
-[node name="Terrain21" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -4)
-
-[node name="Terrain22" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -3)
-
-[node name="Terrain23" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -3)
-
-[node name="Terrain24" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -3)
-
-[node name="Terrain25" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -3)
-
-[node name="Terrain26" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -3)
-
-[node name="Terrain27" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
-
-[node name="Terrain28" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -3)
-
-[node name="Terrain29" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -3)
-
-[node name="Terrain30" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -3)
-
-[node name="Terrain31" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -3)
-
-[node name="Terrain32" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -3)
-
-[node name="Terrain33" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -2)
-
-[node name="Terrain34" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -2)
-
-[node name="Terrain35" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -2)
-
-[node name="Terrain36" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
-
-[node name="Terrain37" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -2)
-
-[node name="Terrain38" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
-
-[node name="Terrain39" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -2)
-
-[node name="Terrain40" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
-
-[node name="Terrain41" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -2)
-
-[node name="Terrain42" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -2)
-
-[node name="Terrain43" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -2)
-
-[node name="Terrain44" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -1)
-
-[node name="Terrain45" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -1)
-
-[node name="Terrain46" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -1)
-
-[node name="Terrain47" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1)
-
-[node name="Terrain48" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -1)
-
-[node name="Terrain49" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
-
-[node name="Terrain50" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -1)
-
-[node name="Terrain51" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1)
-
-[node name="Terrain52" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -1)
-
-[node name="Terrain53" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -1)
-
-[node name="Terrain54" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -1)
-
-[node name="Terrain55" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 0)
-
-[node name="Terrain56" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
-
-[node name="Terrain57" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 0)
-
-[node name="Terrain58" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
-
-[node name="Terrain59" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0)
-
-[node name="Terrain60" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-
-[node name="Terrain61" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
-
-[node name="Terrain62" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
-
-[node name="Terrain63" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0)
-
-[node name="Terrain64" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
-
-[node name="Terrain65" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 0)
-
-[node name="Terrain66" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 1)
-
-[node name="Terrain67" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 1)
-
-[node name="Terrain68" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 1)
-
-[node name="Terrain69" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 1)
-
-[node name="Terrain70" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 1)
-
-[node name="Terrain71" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
-
-[node name="Terrain72" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1)
-
-[node name="Terrain73" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
-
-[node name="Terrain74" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 1)
-
-[node name="Terrain75" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 1)
-
-[node name="Terrain76" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 1)
-
-[node name="Terrain77" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 2)
-
-[node name="Terrain78" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 2)
-
-[node name="Terrain79" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 2)
-
-[node name="Terrain80" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
-
-[node name="Terrain81" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 2)
-
-[node name="Terrain82" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
-
-[node name="Terrain83" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 2)
-
-[node name="Terrain84" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
-
-[node name="Terrain85" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 2)
-
-[node name="Terrain86" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 2)
-
-[node name="Terrain87" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 2)
-
-[node name="Terrain88" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 3)
-
-[node name="Terrain89" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 3)
-
-[node name="Terrain90" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 3)
-
-[node name="Terrain91" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 3)
-
-[node name="Terrain92" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 3)
-
-[node name="Terrain93" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
-
-[node name="Terrain94" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 3)
-
-[node name="Terrain95" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 3)
-
-[node name="Terrain96" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 3)
-
-[node name="Terrain97" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 3)
-
-[node name="Terrain98" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 3)
-
-[node name="Terrain99" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 4)
-
-[node name="Terrain100" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 4)
-
-[node name="Terrain101" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 4)
-
-[node name="Terrain102" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 4)
-
-[node name="Terrain103" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 4)
-
-[node name="Terrain104" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
-
-[node name="Terrain105" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 4)
-
-[node name="Terrain106" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 4)
-
-[node name="Terrain107" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 4)
-
-[node name="Terrain108" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 4)
-
-[node name="Terrain109" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 4)
-
-[node name="Terrain110" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 5)
-
-[node name="Terrain111" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 5)
-
-[node name="Terrain112" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 5)
-
-[node name="Terrain113" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 5)
-
-[node name="Terrain114" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 5)
-
-[node name="Terrain115" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
-
-[node name="Terrain116" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 5)
-
-[node name="Terrain117" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 5)
-
-[node name="Terrain118" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 5)
-
-[node name="Terrain119" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 5)
-
-[node name="Terrain120" parent="World/Playground/000/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 5)
-
-[node name="Stairs" parent="World/Playground/000" instance=ExtResource("7_8fov1")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 4)
-
-[node name="001" type="Node3D" parent="World"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-
-[node name="Terrain" type="Node3D" parent="World/001"]
-
-[node name="Terrain0" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0)
-
-[node name="Terrain1" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-
-[node name="Terrain2" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
-
-[node name="Terrain3" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
-
-[node name="Terrain4" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0)
-
-[node name="Terrain5" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 1)
-
-[node name="Terrain6" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
-
-[node name="Terrain7" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1)
-
-[node name="Terrain8" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
-
-[node name="Terrain9" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 1)
-
-[node name="Terrain10" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 2)
-
-[node name="Terrain11" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
-
-[node name="Terrain12" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 2)
-
-[node name="Terrain13" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
-
-[node name="Terrain14" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 2)
-
-[node name="Terrain15" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 3)
-
-[node name="Terrain16" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
-
-[node name="Terrain17" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 3)
-
-[node name="Terrain18" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 3)
-
-[node name="Terrain19" parent="World/001/Terrain" instance=ExtResource("5_fdsh7")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 3)
+navigation_mesh = SubResource("NavigationMesh_fdsh7")
+
+[node name="GridMap" type="GridMap" parent="World/Playground"]
+mesh_library = ExtResource("7_md4fn")
+cell_size = Vector3(1, 0.5, 1)
+cell_center_y = false
+data = {
+"cells": PackedInt32Array(65535, 0, 0, 0, 0, 0, 0, 1, 0, 65535, 1, 0, 65535, 65535, 0, 0, 65535, 0, 65534, 65535, 0, 65534, 0, 0, 65534, 1, 0, 1, 65535, 0, 1, 0, 0, 1, 1, 0, 2, 0, 0, 3, 0, 0, 4, 0, 0, 65533, 0, 0, 65532, 0, 0, 65531, 0, 0, 65535, 65534, 0, 65534, 65534, 0, 0, 65534, 0, 1, 65534, 0, 65535, 3, 0, 65535, 2, 0, 65534, 2, 0, 0, 2, 0, 1, 2, 0, 65535, 4, 0, 65535, 5, 0, 65535, 65533, 0, 65535, 65532, 0, 65535, 65531, 0, 65534, 65531, 0, 65533, 65531, 0, 65532, 65531, 0, 65531, 65535, 0, 65531, 65534, 0, 65531, 65533, 0, 65531, 65532, 0, 65531, 65531, 0, 65534, 5, 0, 65533, 5, 0, 65532, 5, 0, 65531, 5, 0, 65531, 1, 0, 65531, 2, 0, 65531, 4, 0, 65531, 3, 0, 0, 5, 0, 1, 5, 0, 2, 5, 0, 3, 5, 0, 4, 5, 0, 4, 1, 0, 4, 2, 0, 4, 3, 0, 4, 4, 0, 0, 65531, 0, 1, 65531, 0, 2, 65531, 0, 3, 65531, 0, 4, 65531, 0, 4, 65535, 0, 4, 65534, 0, 4, 65533, 0, 4, 65532, 0, 3, 65532, 0, 2, 65532, 0, 1, 65532, 0, 0, 65532, 0, 65534, 65532, 0, 65533, 65532, 0, 65532, 65532, 0, 65532, 65533, 0, 65533, 65533, 0, 65534, 65533, 0, 0, 65533, 0, 1, 65533, 0, 2, 65533, 0, 3, 65533, 0, 3, 65534, 0, 2, 65534, 0, 65533, 65534, 0, 65532, 65534, 0, 65532, 65535, 0, 65533, 65535, 0, 2, 65535, 0, 3, 65535, 0, 3, 1, 0, 2, 1, 0, 65533, 1, 0, 65533, 2, 0, 65532, 2, 0, 65532, 1, 0, 2, 2, 0, 3, 2, 0, 3, 3, 0, 2, 3, 0, 1, 3, 0, 0, 3, 0, 65534, 3, 0, 65533, 3, 0, 65532, 3, 0, 65532, 4, 0, 65533, 4, 0, 65534, 4, 0, 0, 4, 0, 1, 4, 0, 2, 4, 0, 3, 4, 0, 65537, 4, 1, 65539, 4, 1, 65539, 3, 1, 65537, 2, 1, 65539, 2, 1, 65538, 2, 1, 131073, 4, 0, 131074, 4, 0, 131075, 4, 0, 131075, 3, 0, 131074, 3, 0, 131073, 3, 0, 131073, 2, 0, 131074, 2, 0, 131075, 2, 0)
+}
+metadata/_editor_floor_ = Vector3(0, 2, 0)

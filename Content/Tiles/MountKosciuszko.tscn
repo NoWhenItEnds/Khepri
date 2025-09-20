@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://dndy058arv8bs"]
+
+[ext_resource type="PackedScene" uid="uid://dm4tu3i0sn5s4" path="res://Content/Tiles/MountKosciuszko/MK_Terrain.tscn" id="2_lnmow"]
+[ext_resource type="PackedScene" uid="uid://c7668uo4460su" path="res://Content/Tiles/MountKosciuszko/MK_Wall.tscn" id="3_o6q1j"]
+
+[node name="MountKosciuszko" type="Node3D"]
+
+[node name="MK_Terrain" parent="." instance=ExtResource("2_lnmow")]
+
+[node name="MK_Wall" parent="." instance=ExtResource("3_o6q1j")]
