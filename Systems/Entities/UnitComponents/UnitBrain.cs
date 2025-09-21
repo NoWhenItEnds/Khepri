@@ -22,7 +22,11 @@ namespace Khepri.Entities.UnitComponents
 
 
         /// <summary> The array of entities currently 'known' by the sensors. </summary>
-        private HashSet<KnownEntity> _trackedEntities = new HashSet<KnownEntity>();
+        private HashSet<KnownEntity> _knownEntities = new HashSet<KnownEntity>();
+
+        /// <summary> An array of positions recently visited by the unit. </summary>
+        private HashSet<KnownPosition> _knownLocations = new HashSet<KnownPosition>();
+
 
         /// <summary> A reference to the global world controller. </summary>
         private WorldController _worldController;
@@ -39,12 +43,13 @@ namespace Khepri.Entities.UnitComponents
         public override void _PhysicsProcess(double delta)
         {
             // Remove entities that the unit hasn't seen for a while.
-            _trackedEntities.RemoveWhere(x => x.LastSeenTimestamp < _worldController.CurrentTime - TimeSpan.FromHours(_memoryLength));
+            _knownEntities.RemoveWhere(x => x.LastSeenTimestamp < _worldController.CurrentTime - TimeSpan.FromHours(_memoryLength));
+            _knownLocations.RemoveWhere(x => x.LastSeenTimestamp < _worldController.CurrentTime - TimeSpan.FromHours(_memoryLength));
 
             // Render debug gizmos.
             if (_showDebug)
             {
-                foreach (KnownEntity entity in _trackedEntities)
+                foreach (KnownEntity entity in _knownEntities)
                 {
                     DebugDraw3D.DrawAabb(entity.SmartEntity.CollisionShape.GetAabb(),
                         entity.IsVisible ? Colors.DarkViolet : Colors.MediumPurple);
@@ -59,7 +64,7 @@ namespace Khepri.Entities.UnitComponents
         public KnownEntity RememberEntity(ISmartEntity entity)
         {
             KnownEntity newEntity = new KnownEntity(entity);
-            _trackedEntities.Add(newEntity);
+            _knownEntities.Add(newEntity);
             return newEntity;
         }
 
@@ -69,7 +74,7 @@ namespace Khepri.Entities.UnitComponents
         /// <returns> Whether the object was removed. </returns>
         public Boolean ForgetEntity(ISmartEntity entity)
         {
-            return _trackedEntities.RemoveWhere(x => x.SmartEntity == entity) > 0;
+            return _knownEntities.RemoveWhere(x => x.SmartEntity == entity) > 0;
         }
 
 
@@ -77,7 +82,7 @@ namespace Khepri.Entities.UnitComponents
         /// <param name="entity"> A reference to the tracked entity. A null means that one wasn't found. </param>
         public KnownEntity? KnowsEntity(ISmartEntity entity)
         {
-            return _trackedEntities.FirstOrDefault(x => x.SmartEntity == entity);
+            return _knownEntities.FirstOrDefault(x => x.SmartEntity == entity);
         }
 
 
@@ -85,13 +90,22 @@ namespace Khepri.Entities.UnitComponents
         /// <param name="entity"> An array of entities sharing the given type. An empty array indicates that there are none of the desired type. </param>
         public KnownEntity[] KnowsEntityKind(Type entity)
         {
-            return _trackedEntities.Where(x => x.SmartEntity.GetType() == entity).ToArray();
+            return _knownEntities.Where(x => x.SmartEntity.GetType() == entity).ToArray();
+        }
+
+
+        /// <summary> Attempts to register the position as one it has visited recently. </summary>
+        /// <param name="position"> The position in world space to register. </param>
+        /// <returns> The known position data class representing this memory. </returns>
+        public KnownPosition RememberPosition(Vector3 position)
+        {
+            return new KnownPosition(Vector3.Back);
         }
     }
 
 
     /// <summary> A data object that is 'known' by an agent. </summary>
-    public class KnownEntity
+    public class KnownEntity : IEquatable<KnownEntity>
     {
         /// <summary> A reference to the known entity. </summary>
         public ISmartEntity SmartEntity { get; init; }
@@ -100,11 +114,11 @@ namespace Khepri.Entities.UnitComponents
         public Boolean IsVisible { get; private set; } = false;
 
         /// <summary> The last known position of the entity. </summary>
-        /// <remarks> A null value means that one isn't known. </remarks>
         public Vector3 LastKnownPosition { get; private set; }
 
         /// <summary> When the object was last seen. </summary>
         public DateTimeOffset LastSeenTimestamp { get; private set; }
+
 
         /// <summary> A reference to the global world controller. </summary>
         private WorldController _worldController;
@@ -137,5 +151,61 @@ namespace Khepri.Entities.UnitComponents
             LastSeenTimestamp = _worldController.CurrentTime;
             LastKnownPosition = position == null ? SmartEntity.CollisionShape.GlobalPosition : position.Value;
         }
+
+        /// <inheritdoc/>
+        public override Int32 GetHashCode() => HashCode.Combine(SmartEntity);
+
+
+        /// <inheritdoc/>
+        public override Boolean Equals(Object obj)
+        {
+            KnownEntity? other = obj as KnownEntity;
+            return other != null ? SmartEntity.Equals(other.SmartEntity) : false;
+        }
+
+        /// <inheritdoc/>
+        public bool Equals(KnownEntity other) => SmartEntity.Equals(other.SmartEntity);
+    }
+
+
+    /// <summary> A position that the unit knows about and has visited recently. </summary>
+    public class KnownPosition : IEquatable<KnownPosition>
+    {
+        /// <summary> The position in godot's world space. </summary>
+        public Vector3 Position { get; private set; }
+
+        /// <summary> When the position was last visited. </summary>
+        public DateTimeOffset LastSeenTimestamp { get; private set; }
+
+
+        /// <summary> A reference to the global world controller. </summary>
+        private WorldController _worldController;
+
+
+        /// <summary> A position that the unit knows about and has visited recently. </summary>
+        /// <param name="position"> The position in godot's world space. </param>
+        public KnownPosition(Vector3 position)
+        {
+            _worldController = WorldController.Instance;
+
+            Position = position;
+            LastSeenTimestamp = _worldController.CurrentTime;
+        }
+
+
+        /// <inheritdoc/>
+        public override Int32 GetHashCode() => HashCode.Combine(Position);
+
+
+        /// <inheritdoc/>
+        public override Boolean Equals(Object obj)
+        {
+            KnownPosition? other = obj as KnownPosition;
+            return other != null ? Position.Equals(other.Position) : false;
+        }
+
+
+        /// <inheritdoc/>
+        public bool Equals(KnownPosition other) => Position.Equals(other.Position);
     }
 }

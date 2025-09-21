@@ -4,7 +4,7 @@ using System;
 namespace Khepri.Entities.Interfaces
 {
     /// <summary> The entity is persistent, meaning that its information should be remembered between game sessions. </summary>
-    public interface IEntity : IComparable<IEntity>
+    public interface IEntity : IEquatable<IEntity>
     {
         /// <summary> The object's unique identifier. Acts as it's key value when mapping data to it. </summary>
         public Guid UId { get; }

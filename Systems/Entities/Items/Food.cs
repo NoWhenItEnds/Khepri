@@ -12,21 +12,30 @@ namespace Khepri.Entities.Items
         [ExportGroup("Nodes")]
         [Export] public CollisionShape3D CollisionShape { get; private set; }
 
-
         /// <inheritdoc/>
-        public Guid UId { get; private set; } = Guid.NewGuid(); // TODO - This should be a part of persistent stats.
+        public Guid UId => Data.UId;
 
         /// <inheritdoc/>
         public Vector3 WorldPosition => GlobalPosition;
+
 
         /// <inheritdoc/>
         public ItemData Data { get; private set; } = new ItemData();
 
 
         /// <inheritdoc/>
-        public int CompareTo(IEntity other)
+        public override Int32 GetHashCode() => HashCode.Combine(Data.UId);
+
+
+        /// <inheritdoc/>
+        public override Boolean Equals(Object obj)
         {
-            return UId.CompareTo(other.UId);
+            Food? other = obj as Food;
+            return other != null ? Data.UId.Equals(other.Data.UId) : false;
         }
+
+
+        /// <inheritdoc/>
+        public bool Equals(IEntity other) => UId.Equals(other.UId);
     }
 }

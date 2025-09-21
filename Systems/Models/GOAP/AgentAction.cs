@@ -5,7 +5,7 @@ using Khepri.Models.GOAP.ActionStrategies;
 namespace Khepri.Models.GOAP
 {
     /// <summary> A potential action an entity can use to try to address a goal. </summary>
-    public class AgentAction
+    public class AgentAction : IEquatable<AgentAction>
     {
         /// <summary> The name or key identifying the action. </summary>
         public String Name { get; }
@@ -61,6 +61,22 @@ namespace Khepri.Models.GOAP
 
         /// <summary> Stop or cancel the currently running action. Ensures this is done gracefully. </summary>
         public void Stop() => _strategy.Stop();
+
+
+        /// <inheritdoc/>
+        public override Int32 GetHashCode() => HashCode.Combine(Name);
+
+
+        /// <inheritdoc/>
+        public override Boolean Equals(Object obj)
+        {
+            AgentAction? other = obj as AgentAction;
+            return other != null ? Name.Equals(other.Name) : false;
+        }
+
+
+        /// <inheritdoc/>
+        public bool Equals(AgentAction other) => Name.Equals(other.Name);
 
 
         /// <summary> A helpful builder that allows for easy construction of agent actions. </summary>

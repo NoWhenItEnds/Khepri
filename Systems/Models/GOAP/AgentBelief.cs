@@ -94,7 +94,7 @@ namespace Khepri.Models.GOAP
 
 
     /// <summary> A piece of knowledge the agent has about the world. </summary>
-    public class AgentBelief
+    public class AgentBelief : IEquatable<AgentBelief>
     {
         /// <summary> The identifying name or key of the belief. </summary>
         public String Name { get; private set; }
@@ -120,6 +120,22 @@ namespace Khepri.Models.GOAP
         /// <summary> Calculate the condition to find out if the belief is true. </summary>
         /// <returns> Evaluates the belief to see if it is true or not. </returns>
         public Boolean Evaluate() => _condition();
+
+
+        /// <inheritdoc/>
+        public override Int32 GetHashCode() => HashCode.Combine(Name);
+
+
+        /// <inheritdoc/>
+        public override Boolean Equals(Object obj)
+        {
+            AgentBelief? other = obj as AgentBelief;
+            return other != null ? Name.Equals(other.Name) : false;
+        }
+
+
+        /// <inheritdoc/>
+        public bool Equals(AgentBelief other) => Name.Equals(other.Name);
 
 
         /// <summary> A builder for creating and modifying beliefs. </summary>

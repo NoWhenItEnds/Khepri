@@ -29,9 +29,6 @@ namespace Khepri.Entities
         /// <summary> A reference to the unit's long term memory and senses. </summary>
         [Export] public UnitBrain Brain { get; private set; }
 
-        /// <summary> The stats used by the unit to set its state. </summary>
-        public readonly UnitData Data = new UnitData();
-
 
         /// <summary> The animation sheets to use for the unit's animations. </summary>
         [ExportGroup("Resources")]
@@ -39,10 +36,14 @@ namespace Khepri.Entities
 
 
         /// <inheritdoc/>
-        public Guid UId { get; private set; } = Guid.NewGuid(); // TODO - This should be a part of persistent stats.
+        public Guid UId => Data.UId;
 
         /// <inheritdoc/>
         public Vector3 WorldPosition => GlobalPosition;
+
+
+        /// <summary> The stats used by the unit to set its state. </summary>
+        public readonly UnitData Data = new UnitData();
 
 
         /// <summary> The current state of the unit. </summary>
@@ -84,9 +85,18 @@ namespace Khepri.Entities
 
 
         /// <inheritdoc/>
-        public int CompareTo(IEntity other)
+        public override Int32 GetHashCode() => HashCode.Combine(Data.UId);
+
+
+        /// <inheritdoc/>
+        public override Boolean Equals(Object obj)
         {
-            return UId.CompareTo(other.UId);
+            Unit? other = obj as Unit;
+            return other != null ? Data.UId.Equals(other.Data.UId) : false;
         }
+
+
+        /// <inheritdoc/>
+        public bool Equals(IEntity other) => UId.Equals(other.UId);
     }
 }

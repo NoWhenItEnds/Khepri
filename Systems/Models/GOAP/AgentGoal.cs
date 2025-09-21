@@ -5,7 +5,7 @@ namespace Khepri.Models.GOAP
 {
     /// <summary> A goal that the agent desires and will use a chain of actions to complete. </summary>
     /// <remarks> Under the hood this is really just a series of desired states / beliefs. </remarks>
-    public class AgentGoal
+    public class AgentGoal : IEquatable<AgentGoal>
     {
         /// <summary> The name or key identifying the goal. </summary>
         public String Name { get; }
@@ -23,6 +23,22 @@ namespace Khepri.Models.GOAP
         {
             Name = name;
         }
+
+
+        /// <inheritdoc/>
+        public override Int32 GetHashCode() => HashCode.Combine(Name);
+
+
+        /// <inheritdoc/>
+        public override Boolean Equals(Object obj)
+        {
+            AgentGoal? other = obj as AgentGoal;
+            return other != null ? Name.Equals(other.Name) : false;
+        }
+
+
+        /// <inheritdoc/>
+        public bool Equals(AgentGoal other) => Name.Equals(other.Name);
 
 
         /// <summary> A helpful builder that allows for easy construction of agent goals. </summary>

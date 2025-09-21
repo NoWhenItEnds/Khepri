@@ -13,16 +13,25 @@ namespace Khepri.Entities
 
 
         /// <inheritdoc/>
-        public Guid UId { get; private set; } = Guid.NewGuid();
+        public Guid UId { get; } = Guid.NewGuid();  // TODO - Pull from generator.
 
         /// <inheritdoc/>
         public Vector3 WorldPosition => GlobalPosition;
 
 
         /// <inheritdoc/>
-        public int CompareTo(IEntity other)
+        public override Int32 GetHashCode() => HashCode.Combine(UId);
+
+
+        /// <inheritdoc/>
+        public override Boolean Equals(Object obj)
         {
-            return UId.CompareTo(other.UId);
+            Wall? other = obj as Wall;
+            return other != null ? UId.Equals(other.UId) : false;
         }
+
+
+        /// <inheritdoc/>
+        public bool Equals(IEntity other) => UId.Equals(other.UId);
     }
 }
