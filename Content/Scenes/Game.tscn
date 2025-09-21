@@ -55,6 +55,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.935, 0, -0.318)
 
 [node name="Enemy Unit" parent="World" instance=ExtResource("2_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.065, 0, -0.318)
+_showNeeds = true
 
 [node name="Playground" type="NavigationRegion3D" parent="World"]
 navigation_mesh = SubResource("NavigationMesh_fdsh7")
