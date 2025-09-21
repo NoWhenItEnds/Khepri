@@ -54,10 +54,10 @@ animation = &"walking_up"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
 
 [node name="UnitBrain" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 script = ExtResource("4_xo887")
 
 [node name="Sight Sensor" type="Node3D" parent="UnitBrain" node_paths=PackedStringArray("_unitSensors", "_fieldOfViewArea", "_lineOfSightRayCast")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 script = ExtResource("4_8qol3")
 _unitSensors = NodePath("..")
 _fieldOfViewArea = NodePath("Field of View")

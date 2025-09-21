@@ -79,8 +79,8 @@ namespace Khepri.Models.GOAP
             factory.AddBelief("AgentIsEntertained", () => _controlledEntity.Data.CurrentEntertainment >= 90f);
             factory.AddBelief("AgentIsBored", () => _controlledEntity.Data.CurrentEntertainment < 50f);
 
-            factory.AddSensorBelief("AgentKnowsPlayer", _controlledEntity.Brain, _playerController.PlayerUnit);
-            factory.AddSensorBelief("AgentKnowsFood", _controlledEntity.Brain, typeof(Food));
+            factory.AddBrainBelief("AgentKnowsPlayer", _controlledEntity.Brain, _playerController.PlayerUnit);
+            factory.AddBrainBelief("AgentKnowsFood", _controlledEntity.Brain, typeof(Food));
 
             factory.AddBelief("AgentSeesPlayer", () => true);   // TODO - Tie this to something inside the sensor, or have a new AddSensorBelief.
         }
@@ -97,7 +97,7 @@ namespace Khepri.Models.GOAP
                 .Build());
 
             AvailableActions.Add(new AgentAction.Builder("Wander Around")
-                .WithStrategy(new WanderActionStrategy(_controlledEntity, 5f))
+                .WithStrategy(new WanderActionStrategy(_controlledEntity, 2f))
                 .AddOutcome(_availableBeliefs["AgentIsMoving"])
                 .Build());
 

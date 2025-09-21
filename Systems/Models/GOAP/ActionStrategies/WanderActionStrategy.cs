@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Godot;
 using Khepri.Controllers;
 using Khepri.Entities;
@@ -38,19 +39,32 @@ namespace Khepri.Models.GOAP.ActionStrategies
         /// <inheritdoc/>
         public void Start()
         {
-            /*for (Int32 i = 0; i < 100; i++)   // Attempt "several" times to find a reachable location.
+            // We want to choose a position somewhat distant to the unit as our start point.
+            Vector3[] knownPositions = _unit.Brain.GetKnownPositions();
+            Vector3[] flitteredPositions = knownPositions
+                .OrderByDescending(x => x.DistanceTo(_unit.GlobalPosition))
+                .Take((Int32)Math.Ceiling(knownPositions.Length / 2f)).ToArray();   // Take the more distant points.
+            Vector3 chosenPosition = flitteredPositions[_random.Next(flitteredPositions.Length)];
+            for (Int32 i = 0; i < 100; i++)   // Attempt "several" times to find a reachable location.
             {
                 Single xPos = _random.NextSingle() * _radius * 2f - _radius;
                 Single zPos = _random.NextSingle() * _radius * 2f - _radius;
-                Vector3 targetPosition = _unit.GlobalPosition + new Vector3(xPos, 0f, zPos);
+                Vector3 targetPosition = chosenPosition + new Vector3(xPos, 0f, zPos);
+
+                // Check the current level.
                 _unit.NavigationAgent.TargetPosition = targetPosition;
-                if (_unit.NavigationAgent.IsTargetReachable())  // If we find one, stop trying.
-                {
-                    break;
-                }
+                if (_unit.NavigationAgent.IsTargetReachable()) { break; }
+
+                // Check the upper level.
+                _unit.NavigationAgent.TargetPosition = targetPosition + Vector3.Up;
+                if (_unit.NavigationAgent.IsTargetReachable()) { break; }
+
+                // Check the lower level.
+                _unit.NavigationAgent.TargetPosition = targetPosition + Vector3.Down;
+                if (_unit.NavigationAgent.IsTargetReachable()) { break; }
+
                 _unit.NavigationAgent.TargetPosition = _unit.GlobalPosition;    // Else, reset it.
-            }*/
-            _unit.NavigationAgent.TargetPosition = PlayerController.Instance.PlayerUnit.GlobalPosition;
+            }
         }
 
 

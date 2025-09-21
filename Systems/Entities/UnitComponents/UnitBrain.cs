@@ -42,6 +42,9 @@ namespace Khepri.Entities.UnitComponents
         /// <inheritdoc/>
         public override void _PhysicsProcess(double delta)
         {
+            // Add the current position to the known positions.
+            RememberPosition(GlobalPosition);
+
             // Remove entities that the unit hasn't seen for a while.
             _knownEntities.RemoveWhere(x => x.LastSeenTimestamp < _worldController.CurrentTime - TimeSpan.FromHours(_memoryLength));
             _knownLocations.RemoveWhere(x => x.LastSeenTimestamp < _worldController.CurrentTime - TimeSpan.FromHours(_memoryLength));
@@ -79,7 +82,8 @@ namespace Khepri.Entities.UnitComponents
 
 
         /// <summary> Searches the tracked entity's for a particular smart object. </summary>
-        /// <param name="entity"> A reference to the tracked entity. A null means that one wasn't found. </param>
+        /// <param name="entity"> The entity to search for. </param>
+        /// <returns> A reference to the tracked entity. A null means that one wasn't found. </returns>
         public KnownEntity? KnowsEntity(ISmartEntity entity)
         {
             return _knownEntities.FirstOrDefault(x => x.SmartEntity == entity);
@@ -87,7 +91,8 @@ namespace Khepri.Entities.UnitComponents
 
 
         /// <summary> Searches the tracked entities for an entity of a particular type. This is to search for a kind rather than a specific instance. </summary>
-        /// <param name="entity"> An array of entities sharing the given type. An empty array indicates that there are none of the desired type. </param>
+        /// <param name="entity"> The kind of entity to search for. </param>
+        /// <returns> An array of entities sharing the given type. An empty array indicates that there are none of the desired type. </returns>
         public KnownEntity[] KnowsEntityKind(Type entity)
         {
             return _knownEntities.Where(x => x.SmartEntity.GetType() == entity).ToArray();
@@ -99,7 +104,52 @@ namespace Khepri.Entities.UnitComponents
         /// <returns> The known position data class representing this memory. </returns>
         public KnownPosition RememberPosition(Vector3 position)
         {
-            return new KnownPosition(Vector3.Back);
+            Vector3 modifiedPosition = new Vector3((Single)Math.Round(position.X), (Single)Math.Round(position.Y), (Single)Math.Round(position.Z));
+            KnownPosition? entity = _knownLocations.FirstOrDefault(x => x.Position == modifiedPosition);
+            if (entity == null)
+            {
+                entity = new KnownPosition(modifiedPosition);
+                _knownLocations.Add(entity);
+            }
+            return entity;
+        }
+
+
+        /// <summary> Removes a given location from the unit's memory. </summary>
+        /// <param name="position"> The position to remove. </param>
+        /// <returns> Whether the position was removed or not. </returns>
+        public Boolean ForgetPosition(Vector3 position)
+        {
+            Vector3 modifiedPosition = new Vector3((Single)Math.Round(position.X), (Single)Math.Round(position.Y), (Single)Math.Round(position.Z));
+            return _knownLocations.RemoveWhere(x => x.Position == modifiedPosition) > 0;
+        }
+
+
+        /// <summary> Searches the tracked entity's for a particular location. </summary>
+        /// <param name="position"> The location to search for. </param>
+        /// <returns> A reference to the tracked location. A null means that one wasn't found. </returns>
+        public KnownPosition? KnowsPosition(Vector3 position)
+        {
+            Vector3 modifiedPosition = new Vector3((Single)Math.Round(position.X), (Single)Math.Round(position.Y), (Single)Math.Round(position.Z));
+            return _knownLocations.FirstOrDefault(x => x.Position == position);
+        }
+
+
+        /// <summary> Returns an array of positions that the unit knows. </summary>
+        /// <returns> An array of positions in the game world that the unit is current aware of. </returns>
+        public Vector3[] GetKnownPositions()
+        {
+            return _knownLocations.Select(x => x.Position).ToArray();
+        }
+
+
+        /// <summary> Returns an array of positions nearby the given position. </summary>
+        /// <param name="position"> The position to search around. </param>
+        /// <param name="radius"> The acceptable radius to search within. </param>
+        /// <returns> An array of positions in the game world that the unit is current aware of. </returns>
+        public Vector3[] GetKnownPositions(Vector3 position, Single radius)
+        {
+            return _knownLocations.Select(x => x.Position).Where(x => x.DistanceTo(position) <= radius).ToArray();
         }
     }
 
