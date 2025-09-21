@@ -1,3 +1,4 @@
+using System;
 using Godot;
 
 namespace Khepri.Nodes
@@ -6,9 +7,9 @@ namespace Khepri.Nodes
     public partial class KSprite3D : Sprite3D
     {
         /// <inheritdoc/>
-        public override void _PhysicsProcess(double delta)
+        public override void _PhysicsProcess(Double delta)
         {
-            SortingOffset = GlobalPosition.Z;
+            SortingOffset = (Int32)GlobalPosition.Y * 10000 + GlobalPosition.Z;
         }
     }
 }

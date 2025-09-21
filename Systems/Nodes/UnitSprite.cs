@@ -1,6 +1,6 @@
 using System;
 using Godot;
-using Khepri.Models.UnitStates;
+using Khepri.Entities.UnitComponents.States;
 using Khepri.Types;
 
 namespace Khepri.Nodes
@@ -19,7 +19,7 @@ namespace Khepri.Nodes
         /// <inheritdoc/>
         public override void _PhysicsProcess(double delta)
         {
-            _baseLayer.SortingOffset = GlobalPosition.Z;
+            _baseLayer.SortingOffset = (Int32)GlobalPosition.Y * 10000 + GlobalPosition.Z;
         }
 
 
@@ -54,11 +54,11 @@ namespace Khepri.Nodes
         /// <summary> Transitions the unit's animations to a new one. </summary>
         /// <param name="state"> The current state of the unit. </param>
         /// <param name="direction"> The direction the unit is currently facing. </param>
-        public void TransitionAnimation(IUnitState state, Direction direction = Direction.NONE)
+        public void TransitionAnimation(UnitState state, Direction direction = Direction.NONE)
         {
             _previousDirection = direction != Direction.NONE ? direction : _previousDirection;
             String animationName = state.AnimationPrefix + _previousDirection.ToString().ToLower();
-            _baseLayer.Animation = animationName;
+            _baseLayer.Animation = _baseLayer.SpriteFrames.HasAnimation(animationName) ? animationName : throw new ArgumentException($"Animation '{animationName}' does not exist in the sprite frames!");
         }
     }
 

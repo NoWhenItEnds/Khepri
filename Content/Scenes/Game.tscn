@@ -1,421 +1,476 @@
-[gd_scene load_steps=5 format=3 uid="uid://ko6nvcupfcf4"]
+[gd_scene load_steps=10 format=3 uid="uid://ko6nvcupfcf4"]
 
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
+[ext_resource type="Script" uid="uid://cgujt8yhxbsew" path="res://Systems/Controllers/WorldController.cs" id="1_8fov1"]
 [ext_resource type="PackedScene" uid="uid://rc2326u6agtf" path="res://Content/Prefabs/Entities/Unit.tscn" id="2_5p3x2"]
-[ext_resource type="PackedScene" uid="uid://c7668uo4460su" path="res://Content/Prefabs/Entities/Wall.tscn" id="3_sa7mi"]
-[ext_resource type="PackedScene" uid="uid://dm4tu3i0sn5s4" path="res://Content/Prefabs/Entities/Terrain.tscn" id="5_fdsh7"]
+[ext_resource type="Script" uid="uid://d1dxnpil1ufxm" path="res://Systems/Models/GOAP/AgentController.cs" id="3_md4fn"]
+[ext_resource type="PackedScene" uid="uid://dm4tu3i0sn5s4" path="res://Content/Tiles/MountKosciuszko/MK_Terrain.tscn" id="4_5p3x2"]
+[ext_resource type="PackedScene" uid="uid://dbsl418re8pu4" path="res://Content/Tiles/MountKosciuszko/MK_Wall.tscn" id="5_sa7mi"]
+[ext_resource type="PackedScene" uid="uid://c5oukv8uq6kbj" path="res://Content/Tiles/MountKosciuszko/MK_Stairs.tscn" id="6_fdsh7"]
+
+[sub_resource type="Environment" id="Environment_5p3x2"]
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_fdsh7"]
+vertices = PackedVector3Array(-0.5, 1.25, 3.5, 0.25, 2, 3.25, 0.25, 2, 3, -0.5, 1.25, 2.5, -5, 1, 5, 0.25, 1, 0.5, 1.75, 1, -5, -5, 1, -5, 1.75, 1, 2.25, 1.75, 1, 2, 0.25, 1, 1.75, 2, 1, 0.25, -0.75, 1, 5, 2.25, 1, 2, 2, 1, 3.5, 2.5, 1, 4, -0.25, 1, 4, 4, 1, 3.5, 5, 1, 5, 4, 1, 0.5, 5, 1, -5, 1.5, 1, 4, 1, 2, 2.5, 3.25, 2, 3.25, 3.25, 2, 1, 1, 2, 1)
+polygons = [PackedInt32Array(1, 0, 2), PackedInt32Array(2, 0, 3), PackedInt32Array(3, 4, 5), PackedInt32Array(5, 4, 7), PackedInt32Array(5, 7, 6), PackedInt32Array(9, 8, 10), PackedInt32Array(10, 8, 3), PackedInt32Array(6, 11, 5), PackedInt32Array(5, 10, 3), PackedInt32Array(0, 12, 3), PackedInt32Array(3, 12, 4), PackedInt32Array(9, 13, 8), PackedInt32Array(8, 13, 14), PackedInt32Array(14, 13, 15), PackedInt32Array(0, 16, 12), PackedInt32Array(18, 15, 17), PackedInt32Array(17, 19, 18), PackedInt32Array(18, 19, 20), PackedInt32Array(21, 14, 15), PackedInt32Array(12, 16, 21), PackedInt32Array(21, 15, 12), PackedInt32Array(12, 15, 18), PackedInt32Array(11, 6, 19), PackedInt32Array(19, 6, 20), PackedInt32Array(2, 22, 1), PackedInt32Array(1, 22, 23), PackedInt32Array(25, 24, 22), PackedInt32Array(22, 24, 23)]
+border_size = 0.5
+agent_height = 0.25
+agent_radius = 0.25
+agent_max_climb = 0.5
+agent_max_slope = 60.0
+filter_ledge_spans = true
 
 [node name="Game" type="Node"]
 
 [node name="Controllers" type="Node" parent="."]
 
-[node name="Player Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("_playerUnit", "_mainCamera")]
+[node name="World Controller" type="Node" parent="Controllers"]
+script = ExtResource("1_8fov1")
+
+[node name="Player Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("PlayerUnit", "MainCamera")]
 script = ExtResource("1_5p3x2")
-_playerUnit = NodePath("../../World/Entities/Player Unit")
-_mainCamera = NodePath("../../World/Main Camera")
+PlayerUnit = NodePath("../../World/Player Unit")
+MainCamera = NodePath("../../World/Main Camera")
+
+[node name="Agent Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("_controlledEntity")]
+script = ExtResource("3_md4fn")
+_controlledEntity = NodePath("../../World/Enemy Unit")
 
 [node name="World" type="Node3D" parent="."]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="World"]
+environment = SubResource("Environment_5p3x2")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="World/WorldEnvironment"]
+transform = Transform3D(0.358177, 0.880592, -0.310271, 0.573737, 0.0545764, 0.817219, 0.73657, -0.470723, -0.48568, 0, 0, 0)
+shadow_enabled = true
 
 [node name="Main Camera" type="Camera3D" parent="World"]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 1, 1.5, 0)
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 1, 1, 0)
 projection = 1
 size = 8.0
 
-[node name="Entities" type="Node3D" parent="World"]
+[node name="Player Unit" parent="World" instance=ExtResource("2_5p3x2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.935, 0, -0.318)
 
-[node name="Player Unit" parent="World/Entities" instance=ExtResource("2_5p3x2")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0)
+[node name="Enemy Unit" parent="World" instance=ExtResource("2_5p3x2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.065, 0, -0.318)
 
-[node name="Enemy Unit" parent="World/Entities" instance=ExtResource("2_5p3x2")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 1, 0)
+[node name="Playground" type="NavigationRegion3D" parent="World"]
+navigation_mesh = SubResource("NavigationMesh_fdsh7")
 
-[node name="Playground" type="Node3D" parent="World/Entities"]
+[node name="Floor" type="Node3D" parent="World/Playground"]
 
-[node name="Walls" type="Node3D" parent="World/Entities/Playground"]
-
-[node name="Wall0" parent="World/Entities/Playground/Walls" instance=ExtResource("3_sa7mi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-
-[node name="Wall1" parent="World/Entities/Playground/Walls" instance=ExtResource("3_sa7mi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1, 0)
-
-[node name="Wall2" parent="World/Entities/Playground/Walls" instance=ExtResource("3_sa7mi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1, -1)
-
-[node name="Wall3" parent="World/Entities/Playground/Walls" instance=ExtResource("3_sa7mi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1, 1)
-
-[node name="Wall4" parent="World/Entities/Playground/Walls" instance=ExtResource("3_sa7mi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, 2)
-
-[node name="Wall5" parent="World/Entities/Playground/Walls" instance=ExtResource("3_sa7mi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, 3)
-
-[node name="Wall6" parent="World/Entities/Playground/Walls" instance=ExtResource("3_sa7mi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1, 3)
-
-[node name="Terrains" type="Node3D" parent="World/Entities/Playground"]
-
-[node name="Terrain0" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -5)
 
-[node name="Terrain1" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain2" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -5)
 
-[node name="Terrain2" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain3" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -5)
 
-[node name="Terrain3" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain4" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -5)
 
-[node name="Terrain4" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain5" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -5)
 
-[node name="Terrain5" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain6" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
 
-[node name="Terrain6" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain7" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -5)
 
-[node name="Terrain7" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain8" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -5)
 
-[node name="Terrain8" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain9" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -5)
 
-[node name="Terrain9" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain10" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -5)
 
-[node name="Terrain10" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain11" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -5)
 
-[node name="Terrain11" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain12" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -4)
 
-[node name="Terrain12" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain13" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -4)
 
-[node name="Terrain13" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain14" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -4)
 
-[node name="Terrain14" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain15" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -4)
 
-[node name="Terrain15" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain16" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -4)
 
-[node name="Terrain16" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain17" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4)
 
-[node name="Terrain17" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain18" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -4)
 
-[node name="Terrain18" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain19" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -4)
 
-[node name="Terrain19" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain20" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -4)
 
-[node name="Terrain20" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain21" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -4)
 
-[node name="Terrain21" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain22" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -4)
 
-[node name="Terrain22" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain23" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -3)
 
-[node name="Terrain23" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain24" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -3)
 
-[node name="Terrain24" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain25" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -3)
 
-[node name="Terrain25" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain26" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -3)
 
-[node name="Terrain26" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain27" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -3)
 
-[node name="Terrain27" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain28" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
 
-[node name="Terrain28" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain29" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -3)
 
-[node name="Terrain29" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain30" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -3)
 
-[node name="Terrain30" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain31" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -3)
 
-[node name="Terrain31" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain32" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -3)
 
-[node name="Terrain32" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain33" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -3)
 
-[node name="Terrain33" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain34" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -2)
 
-[node name="Terrain34" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain35" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -2)
 
-[node name="Terrain35" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain36" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -2)
 
-[node name="Terrain36" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain37" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
 
-[node name="Terrain37" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain38" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -2)
 
-[node name="Terrain38" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain39" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
 
-[node name="Terrain39" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain40" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -2)
 
-[node name="Terrain40" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain41" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
 
-[node name="Terrain41" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain42" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -2)
 
-[node name="Terrain42" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain43" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -2)
 
-[node name="Terrain43" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain44" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -2)
 
-[node name="Terrain44" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain45" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -1)
 
-[node name="Terrain45" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain46" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, -1)
 
-[node name="Terrain46" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain47" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -1)
 
-[node name="Terrain47" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain48" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1)
 
-[node name="Terrain48" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain49" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -1)
 
-[node name="Terrain49" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain50" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
 
-[node name="Terrain50" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain51" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -1)
 
-[node name="Terrain51" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain52" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1)
 
-[node name="Terrain52" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain53" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -1)
 
-[node name="Terrain53" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain54" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -1)
 
-[node name="Terrain54" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain55" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -1)
 
-[node name="Terrain55" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain56" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 0)
 
-[node name="Terrain56" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain57" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
 
-[node name="Terrain57" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain58" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 0)
 
-[node name="Terrain58" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain59" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
 
-[node name="Terrain59" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain60" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0)
 
-[node name="Terrain60" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain61" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 
-[node name="Terrain61" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain62" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
 
-[node name="Terrain62" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain63" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
 
-[node name="Terrain63" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain64" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0)
 
-[node name="Terrain64" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain65" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
 
-[node name="Terrain65" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain66" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 0)
 
-[node name="Terrain66" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain67" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 1)
 
-[node name="Terrain67" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain68" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 1)
 
-[node name="Terrain68" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain69" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 1)
 
-[node name="Terrain69" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain70" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 1)
 
-[node name="Terrain70" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain71" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 1)
 
-[node name="Terrain71" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain72" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
 
-[node name="Terrain72" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain73" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1)
 
-[node name="Terrain73" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain74" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
 
-[node name="Terrain74" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain75" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 1)
 
-[node name="Terrain75" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain76" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 1)
 
-[node name="Terrain76" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain77" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 1)
 
-[node name="Terrain77" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain78" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 2)
 
-[node name="Terrain78" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain79" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 2)
 
-[node name="Terrain79" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain80" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 2)
 
-[node name="Terrain80" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain81" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
 
-[node name="Terrain81" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain82" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 2)
 
-[node name="Terrain82" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain83" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
 
-[node name="Terrain83" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain84" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 2)
 
-[node name="Terrain84" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain85" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
 
-[node name="Terrain85" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain86" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 2)
 
-[node name="Terrain86" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain87" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 2)
 
-[node name="Terrain87" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain88" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 2)
 
-[node name="Terrain88" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain89" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 3)
 
-[node name="Terrain89" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain90" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 3)
 
-[node name="Terrain90" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain91" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 3)
 
-[node name="Terrain91" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain92" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 3)
 
-[node name="Terrain92" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain93" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 3)
 
-[node name="Terrain93" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain94" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
 
-[node name="Terrain94" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain95" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 3)
 
-[node name="Terrain95" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain96" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 3)
 
-[node name="Terrain96" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain97" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 3)
 
-[node name="Terrain97" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain98" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 3)
 
-[node name="Terrain98" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain99" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 3)
 
-[node name="Terrain99" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain100" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 4)
 
-[node name="Terrain100" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain101" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 4)
 
-[node name="Terrain101" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain102" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 4)
 
-[node name="Terrain102" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain103" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 4)
 
-[node name="Terrain103" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain104" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 4)
 
-[node name="Terrain104" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain105" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
 
-[node name="Terrain105" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain106" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 4)
 
-[node name="Terrain106" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain107" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 4)
 
-[node name="Terrain107" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain108" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 4)
 
-[node name="Terrain108" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain109" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 4)
 
-[node name="Terrain109" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain110" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 4)
 
-[node name="Terrain110" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain111" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 5)
 
-[node name="Terrain111" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain112" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 5)
 
-[node name="Terrain112" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain113" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 5)
 
-[node name="Terrain113" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain114" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 5)
 
-[node name="Terrain114" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain115" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 5)
 
-[node name="Terrain115" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain116" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
 
-[node name="Terrain116" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain117" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 5)
 
-[node name="Terrain117" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain118" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 5)
 
-[node name="Terrain118" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain119" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 5)
 
-[node name="Terrain119" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain120" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 5)
 
-[node name="Terrain120" parent="World/Entities/Playground/Terrains" instance=ExtResource("5_fdsh7")]
+[node name="MK_Terrain121" parent="World/Playground/Floor" instance=ExtResource("4_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 5)
+
+[node name="Walls" type="Node3D" parent="World/Playground"]
+
+[node name="MK_Wall" parent="World/Playground/Walls" instance=ExtResource("5_sa7mi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 3)
+
+[node name="MK_Wall2" parent="World/Playground/Walls" instance=ExtResource("5_sa7mi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 2)
+
+[node name="MK_Wall3" parent="World/Playground/Walls" instance=ExtResource("5_sa7mi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 1)
+
+[node name="MK_Wall4" parent="World/Playground/Walls" instance=ExtResource("5_sa7mi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
+
+[node name="MK_Wall5" parent="World/Playground/Walls" instance=ExtResource("5_sa7mi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1)
+
+[node name="MK_Wall6" parent="World/Playground/Walls" instance=ExtResource("5_sa7mi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 3)
+
+[node name="Second Floor" type="Node3D" parent="World/Playground"]
+
+[node name="MK_Terrain" parent="World/Playground/Second Floor" instance=ExtResource("4_5p3x2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 3)
+
+[node name="MK_Terrain2" parent="World/Playground/Second Floor" instance=ExtResource("4_5p3x2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, 3)
+
+[node name="MK_Terrain3" parent="World/Playground/Second Floor" instance=ExtResource("4_5p3x2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, 3)
+
+[node name="MK_Terrain4" parent="World/Playground/Second Floor" instance=ExtResource("4_5p3x2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 2)
+
+[node name="MK_Terrain5" parent="World/Playground/Second Floor" instance=ExtResource("4_5p3x2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, 2)
+
+[node name="MK_Terrain6" parent="World/Playground/Second Floor" instance=ExtResource("4_5p3x2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, 2)
+
+[node name="MK_Terrain7" parent="World/Playground/Second Floor" instance=ExtResource("4_5p3x2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1)
+
+[node name="MK_Terrain8" parent="World/Playground/Second Floor" instance=ExtResource("4_5p3x2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, 1)
+
+[node name="MK_Terrain9" parent="World/Playground/Second Floor" instance=ExtResource("4_5p3x2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, 1)
+
+[node name="MK_Stairs" parent="World/Playground/Second Floor" instance=ExtResource("6_fdsh7")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 3)

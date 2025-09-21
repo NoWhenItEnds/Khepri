@@ -1,5 +1,7 @@
 using Godot;
 using Khepri.Entities;
+using Khepri.Entities.Interfaces;
+using Khepri.Entities.UnitComponents;
 using System;
 using System.Collections.Generic;
 
@@ -30,21 +32,34 @@ namespace Khepri.Models.GOAP
         /// <param name="condition"> The function the belief uses to evaluate the nature of the condition. </param>
         public void AddBelief(String key, Func<Boolean> condition)
         {
-            _beliefs.Add(key, new AgentBelief.AgentBeliefBuilder(key)
+            _beliefs.Add(key, new AgentBelief.Builder(key)
                 .WithCondition(condition)
                 .Build());
         }
 
 
-        // TODO - Need to implement || https://www.youtube.com/watch?v=T_sBYgP7_2k || 6:45
-        /*
-        public void AddSensorBelief(string key, Sensor sensor)
+        /// <summary> Adds a new belief relating to information stored in an entity's sensors. </summary>
+        /// <param name="key"> The name of belief. </param>
+        /// <param name="unitBrain"> A reference to the unit's long term memory. </param>
+        /// <param name="entity"> A reference to the entity we're concerned with. </param>
+        public void AddBrainBelief(String key, UnitBrain unitBrain, ISmartEntity entity)
         {
-            _beliefs.Add(key, new AgentBelief.AgentBeliefBuilder(key)
-                .WithCondition(() => sensor.IsTargetInRange)
-                .WithLocation(() => sensor.TargetPosition)
+            _beliefs.Add(key, new AgentBelief.Builder(key)
+                .WithCondition(() => unitBrain.KnowsEntity(entity) != null)
                 .Build());
-        }*/
+        }
+
+
+        /// <summary> Adds a new belief relating to information stored in an entity's sensors. </summary>
+        /// <param name="key"> The name of belief. </param>
+        /// <param name="unitBrain"> A reference to the unit's long term memory. </param>
+        /// <param name="entityType"> The type of entity we're concerned with. </param>
+        public void AddBrainBelief(String key, UnitBrain unitBrain, Type entityType)
+        {
+            _beliefs.Add(key, new AgentBelief.Builder(key)
+                .WithCondition(() => unitBrain.KnowsEntityKind(entityType).Length > 0)
+                .Build());
+        }
 
 
         /// <summary> Add a new locational belief that requires the unit to be in range of a target node. </summary>
@@ -63,7 +78,7 @@ namespace Khepri.Models.GOAP
         /// <param name="targetLocation"> The target position. </param>
         public void AddLocationBelief(String key, Single distance, Vector3 targetLocation)
         {
-            _beliefs.Add(key, new AgentBelief.AgentBeliefBuilder(key)
+            _beliefs.Add(key, new AgentBelief.Builder(key)
                 .WithCondition(() => InRangeOf(targetLocation, distance))
                 .WithLocation(() => targetLocation)
                 .Build());
@@ -79,7 +94,7 @@ namespace Khepri.Models.GOAP
 
 
     /// <summary> A piece of knowledge the agent has about the world. </summary>
-    public class AgentBelief
+    public class AgentBelief : IEquatable<AgentBelief>
     {
         /// <summary> The identifying name or key of the belief. </summary>
         public String Name { get; private set; }
@@ -107,8 +122,24 @@ namespace Khepri.Models.GOAP
         public Boolean Evaluate() => _condition();
 
 
+        /// <inheritdoc/>
+        public override Int32 GetHashCode() => HashCode.Combine(Name);
+
+
+        /// <inheritdoc/>
+        public override Boolean Equals(Object obj)
+        {
+            AgentBelief? other = obj as AgentBelief;
+            return other != null ? Name.Equals(other.Name) : false;
+        }
+
+
+        /// <inheritdoc/>
+        public bool Equals(AgentBelief other) => Name.Equals(other.Name);
+
+
         /// <summary> A builder for creating and modifying beliefs. </summary>
-        public class AgentBeliefBuilder
+        public class Builder
         {
             /// <summary> The belief the builder is associated with. </summary>
             private readonly AgentBelief _belief;
@@ -116,7 +147,7 @@ namespace Khepri.Models.GOAP
 
             /// <summary> A builder for creating and modifying beliefs. </summary>
             /// <param name="name"> The identifying name or key of the belief. </param>
-            public AgentBeliefBuilder(String name)
+            public Builder(String name)
             {
                 _belief = new AgentBelief(name);
             }
@@ -124,7 +155,7 @@ namespace Khepri.Models.GOAP
 
             /// <summary> Add a condition to the belief. </summary>
             /// <param name="condition"> The delegate used to evaluate the condition. </param>
-            public AgentBeliefBuilder WithCondition(Func<Boolean> condition)
+            public Builder WithCondition(Func<Boolean> condition)
             {
                 _belief._condition = condition;
                 return this;
@@ -133,7 +164,7 @@ namespace Khepri.Models.GOAP
 
             /// <summary> Add an observed location to the belief. </summary>
             /// <param name="location"> The delegate used to evaluate the location. </param>
-            public AgentBeliefBuilder WithLocation(Func<Vector3> location)
+            public Builder WithLocation(Func<Vector3> location)
             {
                 _belief._observedLocation = location;
                 return this;

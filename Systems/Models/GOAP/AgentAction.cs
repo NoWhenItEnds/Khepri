@@ -5,7 +5,7 @@ using Khepri.Models.GOAP.ActionStrategies;
 namespace Khepri.Models.GOAP
 {
     /// <summary> A potential action an entity can use to try to address a goal. </summary>
-    public class AgentAction
+    public class AgentAction : IEquatable<AgentAction>
     {
         /// <summary> The name or key identifying the action. </summary>
         public String Name { get; }
@@ -41,7 +41,7 @@ namespace Khepri.Models.GOAP
 
         /// <summary> Update / incrementally run the current action. </summary>
         /// <param name="delta"> The time since the last update frame. </param>
-        public void Update(Single delta)
+        public void Update(Double delta)
         {
             if (_strategy.IsValid)
             {
@@ -63,8 +63,24 @@ namespace Khepri.Models.GOAP
         public void Stop() => _strategy.Stop();
 
 
+        /// <inheritdoc/>
+        public override Int32 GetHashCode() => HashCode.Combine(Name);
+
+
+        /// <inheritdoc/>
+        public override Boolean Equals(Object obj)
+        {
+            AgentAction? other = obj as AgentAction;
+            return other != null ? Name.Equals(other.Name) : false;
+        }
+
+
+        /// <inheritdoc/>
+        public bool Equals(AgentAction other) => Name.Equals(other.Name);
+
+
         /// <summary> A helpful builder that allows for easy construction of agent actions. </summary>
-        public class AgentActionBuilder
+        public class Builder
         {
             /// <summary> A reference to the action being constructed. </summary>
             private readonly AgentAction _action;
@@ -72,7 +88,7 @@ namespace Khepri.Models.GOAP
 
             /// <summary> A helpful builder that allows for easy construction of agent actions. </summary>
             /// <param name="name"> The name or key identifying the action. </param>
-            public AgentActionBuilder(String name)
+            public Builder(String name)
             {
                 _action = new AgentAction(name);
             }
@@ -80,7 +96,7 @@ namespace Khepri.Models.GOAP
 
             /// <summary> Sets the action cost. </summary>
             /// <param name="cost"> How many 'action points' the action would cost to action. </param>
-            public AgentActionBuilder WithCost(Single cost)
+            public Builder WithCost(Single cost)
             {
                 _action.Cost = cost;
                 return this;
@@ -89,7 +105,7 @@ namespace Khepri.Models.GOAP
 
             /// <summary> Sets the action's strategy. </summary>
             /// <param name="strategy"> A reference to the strategy / logic used for this action. </param>
-            public AgentActionBuilder WithStrategy(IActionStrategy strategy)
+            public Builder WithStrategy(IActionStrategy strategy)
             {
                 _action._strategy = strategy;
                 return this;
@@ -98,7 +114,7 @@ namespace Khepri.Models.GOAP
 
             /// <summary> Adds a precondition to the action that must be true for the action to begin. </summary>
             /// <param name="precondition"> The beliefs or conditions that need to be true for the action to be actioned. </param>
-            public AgentActionBuilder AddPrecondition(AgentBelief precondition)
+            public Builder AddPrecondition(AgentBelief precondition)
             {
                 _action.Preconditions.Add(precondition);
                 return this;
@@ -107,7 +123,7 @@ namespace Khepri.Models.GOAP
 
             /// <summary> Adds preconditions to the action that must be true for the action to begin. </summary>
             /// <param name="preconditions"> The beliefs or conditions that need to be true for the action to be actioned. </param>
-            public AgentActionBuilder AddPrecondition(AgentBelief[] preconditions)
+            public Builder AddPrecondition(AgentBelief[] preconditions)
             {
                 foreach (AgentBelief precondition in preconditions)
                 {
@@ -119,7 +135,7 @@ namespace Khepri.Models.GOAP
 
             /// <summary> Adds a outcome that is fulfilled by the action being completed. </summary>
             /// <param name="outcome"> How the agent's beliefs or state will change as a result of the action. </param>
-            public AgentActionBuilder AddOutcome(AgentBelief outcome)
+            public Builder AddOutcome(AgentBelief outcome)
             {
                 _action.Outcomes.Add(outcome);
                 return this;
@@ -128,7 +144,7 @@ namespace Khepri.Models.GOAP
 
             /// <summary> Adds outcomes that is fulfilled by the action being completed. </summary>
             /// <param name="outcomes"> How the agent's beliefs or state will change as a result of the action. </param>
-            public AgentActionBuilder AddOutcome(AgentBelief[] outcomes)
+            public Builder AddOutcome(AgentBelief[] outcomes)
             {
                 foreach (AgentBelief outcome in outcomes)
                 {
