@@ -5,7 +5,7 @@ using System.Threading;
 namespace Khepri.Models.Persistent
 {
     /// <summary> A piece of data that represents a set of persistent data that can be saved and loaded. </summary>
-    public interface IPersistent : IComparable<IPersistent>
+    public interface IPersistent : IEquatable<IPersistent>
     {
         /// <summary> The object's unique identifier. Acts as it's key value when mapping data to it. </summary>
         public Guid UId { get; }

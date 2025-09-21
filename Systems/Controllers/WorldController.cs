@@ -16,12 +16,16 @@ namespace Khepri.Controllers
         /// <remarks> The game starts on Sunday the 5th of February, 2012. </remarks>
         public DateTimeOffset CurrentTime { get; private set; } = new DateTimeOffset(2012, 2, 5, 0, 0, 0, TimeSpan.FromHours(8));
 
+        /// <summary> The amount of time (in seconds) that has passed in game time since the previous physics frame. </summary>
+        public Double GameTimeDelta { get; private set; }
+
 
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
-            // Update the world time each frame.
-            CurrentTime += TimeSpan.FromSeconds(delta * _timescale);
+            DateTimeOffset previousTime = CurrentTime;
+            CurrentTime = CurrentTime.AddSeconds(delta * _timescale);
+            GameTimeDelta = (CurrentTime.ToUnixTimeMilliseconds() - previousTime.ToUnixTimeMilliseconds()) * 0.001f;
         }
     }
 }

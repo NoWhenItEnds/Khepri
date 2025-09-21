@@ -11,6 +11,10 @@ namespace Khepri.Entities.UnitComponents
     /// <summary> The controller or root node of a unit's sensors. </summary>
     public partial class UnitBrain : Node3D
     {
+        /// <summary> A reference to the brain's unit. </summary>
+        [ExportGroup("Nodes")]
+        [Export] private Unit _unit;
+
         /// <summary> How long, in hours, a unit should remember an entity before forgetting it if it hasn't been seen (in that period of time). </summary>
         [ExportGroup("Settings")]
         [Export] private Single _memoryLength = 6f;
@@ -109,7 +113,11 @@ namespace Khepri.Entities.UnitComponents
             if (entity == null)
             {
                 entity = new KnownPosition(modifiedPosition);
-                _knownLocations.Add(entity);
+                Boolean isAdded = _knownLocations.Add(entity);
+                if (isAdded)    // Reward the unit by discovering new areas by increasing their entertainment.
+                {
+                    _unit.Data.UpdateEntertainment(0.1f);
+                }
             }
             return entity;
         }

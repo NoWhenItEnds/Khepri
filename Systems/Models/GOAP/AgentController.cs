@@ -74,8 +74,8 @@ namespace Khepri.Models.GOAP
             factory.AddBelief("AgentIsHurt", () => _controlledEntity.Data.CurrentHealth < 50);
             factory.AddBelief("AgentIsFed", () => _controlledEntity.Data.CurrentHunger >= 90f);
             factory.AddBelief("AgentIsHungry", () => _controlledEntity.Data.CurrentHunger < 50f);
-            factory.AddBelief("AgentIsRested", () => _controlledEntity.Data.CurrentStamina >= 90f);
-            factory.AddBelief("AgentIsTired", () => _controlledEntity.Data.CurrentStamina < 50f);
+            factory.AddBelief("AgentIsRested", () => _controlledEntity.Data.CurrentFatigue >= 90f);
+            factory.AddBelief("AgentIsTired", () => _controlledEntity.Data.CurrentFatigue < 50f);
             factory.AddBelief("AgentIsEntertained", () => _controlledEntity.Data.CurrentEntertainment >= 90f);
             factory.AddBelief("AgentIsBored", () => _controlledEntity.Data.CurrentEntertainment < 50f);
 

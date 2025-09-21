@@ -1,5 +1,6 @@
 using Godot;
 using Godot.Collections;
+using Khepri.Controllers;
 using Khepri.Entities.Interfaces;
 using Khepri.Entities.UnitComponents;
 using Khepri.Entities.UnitComponents.States;
@@ -30,6 +31,20 @@ namespace Khepri.Entities
         [Export] public UnitBrain Brain { get; private set; }
 
 
+        /// <summary> Modifies the amount of hunger the unit looses each tick. </summary>
+        [ExportGroup("Settings")]
+        [Export] private Single _hungerModifier = 0.001f;
+
+        /// <summary> Modifies the amount of fatigue the unit looses each tick. </summary>
+        [Export] private Single _fatigueModifier = 0.001f;
+
+        /// <summary> Modifies the amount of entertainment the unit looses each tick. </summary>
+        [Export] private Single _entertainmentModifier = 0.001f;
+
+        /// <summary> The amount of stamina the unit recovers per tick. </summary>
+        [Export] private Single _staminaModifier = 1f;
+
+
         /// <summary> The animation sheets to use for the unit's animations. </summary>
         [ExportGroup("Resources")]
         [Export] private Dictionary<UnitSpriteLayer, SpriteFrames> _spriteFrames;
@@ -46,6 +61,10 @@ namespace Khepri.Entities
         public readonly UnitData Data = new UnitData();
 
 
+        /// <summary> A reference to the world controller. </summary>
+        private WorldController _worldController;
+
+
         /// <summary> The current state of the unit. </summary>
         private UnitState _currentState;
 
@@ -53,6 +72,8 @@ namespace Khepri.Entities
         /// <inheritdoc/>
         public override void _Ready()
         {
+            _worldController = WorldController.Instance;
+
             _currentState = new IdleState(this);
 
             // Setup the sprite animations.
@@ -68,6 +89,13 @@ namespace Khepri.Entities
         public override void _PhysicsProcess(Double delta)
         {
             _currentState.Update(delta);
+
+            // Update stats.
+            Single gameTimeDelta = (Single)_worldController.GameTimeDelta;
+            Data.UpdateHunger(-gameTimeDelta * _hungerModifier);
+            Data.UpdateFatigue(-gameTimeDelta * _fatigueModifier);
+            Data.UpdateEntertainment(-gameTimeDelta * _entertainmentModifier);
+            Data.UpdateStamina(gameTimeDelta * _staminaModifier);
         }
 
 
