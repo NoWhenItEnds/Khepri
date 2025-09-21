@@ -107,7 +107,7 @@ namespace Khepri.Models.GOAP
                 .AddOutcome(_availableBeliefs["AgentKnowsPlayer"])
                 .Build());
 */
-            AvailableActions.Add(new AgentAction.Builder("Locate Player")
+            AvailableActions.Add(new AgentAction.Builder("Locate Player")   // TODO - Remember that we have a ".WithCost()" method we should use.
                 .WithStrategy(new LocateActionStrategy(_controlledEntity, PlayerController.Instance.PlayerUnit))
                 .AddPrecondition(_availableBeliefs["AgentKnowsPlayer"])
                 .AddOutcome(_availableBeliefs["AgentSeesPlayer"])
