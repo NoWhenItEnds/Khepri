@@ -82,7 +82,7 @@ namespace Khepri.Models.GOAP
             factory.AddBrainBelief("AgentKnowsPlayer", _controlledEntity.Brain, _playerController.PlayerUnit);
             factory.AddBrainBelief("AgentKnowsFood", _controlledEntity.Brain, typeof(Food));
 
-            factory.AddBelief("AgentSeesPlayer", () => true);   // TODO - Tie this to something inside the sensor, or have a new AddSensorBelief.
+            factory.AddBelief("AgentSeesPlayer", () => _controlledEntity.Brain.KnowsEntity(_playerController.PlayerUnit).IsVisible);
         }
 
 
@@ -109,7 +109,7 @@ namespace Khepri.Models.GOAP
 */
             AvailableActions.Add(new AgentAction.Builder("Locate Player")
                 .WithStrategy(new LocateActionStrategy(_controlledEntity, PlayerController.Instance.PlayerUnit))
-                .AddOutcome(_availableBeliefs["AgentKnowsPlayer"])  // TODO - Should this be broken down further. I.e. have a separate strategy to find the player if they're not known vs. move to where they were last seen? YES!
+                .AddPrecondition(_availableBeliefs["AgentKnowsPlayer"])
                 .AddOutcome(_availableBeliefs["AgentSeesPlayer"])
                 .Build());
 
@@ -163,9 +163,6 @@ namespace Khepri.Models.GOAP
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
-            // TODO - For the moment we will degrade health while it is not in range of the player, forcing it to seek the player out. Otherwise it will dance.
-            //_controlledEntity.Stats.UpdateHealth(-(Single)delta);
-
             // Update the plan and current action if there is one
             if (_currentAction == null)
             {

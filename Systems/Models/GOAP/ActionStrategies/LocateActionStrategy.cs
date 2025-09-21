@@ -1,6 +1,8 @@
 using Godot;
 using Khepri.Entities;
 using Khepri.Entities.Interfaces;
+using Khepri.Entities.UnitComponents;
+using Khepri.Models.Input;
 using System;
 
 namespace Khepri.Models.GOAP.ActionStrategies
@@ -12,7 +14,7 @@ namespace Khepri.Models.GOAP.ActionStrategies
         public Boolean IsValid => !IsComplete;
 
         /// <inheritdoc/>
-        public Boolean IsComplete => throw new NotImplementedException();
+        public Boolean IsComplete => _unit.NavigationAgent.IsNavigationFinished();
 
         /// <summary> A reference to the unit being manipulated. </summary>
         private readonly Unit _unit;
@@ -34,21 +36,34 @@ namespace Khepri.Models.GOAP.ActionStrategies
         /// <inheritdoc/>
         public void Start()
         {
-            throw new NotImplementedException();
+            KnownEntity? entity = _unit.Brain.KnowsEntity(_target);
+            if (entity != null)
+            {
+                _unit.NavigationAgent.TargetPosition = entity.LastKnownPosition;
+            }
+            else
+            {
+                _unit.NavigationAgent.TargetPosition = _unit.GlobalPosition;
+            }
         }
 
 
         /// <inheritdoc/>
-        public void Update(double delta)
+        public void Update(Double delta)
         {
-            throw new NotImplementedException();
+            if (!_unit.NavigationAgent.IsNavigationFinished())
+            {
+                Vector3 nextPosition = _unit.NavigationAgent.GetNextPathPosition();
+                Vector3 direction = _unit.GlobalPosition.DirectionTo(nextPosition).Normalized();
+                _unit.HandleInput(new MoveInput(direction, MoveType.WALKING));
+            }
         }
 
 
         /// <inheritdoc/>
         public void Stop()
         {
-            throw new NotImplementedException();
+            _unit.HandleInput(new MoveInput(Vector3.Zero, MoveType.IDLE));
         }
     }
 }

@@ -50,6 +50,11 @@ namespace Khepri.Entities
         [Export] private Dictionary<UnitSpriteLayer, SpriteFrames> _spriteFrames;
 
 
+        /// <summary> Whether the unit's needs should be shown as a debug overlay. </summary>
+        [ExportGroup("Debug")]
+        [Export] private Boolean _showNeeds = false;
+
+
         /// <inheritdoc/>
         public Guid UId => Data.UId;
 
@@ -96,6 +101,29 @@ namespace Khepri.Entities
             Data.UpdateFatigue(-gameTimeDelta * _fatigueModifier);
             Data.UpdateEntertainment(-gameTimeDelta * _entertainmentModifier);
             Data.UpdateStamina(gameTimeDelta * _staminaModifier);
+
+            // Show debug stuff.
+            DrawDebug();
+        }
+
+
+        private void DrawDebug()
+        {
+            Vector3 current = GlobalPosition + new Vector3(1, 1, -1);
+            // Show debug stuff.
+            if (_showNeeds)
+            {
+                DebugDraw3D.DrawText(current, $"HEA: {Data.CurrentHealth:F1}", 32, Colors.Green);
+                current += Vector3.Back * 0.2f;
+                DebugDraw3D.DrawText(current, $"HUG: {Data.CurrentHunger:F1}", 32, Colors.Green);
+                current += Vector3.Back * 0.2f;
+                DebugDraw3D.DrawText(current, $"FAT: {Data.CurrentFatigue:F1}", 32, Colors.Green);
+                current += Vector3.Back * 0.2f;
+                DebugDraw3D.DrawText(current, $"ENT: {Data.CurrentEntertainment:F1}", 32, Colors.Green);
+                current += Vector3.Back * 0.2f;
+                DebugDraw3D.DrawText(current, $"STA: {Data.CurrentStamina:F1}", 32, Colors.Green);
+                current += Vector3.Back * 0.2f;
+            }
         }
 
 
