@@ -507,7 +507,7 @@ _occlusionMesh = NodePath("MeshInstance3D")
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
 cull_mask = 1
 projection = 1
-size = 8.0
+size = 12.0
 
 [node name="Occlusion SubViewport" type="SubViewport" parent="World/World Camera/Main Camera"]
 
@@ -516,7 +516,7 @@ transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 1, 
 cull_mask = 524288
 environment = SubResource("Environment_md4fn")
 projection = 1
-size = 8.0
+size = 12.0
 
 [node name="Occlusion Mask SubViewport" type="SubViewport" parent="World/World Camera/Main Camera"]
 disable_3d = true

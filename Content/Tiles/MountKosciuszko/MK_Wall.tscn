@@ -7,6 +7,7 @@
 size = Vector3(1, 0.5, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_q2mkl"]
+lightmap_size_hint = Vector2i(19, 21)
 size = Vector3(1, 0.5, 1)
 
 [node name="MK_Wall" type="StaticBody3D"]
@@ -17,6 +18,7 @@ shape = SubResource("BoxShape3D_j3tjn")
 
 [node name="Sprite3D" type="Sprite3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+layers = 524289
 offset = Vector2(0, 16)
 pixel_size = 0.0313
 axis = 1
