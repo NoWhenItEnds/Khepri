@@ -1,6 +1,7 @@
 using Godot;
 using Khepri.Entities;
 using Khepri.Models.Input;
+using Khepri.Nodes;
 using Khepri.Nodes.Singletons;
 using System;
 
@@ -13,15 +14,23 @@ namespace Khepri.Controllers
         [ExportGroup("Nodes")]
         [Export] public Unit PlayerUnit { get; private set; }
 
+
         /// <summary> The game world's main camera the player views through. </summary>
-        [Export] public Camera3D MainCamera { get; private set; }
+        private WorldCamera _worldCamera;
+
+
+        /// <inheritdoc/>
+        public override void _Ready()
+        {
+            _worldCamera = WorldCamera.Instance;
+        }
 
 
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
             // TODO - Move into it's own controller / manager?
-            MainCamera.GlobalPosition = PlayerUnit.CameraPosition.GlobalPosition;
+            _worldCamera.GlobalPosition = PlayerUnit.CameraPosition.GlobalPosition;
 
             Single horizontal = Input.GetAxis("action_move_left", "action_move_right");
             Single vertical = Input.GetAxis("action_move_up", "action_move_down");

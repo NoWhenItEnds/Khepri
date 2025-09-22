@@ -71,3 +71,8 @@ monitorable = false
 shape = SubResource("CylinderShape3D_jo3tn")
 
 [node name="RayCast3D" type="RayCast3D" parent="UnitBrain/Sight Sensor"]
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+layers = 524288
+shadow_enabled = true
