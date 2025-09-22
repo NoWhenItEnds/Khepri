@@ -21,7 +21,7 @@ namespace Khepri.Types
     {
         /// <summary> Converts a vector direction to the enum type. </summary>
         /// <param name="vector"> The direction as a vector. </param>
-        /// <returns> The closest six-point direction. </returns>
+        /// <returns> The closest four-point direction. </returns>
         public static Direction ToDirection(this Vector3 vector)
         {
             // First check if there is an up or down direction.
@@ -55,6 +55,33 @@ namespace Khepri.Types
             else
             {
                 result = Direction.RIGHT;
+            }
+            return result;
+        }
+
+
+        /// <summary> Converts a vector direction to the enum type. </summary>
+        /// <param name="direction"> The direction in degrees. </param>
+        /// <returns> The closest four-point direction. </returns>
+        public static Direction ToDirection(this Single direction)
+        {
+            Single angle = Math.Abs(direction);
+            Direction result = Direction.NONE;
+            if (angle > 45f && angle <= 135f)
+            {
+                result = Direction.RIGHT;
+            }
+            else if (angle > 135f && angle <= 225f)
+            {
+                result = Direction.DOWN;
+            }
+            else if (angle > 225f)
+            {
+                result = Direction.LEFT;
+            }
+            else
+            {
+                result = Direction.UP;
             }
             return result;
         }

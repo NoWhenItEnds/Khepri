@@ -27,8 +27,7 @@ namespace Khepri.Entities.UnitComponents.States
         /// <inheritdoc/>
         public override void Update(Double delta)
         {
-            // TODO - This direction needs to be set... Somehow. Maybe mouse direction?
-            _unit.AnimatedSprite.TransitionAnimation(this, Vector3.Zero.ToDirection());
+            _unit.AnimatedSprite.TransitionAnimation(this, _unit.Direction.ToDirection());
 
             // TODO - Have a timer here to do a fidget animation.
             // Apply gravity if we're not on the ground.

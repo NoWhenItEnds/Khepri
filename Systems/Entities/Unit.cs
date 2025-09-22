@@ -61,6 +61,8 @@ namespace Khepri.Entities
         /// <inheritdoc/>
         public Vector3 WorldPosition => GlobalPosition;
 
+        /// <summary> The current direction the unit is facing. </summary>
+        public Single Direction { get; private set; } = 0f;
 
         /// <summary> The stats used by the unit to set its state. </summary>
         public readonly UnitData Data = new UnitData();
@@ -94,6 +96,7 @@ namespace Khepri.Entities
         public override void _PhysicsProcess(Double delta)
         {
             _currentState.Update(delta);
+            UpdateDirection();
 
             // Update stats.
             Single gameTimeDelta = (Single)_worldController.GameTimeDelta;
@@ -104,6 +107,16 @@ namespace Khepri.Entities
 
             // Show debug stuff.
             DrawDebug();
+        }
+
+
+        /// <summary> Update the direction the unit is currently facing. </summary>
+        public void UpdateDirection()
+        {
+            if (Velocity != Vector3.Zero)
+            {
+                Direction = Mathf.RadToDeg(new Vector2(Velocity.X, Velocity.Z).Angle()) * -1f - 90f;  // Invert direction by * -1f
+            }
         }
 
 
