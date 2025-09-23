@@ -25,14 +25,19 @@ namespace Khepri.Controllers
         /// <summary> Whether the ui is currently open. </summary>
         private Boolean _isUIOpen = false;
 
+        /// <summary> Whether the user is currently using a controller. </summary>
+        private Boolean _isUsingJoypad = false;
+
 
         /// <inheritdoc/>
         public override void _Ready()
         {
             _viewport = GetViewport();
-
             _worldCamera = WorldCamera.Instance;
+
+            // Set up initial state.
             _worldCamera.SetTarget(PlayerUnit.CameraPosition);
+            Input.MouseMode = Input.MouseModeEnum.ConfinedHidden;
         }
 
 
@@ -41,23 +46,33 @@ namespace Khepri.Controllers
         {
             if (!_isUIOpen)
             {
-                Single horizontal = Input.GetAxis("action_move_left", "action_move_right");
-                Single vertical = Input.GetAxis("action_move_up", "action_move_down");
-                Vector3 direction = new Vector3(horizontal, 0f, vertical).Normalized();
+                Single moveHorizontal = Input.GetAxis("action_move_left", "action_move_right");
+                Single moveVertical = Input.GetAxis("action_move_up", "action_move_down");
+                Vector3 moveDirection = new Vector3(moveHorizontal, 0f, moveVertical).Normalized();
 
                 MoveType movementType = MoveType.IDLE;
-                if (direction != Vector3.Zero)
+                if (moveDirection != Vector3.Zero)
                 {
                     movementType = Input.IsActionPressed("action_move_sprint") ? MoveType.SPRINTING : MoveType.WALKING;
                 }
 
-                MoveInput moveInput = new MoveInput(direction, movementType);
+                MoveInput moveInput = new MoveInput(moveDirection, movementType);
                 PlayerUnit.HandleInput(moveInput);
 
                 // Handle camera.
-                Vector2 radius = (Vector2)_viewport.GetVisibleRect().Size * 0.5f;
-                Vector2 centeredMousePosition = _viewport.GetMousePosition() - (Vector2)_viewport.GetVisibleRect().Size * 0.5f;
-                Vector2 ratio = centeredMousePosition / radius;
+                Vector2 ratio = Vector2.Zero;
+                if (_isUsingJoypad)
+                {
+                    Single cameraHorizontal = Input.GetAxis("action_camera_left", "action_camera_right");
+                    Single cameraVertical = Input.GetAxis("action_camera_up", "action_camera_down");
+                    ratio = new Vector2(cameraHorizontal, cameraVertical);
+                }
+                else
+                {
+                    Vector2 radius = (Vector2)_viewport.GetVisibleRect().Size * 0.5f;
+                    Vector2 centeredMousePosition = _viewport.GetMousePosition() - (Vector2)_viewport.GetVisibleRect().Size * 0.5f;
+                    ratio = centeredMousePosition / radius;
+                }
                 _worldCamera.UpdateCameraPosition(ratio);
             }
         }
@@ -66,10 +81,29 @@ namespace Khepri.Controllers
         /// <inheritdoc/>
         public override void _UnhandledInput(InputEvent @event)
         {
+            SetControllerType(@event);
+
             if (@event.IsActionReleased("action_toggle_ui"))
             {
                 _isUIOpen = !_isUIOpen;
                 Input.MouseMode = _isUIOpen ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.ConfinedHidden;
+            }
+        }
+
+
+        /// <summary> Check and set whether the player is using a controller or not. </summary>
+        /// <param name="event"> The event to check. </param>
+        private void SetControllerType(InputEvent @event)
+        {
+            switch (@event)
+            {
+                case InputEventKey or InputEventMouse:
+                    _isUsingJoypad = false;
+                    break;
+                case InputEventJoypadButton:
+                case InputEventJoypadMotion { AxisValue: < -0.1f or > 0.1f }:
+                    _isUsingJoypad = true;
+                    break;
             }
         }
     }

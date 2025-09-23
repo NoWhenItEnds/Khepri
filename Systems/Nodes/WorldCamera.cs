@@ -26,7 +26,7 @@ namespace Khepri.Nodes
 
         /// <summary> The modifier to allow the camera to move away from the followed node. </summary>
         [ExportGroup("Settings")]
-        [Export] private Single _cameraRadiusModifier = 5f;
+        [Export] private Single _cameraRadiusModifier = 4f;
 
 
         /// <summary> A reference to the window node. </summary>
