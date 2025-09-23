@@ -15,41 +15,62 @@ namespace Khepri.Controllers
         [Export] public Unit PlayerUnit { get; private set; }
 
 
+        /// <summary> A reference to the window node. </summary>
+        private Viewport _viewport;
+
         /// <summary> The game world's main camera the player views through. </summary>
         private WorldCamera _worldCamera;
+
+
+        /// <summary> Whether the ui is currently open. </summary>
+        private Boolean _isUIOpen = false;
 
 
         /// <inheritdoc/>
         public override void _Ready()
         {
+            _viewport = GetViewport();
+
             _worldCamera = WorldCamera.Instance;
+            _worldCamera.SetTarget(PlayerUnit.CameraPosition);
         }
 
 
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
-            // TODO - Move into it's own controller / manager?
-            _worldCamera.GlobalPosition = PlayerUnit.CameraPosition.GlobalPosition;
-
-            Single horizontal = Input.GetAxis("action_move_left", "action_move_right");
-            Single vertical = Input.GetAxis("action_move_up", "action_move_down");
-            Vector3 direction = new Vector3(horizontal, 0f, vertical).Normalized();
-
-            MoveType movementType = MoveType.IDLE;
-            if (direction != Vector3.Zero)
+            if (!_isUIOpen)
             {
-                movementType = Input.IsActionPressed("action_move_sprint") ? MoveType.SPRINTING : MoveType.WALKING;
+                Single horizontal = Input.GetAxis("action_move_left", "action_move_right");
+                Single vertical = Input.GetAxis("action_move_up", "action_move_down");
+                Vector3 direction = new Vector3(horizontal, 0f, vertical).Normalized();
+
+                MoveType movementType = MoveType.IDLE;
+                if (direction != Vector3.Zero)
+                {
+                    movementType = Input.IsActionPressed("action_move_sprint") ? MoveType.SPRINTING : MoveType.WALKING;
+                }
+
+                MoveInput moveInput = new MoveInput(direction, movementType);
+                PlayerUnit.HandleInput(moveInput);
+
+                // Handle camera.
+                Vector2 radius = (Vector2)_viewport.GetVisibleRect().Size * 0.5f;
+                Vector2 centeredMousePosition = _viewport.GetMousePosition() - (Vector2)_viewport.GetVisibleRect().Size * 0.5f;
+                Vector2 ratio = centeredMousePosition / radius;
+                _worldCamera.UpdateCameraPosition(ratio);
             }
-
-            MoveInput moveInput = new MoveInput(direction, movementType);
-            PlayerUnit.HandleInput(moveInput);
+        }
 
 
-            // TODO - Make more elegant.
-            Viewport viewport = GetViewport();
-            Vector2 centeredMousePosition = viewport.GetMousePosition() - (Vector2)viewport.GetVisibleRect().Size * 0.5f;
-            // TODO - Adjust camera from offset.
+        /// <inheritdoc/>
+        public override void _UnhandledInput(InputEvent @event)
+        {
+            if (@event.IsActionReleased("action_toggle_ui"))
+            {
+                _isUIOpen = !_isUIOpen;
+                Input.MouseMode = _isUIOpen ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.ConfinedHidden;
+            }
         }
     }
 }
