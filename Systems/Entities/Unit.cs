@@ -72,8 +72,8 @@ namespace Khepri.Entities
         private WorldController _worldController;
 
 
-        /// <summary> The current state of the unit. </summary>
-        private UnitState _currentState;
+        /// <summary> The state machine controlling the unit. </summary>
+        private UnitStateMachine _stateMachine;
 
 
         /// <inheritdoc/>
@@ -81,7 +81,7 @@ namespace Khepri.Entities
         {
             _worldController = WorldController.Instance;
 
-            _currentState = new IdleState(this);
+            _stateMachine = new UnitStateMachine(this);
 
             // Setup the sprite animations.
             foreach (var frames in _spriteFrames)
@@ -95,7 +95,7 @@ namespace Khepri.Entities
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
-            _currentState.Update(delta);
+            _stateMachine.CurrentState.Update(delta);
             UpdateDirection();
 
             // Update stats.
@@ -140,16 +140,28 @@ namespace Khepri.Entities
         }
 
 
-        /// <summary> Attempts to set the unit's state. </summary>
-        /// <param name="state"> The state to set the unit. </param>
-        public void TrySetUnitState(Type state) => _currentState = _currentState.TryTransitionTo(state);
-
-
         /// <summary> Handle the input sent to the unit by it's controller. </summary>
         /// <param name="input"> The input data class to interpret. </param>
         public void HandleInput(IInput input)
         {
-            _currentState.HandleInput(input);
+            if (input is MoveInput moveInput)
+            {
+                switch (moveInput.MovementType)
+                {
+                    case MoveType.WALKING:
+                        _stateMachine.TransitionState(StateEvent.WALK);
+                        break;
+                    case MoveType.SPRINTING:
+                        _stateMachine.TransitionState(StateEvent.SPRINT);
+                        break;
+                    case MoveType.IDLE:
+                    default:
+                        _stateMachine.TransitionState(StateEvent.IDLE);
+                        break;
+                }
+            }
+
+            _stateMachine.CurrentState.HandleInput(input);
         }
 
 
