@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://ko6nvcupfcf4"]
+[gd_scene load_steps=18 format=3 uid="uid://ko6nvcupfcf4"]
 
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="Script" uid="uid://cgujt8yhxbsew" path="res://Systems/Controllers/WorldController.cs" id="1_8fov1"]
@@ -7,8 +7,10 @@
 [ext_resource type="PackedScene" uid="uid://dm4tu3i0sn5s4" path="res://Content/Tiles/MountKosciuszko/MK_Terrain.tscn" id="4_5p3x2"]
 [ext_resource type="PackedScene" uid="uid://dbsl418re8pu4" path="res://Content/Tiles/MountKosciuszko/MK_Wall.tscn" id="5_sa7mi"]
 [ext_resource type="PackedScene" uid="uid://c5oukv8uq6kbj" path="res://Content/Tiles/MountKosciuszko/MK_Stairs.tscn" id="6_fdsh7"]
+[ext_resource type="Script" uid="uid://cetn5kplov84b" path="res://Systems/Nodes/WorldCamera.cs" id="8_md4fn"]
+[ext_resource type="Shader" uid="uid://ctyba6bkndpm1" path="res://Content/Shaders/Shader_MainCameraMask.gdshader" id="9_gh1u3"]
 
-[sub_resource type="Environment" id="Environment_5p3x2"]
+[sub_resource type="Environment" id="Environment_gh1u3"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_fdsh7"]
 vertices = PackedVector3Array(-0.5, 1.25, 3.5, 0.25, 2, 3.25, 0.25, 2, 3, -0.5, 1.25, 2.5, -5, 1, 5, 0.25, 1, 0.5, 1.75, 1, -5, -5, 1, -5, 1.75, 1, 2.25, 1.75, 1, 2, 0.25, 1, 1.75, 2, 1, 0.25, -0.75, 1, 5, 2.25, 1, 2, 2, 1, 3.5, 2.5, 1, 4, -0.25, 1, 4, 4, 1, 3.5, 5, 1, 5, 4, 1, 0.5, 5, 1, -5, 1.5, 1, 4, 1, 2, 2.5, 3.25, 2, 3.25, 3.25, 2, 1, 1, 2, 1)
@@ -20,6 +22,29 @@ agent_max_climb = 0.5
 agent_max_slope = 60.0
 filter_ledge_spans = true
 
+[sub_resource type="Environment" id="Environment_md4fn"]
+background_mode = 1
+ambient_light_source = 1
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vstfe"]
+shader = ExtResource("9_gh1u3")
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_md4fn"]
+viewport_path = NodePath("World/World Camera/Main Camera/Occlusion SubViewport")
+
+[sub_resource type="QuadMesh" id="QuadMesh_gh1u3"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_gh1u3"]
+viewport_path = NodePath("World/World Camera/Main Camera/Occlusion Mask SubViewport")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gh1u3"]
+resource_local_to_scene = true
+transparency = 2
+alpha_scissor_threshold = 0.5
+alpha_antialiasing_mode = 0
+shading_mode = 0
+albedo_texture = SubResource("ViewportTexture_gh1u3")
+
 [node name="Game" type="Node"]
 
 [node name="Controllers" type="Node" parent="."]
@@ -27,10 +52,9 @@ filter_ledge_spans = true
 [node name="World Controller" type="Node" parent="Controllers"]
 script = ExtResource("1_8fov1")
 
-[node name="Player Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("PlayerUnit", "MainCamera")]
+[node name="Player Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("PlayerUnit")]
 script = ExtResource("1_5p3x2")
 PlayerUnit = NodePath("../../World/Player Unit")
-MainCamera = NodePath("../../World/Main Camera")
 
 [node name="Agent Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("_controlledEntity")]
 script = ExtResource("3_md4fn")
@@ -39,22 +63,17 @@ _controlledEntity = NodePath("../../World/Enemy Unit")
 [node name="World" type="Node3D" parent="."]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="World"]
-environment = SubResource("Environment_5p3x2")
+environment = SubResource("Environment_gh1u3")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="World/WorldEnvironment"]
-transform = Transform3D(0.358177, 0.880592, -0.310271, 0.573737, 0.0545764, 0.817219, 0.73657, -0.470723, -0.48568, 0, 0, 0)
-shadow_enabled = true
-
-[node name="Main Camera" type="Camera3D" parent="World"]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 1, 1, 0)
-projection = 1
-size = 8.0
+transform = Transform3D(1, 0, 0, 0, -4.3711385e-08, 0.99999994, 0, -0.99999994, -4.3711385e-08, 0, 0, 0)
 
 [node name="Player Unit" parent="World" instance=ExtResource("2_5p3x2")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.935, 0, -0.318)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -2)
 
 [node name="Enemy Unit" parent="World" instance=ExtResource("2_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.065, 0, -0.318)
+_showNeeds = true
 
 [node name="Playground" type="NavigationRegion3D" parent="World"]
 navigation_mesh = SubResource("NavigationMesh_fdsh7")
@@ -474,3 +493,43 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, 1)
 
 [node name="MK_Stairs" parent="World/Playground/Second Floor" instance=ExtResource("6_fdsh7")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 3)
+
+[node name="World Camera" type="Node3D" parent="World" node_paths=PackedStringArray("_mainCamera", "_occlusionSubViewport", "_occlusionCamera", "_occlusionMaskSubViewport", "_occlusionMesh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+script = ExtResource("8_md4fn")
+_mainCamera = NodePath("Main Camera")
+_occlusionSubViewport = NodePath("Main Camera/Occlusion SubViewport")
+_occlusionCamera = NodePath("Main Camera/Occlusion SubViewport/Occlusion Camera")
+_occlusionMaskSubViewport = NodePath("Main Camera/Occlusion Mask SubViewport")
+_occlusionMesh = NodePath("MeshInstance3D")
+
+[node name="Main Camera" type="Camera3D" parent="World/World Camera"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+cull_mask = 1
+projection = 1
+size = 12.0
+
+[node name="Occlusion SubViewport" type="SubViewport" parent="World/World Camera/Main Camera"]
+
+[node name="Occlusion Camera" type="Camera3D" parent="World/World Camera/Main Camera/Occlusion SubViewport"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 1, 0)
+cull_mask = 524288
+environment = SubResource("Environment_md4fn")
+projection = 1
+size = 12.0
+
+[node name="Occlusion Mask SubViewport" type="SubViewport" parent="World/World Camera/Main Camera"]
+disable_3d = true
+own_world_3d = true
+transparent_bg = true
+
+[node name="TextureRect" type="TextureRect" parent="World/World Camera/Main Camera/Occlusion Mask SubViewport"]
+material = SubResource("ShaderMaterial_vstfe")
+offset_right = 40.0
+offset_bottom = 40.0
+texture = SubResource("ViewportTexture_md4fn")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="World/World Camera"]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, -0.2, 0)
+mesh = SubResource("QuadMesh_gh1u3")
+surface_material_override/0 = SubResource("StandardMaterial3D_gh1u3")

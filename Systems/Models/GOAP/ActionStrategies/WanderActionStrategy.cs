@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using Godot;
-using Khepri.Controllers;
 using Khepri.Entities;
 using Khepri.Models.Input;
 
@@ -11,7 +10,7 @@ namespace Khepri.Models.GOAP.ActionStrategies
     public class WanderActionStrategy : IActionStrategy
     {
         /// <inheritdoc/>
-        public bool IsValid => !IsComplete;
+        public bool IsValid => !IsComplete; // TODO - See if this is necessary.
 
         /// <inheritdoc/>
         public bool IsComplete => _unit.NavigationAgent.IsNavigationFinished();

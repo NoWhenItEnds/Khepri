@@ -11,13 +11,6 @@ namespace Khepri.Entities.UnitComponents.States
         /// <inheritdoc/>
         public override String AnimationPrefix { get; } = "walking_";
 
-        /// <inheritdoc/>
-        protected override Type[] _connectingStates { get; } =
-        [
-            typeof(IdleState),
-            typeof(SprintingState)
-        ];
-
 
         /// <summary> The unit is walking across the ground. </summary>
         /// <param name="unit"> A reference to the unit. </param>
@@ -25,41 +18,26 @@ namespace Khepri.Entities.UnitComponents.States
 
 
         /// <inheritdoc/>
-        public override void Update(Double delta)
-        {
-        }
-
-
-        /// <inheritdoc/>
         public override void HandleInput(IInput input)
         {
             if (input is MoveInput move)
             {
-                switch (move.MovementType)
-                {
-                    case MoveType.IDLE:
-                        _unit.TrySetUnitState(typeof(IdleState));
-                        break;
-                    case MoveType.SPRINTING:
-                        _unit.TrySetUnitState(typeof(SprintingState));
-                        break;
-                    default:
-                        _unit.Velocity = move.Direction * _unit.Data.BaseSpeed;
-                        if (!_unit.IsOnFloor()) { _unit.Velocity -= new Vector3(0f, 9.81f, 0f) * 0.5f; }    // Apply gravity if we're not on the ground.
-                        _unit.MoveAndSlide();
-
-                        _unit.AnimatedSprite.TransitionAnimation(this, move.Direction.ToDirection());
-                        break;
-                }
+                _unit.Velocity = move.Direction * _unit.Data.BaseSpeed;
+                _unit.AnimatedSprite.TransitionAnimation(this, move.Direction.ToDirection());
             }
         }
 
 
         /// <inheritdoc/>
-        protected override void Initialise() { }
+        public override void Update(Double delta)
+        {
+            // Apply gravity if we're not on the ground.
+            if (!_unit.IsOnFloor())
+            {
+                _unit.Velocity -= new Vector3(0f, 9.81f, 0f) * 0.5f * (Single)delta;
+            }
 
-
-        /// <inheritdoc/>
-        protected override void Cleanup() { }
+            _unit.MoveAndSlide();
+        }
     }
 }
