@@ -44,6 +44,12 @@ namespace Khepri.Controllers
 
             MoveInput moveInput = new MoveInput(direction, movementType);
             PlayerUnit.HandleInput(moveInput);
+
+
+            // TODO - Make more elegant.
+            Viewport viewport = GetViewport();
+            Vector2 centeredMousePosition = viewport.GetMousePosition() - (Vector2)viewport.GetVisibleRect().Size * 0.5f;
+            // TODO - Adjust camera from offset.
         }
     }
 }

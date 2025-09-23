@@ -25,14 +25,15 @@ namespace Khepri.Nodes
 
 
         /// <summary> A reference to the window node. </summary>
-        private Window _window;
+        private Viewport _viewport;
 
 
         /// <inheritdoc/>
         public override void _Ready()
         {
-            _window = GetWindow();
-            _window.SizeChanged += SyncViewportSize;
+            _viewport = GetViewport();
+            _viewport.SizeChanged += SyncViewportSize;
+            SetCameraSize(_mainCamera.Size);
             SyncViewportSize();
         }
 
@@ -45,9 +46,18 @@ namespace Khepri.Nodes
         }
 
 
+        /// <summary> Set's the orthographic camera's size. </summary>
+        /// <param name="size"> The distance the camera is zoomed. Higher values means that it is more zoomed out.</param>
+        public void SetCameraSize(Single size = 12f)
+        {
+            _mainCamera.Size = size;
+            _occlusionCamera.Size = size;
+        }
+
+
         private void SyncViewportSize()
         {
-            Vector2I viewportSize = _window.Size;
+            Vector2I viewportSize = (Vector2I)_viewport.GetVisibleRect().Size;
             _occlusionSubViewport.Size = viewportSize;
             _occlusionMaskSubViewport.Size = viewportSize;
 
