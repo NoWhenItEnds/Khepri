@@ -7,7 +7,6 @@
 size = Vector3(1, 0.5, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_q2mkl"]
-lightmap_size_hint = Vector2i(19, 21)
 size = Vector3(1, 0.5, 1)
 
 [node name="MK_Wall" type="StaticBody3D"]
