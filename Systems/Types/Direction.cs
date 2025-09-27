@@ -6,13 +6,15 @@ namespace Khepri.Types
     /// <summary> Represents a six-point direction. </summary>
     public enum Direction
     {
-        NONE,
-        UP,
-        RIGHT,
-        DOWN,
-        LEFT,
-        TOP,
-        BOTTOM
+        NONE = -1,
+        N = 0,
+        NE = 1,
+        E = 2,
+        SE = 3,
+        S = 4,
+        SW = 5,
+        W = 6,
+        NW = 7
     }
 
 
@@ -24,12 +26,6 @@ namespace Khepri.Types
         /// <returns> The closest four-point direction. </returns>
         public static Direction ToDirection(this Vector3 vector)
         {
-            // First check if there is an up or down direction.
-            if (vector.Y != 0f)
-            {
-                return vector.Y > 0f ? Direction.TOP : Direction.BOTTOM;
-            }
-
             // Convert angle to something usable.
             Vector2 direction2D = new Vector2(vector.X, vector.Z);
             Single angle = direction2D.Angle();
@@ -39,24 +35,7 @@ namespace Khepri.Types
             }
             angle = Mathf.RadToDeg(angle);
 
-            Direction result = Direction.NONE;
-            if (angle > 45f && angle <= 135f)
-            {
-                result = Direction.DOWN;
-            }
-            else if (angle > 135f && angle <= 225f)
-            {
-                result = Direction.LEFT;
-            }
-            else if (angle > 225f && angle <= 315f)
-            {
-                result = Direction.UP;
-            }
-            else
-            {
-                result = Direction.RIGHT;
-            }
-            return result;
+            return angle.ToDirection();
         }
 
 
@@ -65,23 +44,38 @@ namespace Khepri.Types
         /// <returns> The closest four-point direction. </returns>
         public static Direction ToDirection(this Single direction)
         {
-            Single angle = Math.Abs(direction);
             Direction result = Direction.NONE;
-            if (angle > 45f && angle <= 135f)
+            if (direction > 22.5f && direction <= 67.5f)
             {
-                result = Direction.RIGHT;
+                result = Direction.SE;
             }
-            else if (angle > 135f && angle <= 225f)
+            else if (direction > 67.5f && direction <= 112.5f)
             {
-                result = Direction.DOWN;
+                result = Direction.S;
             }
-            else if (angle > 225f)
+            else if (direction > 112.5f && direction <= 157.5f)
             {
-                result = Direction.LEFT;
+                result = Direction.SW;
+            }
+            else if (direction > 157.5f && direction <= 202.5f)
+            {
+                result = Direction.W;
+            }
+            else if (direction > 202.5f && direction <= 247.5f)
+            {
+                result = Direction.NW;
+            }
+            else if (direction > 247.5f && direction <= 292.5f)
+            {
+                result = Direction.N;
+            }
+            else if (direction > 292.5f && direction <= 337.5f)
+            {
+                result = Direction.NE;
             }
             else
             {
-                result = Direction.UP;
+                result = Direction.E;
             }
             return result;
         }

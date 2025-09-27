@@ -9,7 +9,7 @@ namespace Khepri.Entities.UnitComponents.States
     public class IdlingState : UnitState
     {
         /// <inheritdoc/>
-        public override String AnimationPrefix { get; } = "idle_";
+        public override String AnimationPrefix { get; } = "Idle_";
 
 
         /// <summary> The unit is standing idle, waiting for an action. </summary>

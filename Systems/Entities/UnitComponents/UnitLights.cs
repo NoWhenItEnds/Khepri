@@ -37,7 +37,7 @@ namespace Khepri.Entities.UnitComponents
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
-            _spotlight.GlobalRotationDegrees = new Vector3(0f, _unit.Direction, 0f);
+            _spotlight.GlobalRotationDegrees = new Vector3(0f, _unit.Direction * -1f - 90f, 0f);
         }
     }
 }

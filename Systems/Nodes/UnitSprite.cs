@@ -13,7 +13,7 @@ namespace Khepri.Nodes
         [Export] private AnimatedSprite3D _baseLayer;
 
         /// <summary> The previously registered direction. </summary>
-        private Direction _previousDirection = Direction.DOWN;
+        private Direction _previousDirection = Direction.S;
 
 
         /// <inheritdoc/>
@@ -57,7 +57,7 @@ namespace Khepri.Nodes
         public void TransitionAnimation(UnitState state, Direction direction = Direction.NONE)
         {
             _previousDirection = direction != Direction.NONE ? direction : _previousDirection;
-            String animationName = state.AnimationPrefix + _previousDirection.ToString().ToLower();
+            String animationName = state.AnimationPrefix + _previousDirection;
             _baseLayer.Animation = _baseLayer.SpriteFrames.HasAnimation(animationName) ? animationName : throw new ArgumentException($"Animation '{animationName}' does not exist in the sprite frames!");
         }
     }
