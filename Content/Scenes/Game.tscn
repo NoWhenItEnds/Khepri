@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://ko6nvcupfcf4"]
+[gd_scene load_steps=26 format=3 uid="uid://ko6nvcupfcf4"]
 
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="Script" uid="uid://cgujt8yhxbsew" path="res://Systems/Controllers/WorldController.cs" id="1_8fov1"]
@@ -13,6 +13,10 @@
 [ext_resource type="Script" uid="uid://cyaymrk4jwk3o" path="res://Systems/UI/HUD/Astrolabe.cs" id="11_k5j0c"]
 [ext_resource type="Texture2D" uid="uid://bf4jcda6yqjao" path="res://Content/Textures/UI/HUD/Astrolabe/Astrolabe_Ring.png" id="12_k5j0c"]
 [ext_resource type="Texture2D" uid="uid://dt68ek83vdc6r" path="res://Content/Textures/UI/HUD/Astrolabe/Astrolabe_Indicator.png" id="13_wrnex"]
+[ext_resource type="Texture2D" uid="uid://c01vvl8jnhv8b" path="res://Content/Textures/UI/HUD/StatusBar/StatusBar_Frame.png" id="14_a7rpa"]
+[ext_resource type="Script" uid="uid://bvp2kcvx54mn7" path="res://Systems/UI/HUD/StatusBars.cs" id="14_rj7tm"]
+[ext_resource type="Texture2D" uid="uid://jm8q7n0aefdj" path="res://Content/Textures/UI/HUD/StatusBar/StatusBar_Progress.png" id="15_rj7tm"]
+[ext_resource type="Texture2D" uid="uid://be0foew3edrpc" path="res://Content/Textures/UI/HUD/StatusBar/StatusBar_Slider.png" id="17_kqbmc"]
 
 [sub_resource type="Environment" id="Environment_gh1u3"]
 
@@ -603,4 +607,75 @@ grow_horizontal = 2
 grow_vertical = 2
 pivot_offset = Vector2(128, 128)
 texture = ExtResource("13_wrnex")
+stretch_mode = 2
+
+[node name="Status Bars" type="Control" parent="UI/HUD" node_paths=PackedStringArray("_needsContainer", "_staminaBar", "_healthBar", "_hungerBar", "_fatigueBar", "_entertainmentBar", "_statusBarSlider")]
+layout_mode = 1
+offset_right = 256.0
+offset_bottom = 80.0
+script = ExtResource("14_rj7tm")
+_needsContainer = NodePath("Needs Bars")
+_staminaBar = NodePath("Stamina Bar")
+_healthBar = NodePath("Needs Bars/Health Bar")
+_hungerBar = NodePath("Needs Bars/Hunger Bar")
+_fatigueBar = NodePath("Needs Bars/Fatigue Bar")
+_entertainmentBar = NodePath("Needs Bars/Entertainment Bar")
+_statusBarSlider = NodePath("StatusBar Slider")
+
+[node name="Stamina Bar" type="TextureProgressBar" parent="UI/HUD/Status Bars"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 16.0
+grow_horizontal = 2
+value = 26.0
+texture_under = ExtResource("14_a7rpa")
+texture_progress = ExtResource("15_rj7tm")
+tint_progress = Color(0, 0.72156864, 0.4, 1)
+
+[node name="Needs Bars" type="VBoxContainer" parent="UI/HUD/Status Bars"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="Health Bar" type="TextureProgressBar" parent="UI/HUD/Status Bars/Needs Bars"]
+layout_mode = 2
+value = 26.0
+texture_under = ExtResource("14_a7rpa")
+texture_progress = ExtResource("15_rj7tm")
+tint_progress = Color(0.69411767, 0, 0, 1)
+
+[node name="Hunger Bar" type="TextureProgressBar" parent="UI/HUD/Status Bars/Needs Bars"]
+layout_mode = 2
+value = 26.0
+texture_under = ExtResource("14_a7rpa")
+texture_progress = ExtResource("15_rj7tm")
+tint_progress = Color(1, 0.69411767, 0, 1)
+
+[node name="Fatigue Bar" type="TextureProgressBar" parent="UI/HUD/Status Bars/Needs Bars"]
+layout_mode = 2
+value = 26.0
+texture_under = ExtResource("14_a7rpa")
+texture_progress = ExtResource("15_rj7tm")
+tint_progress = Color(0.25490198, 0.4392157, 0.7921569, 1)
+
+[node name="Entertainment Bar" type="TextureProgressBar" parent="UI/HUD/Status Bars/Needs Bars"]
+layout_mode = 2
+value = 26.0
+texture_under = ExtResource("14_a7rpa")
+texture_progress = ExtResource("15_rj7tm")
+tint_progress = Color(0.57254905, 0.31764707, 1, 1)
+
+[node name="StatusBar Slider" type="TextureRect" parent="UI/HUD/Status Bars"]
+layout_mode = 1
+offset_left = 65.02
+offset_right = 69.02003
+offset_bottom = 32.0
+pivot_offset = Vector2(2, 16)
+texture = ExtResource("17_kqbmc")
 stretch_mode = 2
