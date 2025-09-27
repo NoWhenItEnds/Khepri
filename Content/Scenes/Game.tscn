@@ -1,8 +1,8 @@
-[gd_scene load_steps=19 format=3 uid="uid://ko6nvcupfcf4"]
+[gd_scene load_steps=22 format=3 uid="uid://ko6nvcupfcf4"]
 
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="Script" uid="uid://cgujt8yhxbsew" path="res://Systems/Controllers/WorldController.cs" id="1_8fov1"]
-[ext_resource type="PackedScene" uid="uid://rc2326u6agtf" path="res://Content/Prefabs/Entities/Unit.tscn" id="2_5p3x2"]
+[ext_resource type="PackedScene" uid="uid://rc2326u6agtf" path="res://Content/Prefabs/Entities/Actors/Unit.tscn" id="2_5p3x2"]
 [ext_resource type="Script" uid="uid://d1dxnpil1ufxm" path="res://Systems/Models/GOAP/AgentController.cs" id="3_md4fn"]
 [ext_resource type="PackedScene" uid="uid://dm4tu3i0sn5s4" path="res://Content/Tiles/MountKosciuszko/MK_Terrain.tscn" id="4_5p3x2"]
 [ext_resource type="PackedScene" uid="uid://dbsl418re8pu4" path="res://Content/Tiles/MountKosciuszko/MK_Wall.tscn" id="5_sa7mi"]
@@ -10,6 +10,9 @@
 [ext_resource type="Script" uid="uid://cetn5kplov84b" path="res://Systems/Nodes/WorldCamera.cs" id="8_md4fn"]
 [ext_resource type="PackedScene" uid="uid://b4pnoeq7plx01" path="res://Content/Prefabs/Entities/Environment/Tree.tscn" id="8_vstfe"]
 [ext_resource type="Shader" uid="uid://ctyba6bkndpm1" path="res://Content/Shaders/Shader_MainCameraMask.gdshader" id="9_gh1u3"]
+[ext_resource type="Script" uid="uid://cyaymrk4jwk3o" path="res://Systems/UI/HUD/Astrolabe.cs" id="11_k5j0c"]
+[ext_resource type="Texture2D" uid="uid://bf4jcda6yqjao" path="res://Content/Textures/UI/HUD/Astrolabe/Astrolabe_Ring.png" id="12_k5j0c"]
+[ext_resource type="Texture2D" uid="uid://dt68ek83vdc6r" path="res://Content/Textures/UI/HUD/Astrolabe/Astrolabe_Indicator.png" id="13_wrnex"]
 
 [sub_resource type="Environment" id="Environment_gh1u3"]
 
@@ -538,3 +541,66 @@ texture = SubResource("ViewportTexture_md4fn")
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, -0.2, 0)
 mesh = SubResource("QuadMesh_gh1u3")
 surface_material_override/0 = SubResource("StandardMaterial3D_gh1u3")
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HUD" type="Control" parent="UI"]
+custom_minimum_size = Vector2(0, 256)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 256.0
+grow_horizontal = 2
+
+[node name="Astrolabe" type="Control" parent="UI/HUD" node_paths=PackedStringArray("_ringTexture")]
+layout_mode = 1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -128.0
+offset_top = -128.0
+offset_right = 128.0
+offset_bottom = 128.0
+grow_horizontal = 2
+pivot_offset = Vector2(128, 128)
+script = ExtResource("11_k5j0c")
+_ringTexture = NodePath("Ring")
+
+[node name="Ring" type="TextureRect" parent="UI/HUD/Astrolabe"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -128.0
+offset_top = -128.0
+offset_right = 128.0
+offset_bottom = 128.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(128, 128)
+texture = ExtResource("12_k5j0c")
+stretch_mode = 2
+
+[node name="Indicator" type="TextureRect" parent="UI/HUD/Astrolabe"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -128.0
+offset_top = -128.0
+offset_right = 128.0
+offset_bottom = 128.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(128, 128)
+texture = ExtResource("13_wrnex")
+stretch_mode = 2

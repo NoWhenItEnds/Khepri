@@ -35,40 +35,7 @@ namespace Khepri.Types
             }
             angle = Mathf.RadToDeg(angle);
 
-            Direction result = Direction.NONE;
-            if (angle > 22.5f && angle <= 67.5f)
-            {
-                result = Direction.SE;
-            }
-            else if (angle > 67.5f && angle <= 112.5f)
-            {
-                result = Direction.S;
-            }
-            else if (angle > 112.5f && angle <= 157.5f)
-            {
-                result = Direction.SW;
-            }
-            else if (angle > 157.5f && angle <= 202.5f)
-            {
-                result = Direction.W;
-            }
-            else if (angle > 202.5f && angle <= 247.5f)
-            {
-                result = Direction.NW;
-            }
-            else if (angle > 247.5f && angle <= 292.5f)
-            {
-                result = Direction.N;
-            }
-            else if (angle > 292.5f && angle <= 337.5f)
-            {
-                result = Direction.NE;
-            }
-            else
-            {
-                result = Direction.E;
-            }
-            return result;
+            return angle.ToDirection();
         }
 
 
@@ -77,23 +44,38 @@ namespace Khepri.Types
         /// <returns> The closest four-point direction. </returns>
         public static Direction ToDirection(this Single direction)
         {
-            Single angle = Math.Abs(direction);
             Direction result = Direction.NONE;
-            if (angle > 45f && angle <= 135f)
+            if (direction > 22.5f && direction <= 67.5f)
             {
-                result = Direction.E;
+                result = Direction.SE;
             }
-            else if (angle > 135f && angle <= 225f)
+            else if (direction > 67.5f && direction <= 112.5f)
             {
                 result = Direction.S;
             }
-            else if (angle > 225f)
+            else if (direction > 112.5f && direction <= 157.5f)
+            {
+                result = Direction.SW;
+            }
+            else if (direction > 157.5f && direction <= 202.5f)
             {
                 result = Direction.W;
             }
-            else
+            else if (direction > 202.5f && direction <= 247.5f)
+            {
+                result = Direction.NW;
+            }
+            else if (direction > 247.5f && direction <= 292.5f)
             {
                 result = Direction.N;
+            }
+            else if (direction > 292.5f && direction <= 337.5f)
+            {
+                result = Direction.NE;
+            }
+            else
+            {
+                result = Direction.E;
             }
             return result;
         }
