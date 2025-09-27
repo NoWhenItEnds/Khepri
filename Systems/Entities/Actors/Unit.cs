@@ -1,15 +1,14 @@
 using Godot;
 using Godot.Collections;
 using Khepri.Controllers;
+using Khepri.Entities.Actors.Components;
+using Khepri.Entities.Actors.Components.States;
 using Khepri.Entities.Interfaces;
-using Khepri.Entities.UnitComponents;
-using Khepri.Entities.UnitComponents.States;
 using Khepri.Models.Input;
-using Khepri.Models.Persistent;
 using Khepri.Nodes;
 using System;
 
-namespace Khepri.Entities
+namespace Khepri.Entities.Actors
 {
     /// <summary> An active entity controlled by something. </summary>
     public partial class Unit : CharacterBody3D, IEntity

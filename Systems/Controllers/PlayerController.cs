@@ -1,5 +1,5 @@
 using Godot;
-using Khepri.Entities;
+using Khepri.Entities.Actors;
 using Khepri.Models.Input;
 using Khepri.Nodes;
 using Khepri.Nodes.Singletons;

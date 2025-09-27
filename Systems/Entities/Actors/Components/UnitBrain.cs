@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Khepri.Entities.UnitComponents
+namespace Khepri.Entities.Actors.Components
 {
     /// <summary> The controller or root node of a unit's sensors. </summary>
     public partial class UnitBrain : Node3D

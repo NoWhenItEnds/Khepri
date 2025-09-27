@@ -3,7 +3,7 @@ using Khepri.Entities.Interfaces;
 using System;
 using System.Collections.Generic;
 
-namespace Khepri.Entities.UnitComponents.Sensors
+namespace Khepri.Entities.Actors.Components.Sensors
 {
     /// <summary> A sensor used to find visual information about the surrounding environment. </summary>
     public partial class SightSensor : Node3D, ISensor

@@ -1,11 +1,11 @@
 [gd_scene load_steps=9 format=3 uid="uid://rc2326u6agtf"]
 
-[ext_resource type="Script" uid="uid://djimvajqu34qh" path="res://Systems/Entities/Unit.cs" id="1_igitp"]
+[ext_resource type="Script" uid="uid://djimvajqu34qh" path="res://Systems/Entities/Actors/Unit.cs" id="1_igitp"]
 [ext_resource type="SpriteFrames" uid="uid://dx5orqkv03mqp" path="res://Content/Resources/SpriteFrames/Actors/HumanF/SpriteFrame_Actor_HumanF_Base.tres" id="3_2si40"]
 [ext_resource type="Script" uid="uid://5e2lglu1l111" path="res://Systems/Nodes/UnitSprite.cs" id="3_jo3tn"]
-[ext_resource type="Script" uid="uid://dngxhgfxttnb5" path="res://Systems/Entities/UnitComponents/UnitLights.cs" id="4_2si40"]
-[ext_resource type="Script" uid="uid://cd2hrmpbnnupp" path="res://Systems/Entities/UnitComponents/Sensors/SightSensor.cs" id="4_8qol3"]
-[ext_resource type="Script" uid="uid://c83wmu6k0wt68" path="res://Systems/Entities/UnitComponents/UnitBrain.cs" id="4_xo887"]
+[ext_resource type="Script" uid="uid://dngxhgfxttnb5" path="res://Systems/Entities/Actors/Components/UnitLights.cs" id="4_2si40"]
+[ext_resource type="Script" uid="uid://cd2hrmpbnnupp" path="res://Systems/Entities/Actors/Components/Sensors/SightSensor.cs" id="4_8qol3"]
+[ext_resource type="Script" uid="uid://c83wmu6k0wt68" path="res://Systems/Entities/Actors/Components/UnitBrain.cs" id="4_xo887"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xo887"]
 radius = 0.2

@@ -3,7 +3,7 @@ using Godot;
 using Khepri.Models.Input;
 using Khepri.Types;
 
-namespace Khepri.Entities.UnitComponents.States
+namespace Khepri.Entities.Actors.Components.States
 {
     /// <summary> The unit is standing idle, waiting for an action. </summary>
     public class IdlingState : UnitState

@@ -2,7 +2,7 @@ using Khepri.Entities.Items;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace Khepri.Models.Persistent
+namespace Khepri.Entities.Components
 {
     /// <summary> A data structure representing an entity's inventory. </summary>
     public record EntityInventory

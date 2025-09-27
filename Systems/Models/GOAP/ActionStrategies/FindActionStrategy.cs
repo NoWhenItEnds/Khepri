@@ -1,6 +1,5 @@
-using Khepri.Entities;
-using Khepri.Entities.Interfaces;
 using System;
+using Khepri.Entities.Actors;
 
 namespace Khepri.Models.GOAP.ActionStrategies
 {

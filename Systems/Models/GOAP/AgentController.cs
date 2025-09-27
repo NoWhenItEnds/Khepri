@@ -1,6 +1,6 @@
 using Godot;
 using Khepri.Controllers;
-using Khepri.Entities;
+using Khepri.Entities.Actors;
 using Khepri.Entities.Items;
 using Khepri.Models.GOAP.ActionStrategies;
 using System;

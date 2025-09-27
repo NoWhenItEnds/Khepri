@@ -2,7 +2,7 @@ using Godot;
 using Khepri.Controllers;
 using System;
 
-namespace Khepri.Entities.UnitComponents
+namespace Khepri.Entities.Actors.Components
 {
     /// <summary> The lights used by a unit to represent its line of sight. </summary>
     public partial class UnitLights : Node3D

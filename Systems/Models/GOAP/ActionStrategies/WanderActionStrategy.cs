@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using Godot;
-using Khepri.Entities;
+using Khepri.Entities.Actors;
 using Khepri.Models.Input;
 
 namespace Khepri.Models.GOAP.ActionStrategies

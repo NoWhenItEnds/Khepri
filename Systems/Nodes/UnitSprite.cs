@@ -1,6 +1,6 @@
 using System;
 using Godot;
-using Khepri.Entities.UnitComponents.States;
+using Khepri.Entities.Actors.Components.States;
 using Khepri.Types;
 
 namespace Khepri.Nodes

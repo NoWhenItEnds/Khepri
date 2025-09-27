@@ -1,9 +1,9 @@
 using System;
 using System.Text.Json.Serialization;
 using System.Threading;
-using Godot;
+using Khepri.Entities.Components;
 
-namespace Khepri.Models.Persistent
+namespace Khepri.Entities.Actors.Components
 {
     /// <summary> The persistent stats of a unit. These are saved and loaded to keep track of the world. </summary>
     public class UnitNeeds

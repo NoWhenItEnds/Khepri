@@ -3,7 +3,7 @@ using Godot;
 using Khepri.Models.Input;
 using Khepri.Types;
 
-namespace Khepri.Entities.UnitComponents.States
+namespace Khepri.Entities.Actors.Components.States
 {
     /// <summary> The unit is moving quickly along the ground. </summary>
     public class SprintingState : UnitState

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Khepri.Models.Input;
 
-namespace Khepri.Entities.UnitComponents.States
+namespace Khepri.Entities.Actors.Components.States
 {
     /// <summary> The basic data object representing a unit's potential state. </summary>
     public abstract class UnitState : IEquatable<UnitState>

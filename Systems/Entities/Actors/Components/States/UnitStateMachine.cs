@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Khepri.Entities.UnitComponents.States
+namespace Khepri.Entities.Actors.Components.States
 {
     /// <summary> An event that triggers a transition in the state machine. </summary>
     public enum StateEvent
