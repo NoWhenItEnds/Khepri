@@ -9,7 +9,7 @@ namespace Khepri.Entities.UnitComponents.States
     public class WalkingState : UnitState
     {
         /// <inheritdoc/>
-        public override String AnimationPrefix { get; } = "walking_";
+        public override String AnimationPrefix { get; } = "Walk_";
 
 
         /// <summary> The unit is walking across the ground. </summary>

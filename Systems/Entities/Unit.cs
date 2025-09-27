@@ -115,7 +115,12 @@ namespace Khepri.Entities
         {
             if (Velocity != Vector3.Zero)
             {
-                Direction = Mathf.RadToDeg(new Vector2(Velocity.X, Velocity.Z).Angle()) * -1f - 90f;  // Invert direction by * -1f
+                Single directionRad = new Vector2(Velocity.X, Velocity.Z).Angle();
+                if (directionRad < 0f)
+                {
+                    directionRad += Mathf.Tau;
+                }
+                Direction = Mathf.RadToDeg(directionRad);
             }
         }
 

@@ -6,13 +6,15 @@ namespace Khepri.Types
     /// <summary> Represents a six-point direction. </summary>
     public enum Direction
     {
-        NONE,
-        UP,
-        RIGHT,
-        DOWN,
-        LEFT,
-        TOP,
-        BOTTOM
+        NONE = -1,
+        N = 0,
+        NE = 1,
+        E = 2,
+        SE = 3,
+        S = 4,
+        SW = 5,
+        W = 6,
+        NW = 7
     }
 
 
@@ -24,12 +26,6 @@ namespace Khepri.Types
         /// <returns> The closest four-point direction. </returns>
         public static Direction ToDirection(this Vector3 vector)
         {
-            // First check if there is an up or down direction.
-            if (vector.Y != 0f)
-            {
-                return vector.Y > 0f ? Direction.TOP : Direction.BOTTOM;
-            }
-
             // Convert angle to something usable.
             Vector2 direction2D = new Vector2(vector.X, vector.Z);
             Single angle = direction2D.Angle();
@@ -40,21 +36,37 @@ namespace Khepri.Types
             angle = Mathf.RadToDeg(angle);
 
             Direction result = Direction.NONE;
-            if (angle > 45f && angle <= 135f)
+            if (angle > 22.5f && angle <= 67.5f)
             {
-                result = Direction.DOWN;
+                result = Direction.SE;
             }
-            else if (angle > 135f && angle <= 225f)
+            else if (angle > 67.5f && angle <= 112.5f)
             {
-                result = Direction.LEFT;
+                result = Direction.S;
             }
-            else if (angle > 225f && angle <= 315f)
+            else if (angle > 112.5f && angle <= 157.5f)
             {
-                result = Direction.UP;
+                result = Direction.SW;
+            }
+            else if (angle > 157.5f && angle <= 202.5f)
+            {
+                result = Direction.W;
+            }
+            else if (angle > 202.5f && angle <= 247.5f)
+            {
+                result = Direction.NW;
+            }
+            else if (angle > 247.5f && angle <= 292.5f)
+            {
+                result = Direction.N;
+            }
+            else if (angle > 292.5f && angle <= 337.5f)
+            {
+                result = Direction.NE;
             }
             else
             {
-                result = Direction.RIGHT;
+                result = Direction.E;
             }
             return result;
         }
@@ -69,19 +81,19 @@ namespace Khepri.Types
             Direction result = Direction.NONE;
             if (angle > 45f && angle <= 135f)
             {
-                result = Direction.RIGHT;
+                result = Direction.E;
             }
             else if (angle > 135f && angle <= 225f)
             {
-                result = Direction.DOWN;
+                result = Direction.S;
             }
             else if (angle > 225f)
             {
-                result = Direction.LEFT;
+                result = Direction.W;
             }
             else
             {
-                result = Direction.UP;
+                result = Direction.N;
             }
             return result;
         }

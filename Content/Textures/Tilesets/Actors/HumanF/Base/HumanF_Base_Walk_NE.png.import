@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://urqnratmldun"
-path.s3tc="res://.godot/imported/64X128_Idle_Free.png-a7f8727880320e819d52da007587f1e0.s3tc.ctex"
+uid="uid://de3wm2wpwgrik"
+path.s3tc="res://.godot/imported/HumanF_Base_Walk_NE.png-3dceae3d4a45ebb768a5ff4f1f4715e8.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,14 +11,16 @@ metadata={
 
 [deps]
 
-source_file="res://Content/Textures/Entities/64X128_Idle_Free.png"
-dest_files=["res://.godot/imported/64X128_Idle_Free.png-a7f8727880320e819d52da007587f1e0.s3tc.ctex"]
+source_file="res://Content/Textures/Tilesets/Actors/HumanF/Base/HumanF_Base_Walk_NE.png"
+dest_files=["res://.godot/imported/HumanF_Base_Walk_NE.png-3dceae3d4a45ebb768a5ff4f1f4715e8.s3tc.ctex"]
 
 [params]
 
 compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
+compress/uastc_level=0
+compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
@@ -26,6 +28,10 @@ mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
+process/channel_remap/red=0
+process/channel_remap/green=1
+process/channel_remap/blue=2
+process/channel_remap/alpha=3
 process/fix_alpha_border=true
 process/premult_alpha=false
 process/normal_map_invert_y=false
