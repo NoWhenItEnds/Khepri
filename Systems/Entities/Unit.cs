@@ -12,7 +12,7 @@ using System;
 namespace Khepri.Entities
 {
     /// <summary> An active entity controlled by something. </summary>
-    public partial class Unit : CharacterBody3D, ISmartEntity
+    public partial class Unit : CharacterBody3D, IEntity
     {
         /// <inheritdoc/>
         [ExportGroup("Nodes")]
@@ -56,7 +56,7 @@ namespace Khepri.Entities
 
 
         /// <inheritdoc/>
-        public Guid UId => Data.UId;
+        public Guid UId { get; } = Guid.NewGuid();
 
         /// <inheritdoc/>
         public Vector3 WorldPosition => GlobalPosition;
@@ -65,7 +65,7 @@ namespace Khepri.Entities
         public Single Direction { get; private set; } = 0f;
 
         /// <summary> The stats used by the unit to set its state. </summary>
-        public readonly UnitData Data = new UnitData();
+        public readonly UnitNeeds Data = new UnitNeeds();
 
 
         /// <summary> A reference to the world controller. </summary>
@@ -171,14 +171,14 @@ namespace Khepri.Entities
 
 
         /// <inheritdoc/>
-        public override Int32 GetHashCode() => HashCode.Combine(Data.UId);
+        public override Int32 GetHashCode() => HashCode.Combine(UId);
 
 
         /// <inheritdoc/>
         public override Boolean Equals(Object obj)
         {
             Unit? other = obj as Unit;
-            return other != null ? Data.UId.Equals(other.Data.UId) : false;
+            return other != null ? UId.Equals(other.UId) : false;
         }
 
 

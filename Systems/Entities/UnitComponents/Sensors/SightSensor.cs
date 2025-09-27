@@ -25,7 +25,7 @@ namespace Khepri.Entities.UnitComponents.Sensors
 
 
         /// <summary> The array of entities that are potentially visible. </summary>
-        private HashSet<ISmartEntity> _nearbyEntities = new HashSet<ISmartEntity>();
+        private HashSet<IEntity> _nearbyEntities = new HashSet<IEntity>();
 
 
         /// <inheritdoc/>
@@ -40,7 +40,7 @@ namespace Khepri.Entities.UnitComponents.Sensors
         /// <param name="body"> A reference to the new body. </param>
         private void OnBodyEntered(Node3D body)
         {
-            if (body is ISmartEntity entity && entity != Owner)
+            if (body is IEntity entity && entity != Owner)
             {
                 _nearbyEntities.Add(entity);
             }
@@ -51,7 +51,7 @@ namespace Khepri.Entities.UnitComponents.Sensors
         /// <param name="body"> A reference to the new body. </param>
         private void OnBodyExited(Node3D body)
         {
-            if (body is ISmartEntity entity)
+            if (body is IEntity entity)
             {
                 // Remove the entity from visibility.
                 KnownEntity? trackedObject = _unitSensors.KnowsEntity(entity);
@@ -65,7 +65,7 @@ namespace Khepri.Entities.UnitComponents.Sensors
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
-            foreach (ISmartEntity current in _nearbyEntities)
+            foreach (IEntity current in _nearbyEntities)
             {
                 Vector3 targetPosition = ToLocal(current.CollisionShape.GlobalPosition);
                 _lineOfSightRayCast.TargetPosition = targetPosition;
@@ -75,7 +75,7 @@ namespace Khepri.Entities.UnitComponents.Sensors
                 if (_lineOfSightRayCast.IsColliding())
                 {
                     KnownEntity? trackedObject = _unitSensors.KnowsEntity(current);
-                    if (_lineOfSightRayCast.GetCollider() is ISmartEntity entity && entity == current)  // Is the entity directly visible.
+                    if (_lineOfSightRayCast.GetCollider() is IEntity entity && entity == current)  // Is the entity directly visible.
                     {
                         if (trackedObject == null)  // If the entity isn't already known, add it.
                         {

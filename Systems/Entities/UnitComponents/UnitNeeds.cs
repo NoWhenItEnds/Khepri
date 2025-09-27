@@ -6,16 +6,8 @@ using Godot;
 namespace Khepri.Models.Persistent
 {
     /// <summary> The persistent stats of a unit. These are saved and loaded to keep track of the world. </summary>
-    public class UnitData : IPersistent
+    public class UnitNeeds
     {
-        /// <inheritdoc/>
-        [JsonPropertyName("uid")]
-        public Guid UId { get; } = Guid.NewGuid();
-
-        /// <inheritdoc/>
-        [JsonPropertyName("position")]
-        public Vector3 WorldPosition { get; private set; } = Vector3.Zero;   // TODO - Figure out what to do here.
-
         /// <summary> The unit's base movement speed. </summary>
         [JsonPropertyName("base_speed")]
         public Single BaseSpeed { get; private set; } = 3f;
@@ -100,21 +92,5 @@ namespace Khepri.Models.Persistent
             Single minValue = Math.Min(CurrentHealth, Math.Min(CurrentHunger, Math.Min(CurrentFatigue, CurrentEntertainment)));
             CurrentStamina = Math.Clamp(CurrentStamina + amount, 0f, minValue);
         }
-
-
-        /// <inheritdoc/>
-        public override Int32 GetHashCode() => HashCode.Combine(UId);
-
-
-        /// <inheritdoc/>
-        public override Boolean Equals(Object obj)
-        {
-            UnitData? other = obj as UnitData;
-            return other != null ? UId.Equals(other.UId) : false;
-        }
-
-
-        /// <inheritdoc/>
-        public bool Equals(IPersistent other) => UId.Equals(other.UId);
     }
 }

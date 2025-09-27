@@ -58,7 +58,7 @@ namespace Khepri.Entities.UnitComponents
             {
                 foreach (KnownEntity entity in _knownEntities)
                 {
-                    DebugDraw3D.DrawAabb(entity.SmartEntity.CollisionShape.GetAabb(),
+                    DebugDraw3D.DrawAabb(entity.Entity.CollisionShape.GetAabb(),
                         entity.IsVisible ? Colors.DarkViolet : Colors.MediumPurple);
                 }
             }
@@ -68,7 +68,7 @@ namespace Khepri.Entities.UnitComponents
         /// <summary> Adds an entity to the ones being tracked by the unit. Represents its memory. </summary>
         /// <param name="entity"> The object to begin tracking. </param>
         /// <returns> A reference to the newly remembered know entity. </returns>
-        public KnownEntity RememberEntity(ISmartEntity entity)
+        public KnownEntity RememberEntity(IEntity entity)
         {
             KnownEntity newEntity = new KnownEntity(entity);
             _knownEntities.Add(newEntity);
@@ -79,18 +79,18 @@ namespace Khepri.Entities.UnitComponents
         /// <summary> Stops tracking the given entity. </summary>
         /// <param name="entity"> A reference to the object to stop tracking. </param>
         /// <returns> Whether the object was removed. </returns>
-        public Boolean ForgetEntity(ISmartEntity entity)
+        public Boolean ForgetEntity(IEntity entity)
         {
-            return _knownEntities.RemoveWhere(x => x.SmartEntity == entity) > 0;
+            return _knownEntities.RemoveWhere(x => x.Entity == entity) > 0;
         }
 
 
-        /// <summary> Searches the tracked entity's for a particular smart object. </summary>
+        /// <summary> Searches the tracked entity's for a particular entity. </summary>
         /// <param name="entity"> The entity to search for. </param>
         /// <returns> A reference to the tracked entity. A null means that one wasn't found. </returns>
-        public KnownEntity? KnowsEntity(ISmartEntity entity)
+        public KnownEntity? KnowsEntity(IEntity entity)
         {
-            return _knownEntities.FirstOrDefault(x => x.SmartEntity == entity);
+            return _knownEntities.FirstOrDefault(x => x.Entity == entity);
         }
 
 
@@ -99,7 +99,7 @@ namespace Khepri.Entities.UnitComponents
         /// <returns> An array of entities sharing the given type. An empty array indicates that there are none of the desired type. </returns>
         public KnownEntity[] KnowsEntityKind(Type entity)
         {
-            return _knownEntities.Where(x => x.SmartEntity.GetType() == entity).ToArray();
+            return _knownEntities.Where(x => x.Entity.GetType() == entity).ToArray();
         }
 
 
@@ -166,7 +166,7 @@ namespace Khepri.Entities.UnitComponents
     public class KnownEntity : IEquatable<KnownEntity>
     {
         /// <summary> A reference to the known entity. </summary>
-        public ISmartEntity SmartEntity { get; init; }
+        public IEntity Entity { get; init; }
 
         /// <summary> Whether the entity is visible. </summary>
         public Boolean IsVisible { get; private set; } = false;
@@ -184,18 +184,18 @@ namespace Khepri.Entities.UnitComponents
 
         /// <summary> A data object that is 'known' by an agent. </summary>
         /// <param name="entity"> A reference to the known entity. </param>
-        public KnownEntity(ISmartEntity entity)
+        public KnownEntity(IEntity entity)
         {
             _worldController = WorldController.Instance;
 
-            SmartEntity = entity;
+            Entity = entity;
             LastKnownPosition = entity.CollisionShape.GlobalPosition;
             LastSeenTimestamp = _worldController.CurrentTime;
         }
 
 
         /// <summary> Set whether the entity is currently visible to the tracker. </summary>
-        /// <param name="isVisible"> Whether the smart entity is directly visible. </param>
+        /// <param name="isVisible"> Whether the entity is directly visible. </param>
         public void SetIsVisible(Boolean isVisible)
         {
             IsVisible = isVisible;
@@ -203,26 +203,26 @@ namespace Khepri.Entities.UnitComponents
 
 
         /// <summary> Updates the last known position of the entity. </summary>
-        /// <param name="position"> An optional position. A null will use the smart entity's actual position, a value will override it. </param>
+        /// <param name="position"> An optional position. A null will use the entity's actual position, a value will override it. </param>
         public void UpdateLastKnownPosition(Vector3? position = null)
         {
             LastSeenTimestamp = _worldController.CurrentTime;
-            LastKnownPosition = position == null ? SmartEntity.CollisionShape.GlobalPosition : position.Value;
+            LastKnownPosition = position == null ? Entity.CollisionShape.GlobalPosition : position.Value;
         }
 
         /// <inheritdoc/>
-        public override Int32 GetHashCode() => HashCode.Combine(SmartEntity);
+        public override Int32 GetHashCode() => HashCode.Combine(Entity);
 
 
         /// <inheritdoc/>
         public override Boolean Equals(Object obj)
         {
             KnownEntity? other = obj as KnownEntity;
-            return other != null ? SmartEntity.Equals(other.SmartEntity) : false;
+            return other != null ? Entity.Equals(other.Entity) : false;
         }
 
         /// <inheritdoc/>
-        public bool Equals(KnownEntity other) => SmartEntity.Equals(other.SmartEntity);
+        public bool Equals(KnownEntity other) => Entity.Equals(other.Entity);
     }
 
 

@@ -6,7 +6,7 @@ using System;
 namespace Khepri.Entities.Items
 {
     /// <summary> A food item that can be used to reduce hunger. </summary>
-    public partial class Food : RigidBody3D, ISmartEntity, IItem
+    public partial class Food : RigidBody3D, IEntity, IItem
     {
         /// <inheritdoc/>
         [ExportGroup("Nodes")]
