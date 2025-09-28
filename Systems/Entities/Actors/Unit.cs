@@ -1,5 +1,4 @@
 using Godot;
-using Godot.Collections;
 using Khepri.Controllers;
 using Khepri.Entities.Actors.Components;
 using Khepri.Entities.Actors.Components.States;
@@ -7,6 +6,7 @@ using Khepri.Entities.Interfaces;
 using Khepri.Models.Input;
 using Khepri.Nodes;
 using System;
+using System.Collections.Generic;
 
 namespace Khepri.Entities.Actors
 {
@@ -26,27 +26,19 @@ namespace Khepri.Entities.Actors
         /// <summary> A reference to the unit's sprite. </summary>
         [Export] public UnitSprite AnimatedSprite { get; private set; }
 
-        /// <summary> A reference to the unit's long term memory and senses. </summary>
-        [Export] public UnitBrain Brain { get; private set; }
+        /// <summary> A reference to the unit's needs component. </summary>
+        [Export] public NeedComponent Needs { get; private set; }
 
+        /// <summary> A reference to the unit's sensors' component. </summary>
+        [Export] public SensorComponent Sensors { get; private set; }
 
-        /// <summary> Modifies the amount of hunger the unit looses each tick. </summary>
-        [ExportGroup("Settings")]
-        [Export] private Single _hungerModifier = 0.001f;
-
-        /// <summary> Modifies the amount of fatigue the unit looses each tick. </summary>
-        [Export] private Single _fatigueModifier = 0.001f;
-
-        /// <summary> Modifies the amount of entertainment the unit looses each tick. </summary>
-        [Export] private Single _entertainmentModifier = 0.001f;
-
-        /// <summary> The amount of stamina the unit recovers per tick. </summary>
-        [Export] private Single _staminaModifier = 1f;
+        /// <summary> The state machine controlling the unit. </summary>
+        [Export] public UnitStateMachine StateMachine { get; private set; }
 
 
         /// <summary> The animation sheets to use for the unit's animations. </summary>
         [ExportGroup("Resources")]
-        [Export] private Dictionary<UnitSpriteLayer, SpriteFrames> _spriteFrames;
+        [Export] private Godot.Collections.Dictionary<UnitSpriteLayer, SpriteFrames> _spriteFrames;
 
 
         /// <summary> Whether the unit's needs should be shown as a debug overlay. </summary>
@@ -63,24 +55,17 @@ namespace Khepri.Entities.Actors
         /// <summary> The current direction the unit is facing. </summary>
         public Single Direction { get; private set; } = 0f;
 
-        /// <summary> The stats used by the unit to set its state. </summary>
-        public readonly UnitNeeds Data = new UnitNeeds();
-
-
         /// <summary> A reference to the world controller. </summary>
         private WorldController _worldController;
 
-
-        /// <summary> The state machine controlling the unit. </summary>
-        private UnitStateMachine _stateMachine;
+        /// <summary> A list of entities that the unit is close enough to interact with. </summary>
+        private HashSet<IEntity> _usableEntities = new HashSet<IEntity>();
 
 
         /// <inheritdoc/>
         public override void _Ready()
         {
             _worldController = WorldController.Instance;
-
-            _stateMachine = new UnitStateMachine(this);
 
             // Setup the sprite animations.
             foreach (var frames in _spriteFrames)
@@ -94,15 +79,7 @@ namespace Khepri.Entities.Actors
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
-            _stateMachine.CurrentState.Update(delta);
             UpdateDirection();
-
-            // Update stats.
-            Single gameTimeDelta = (Single)_worldController.GameTimeDelta;
-            Data.UpdateHunger(-gameTimeDelta * _hungerModifier);
-            Data.UpdateFatigue(-gameTimeDelta * _fatigueModifier);
-            Data.UpdateEntertainment(-gameTimeDelta * _entertainmentModifier);
-            Data.UpdateStamina(gameTimeDelta * _staminaModifier);
 
             // Show debug stuff.
             DrawDebug();
@@ -130,15 +107,15 @@ namespace Khepri.Entities.Actors
             // Show debug stuff.
             if (_showNeeds)
             {
-                DebugDraw3D.DrawText(current, $"HEA: {Data.CurrentHealth:F1}", 32, Colors.Green);
+                DebugDraw3D.DrawText(current, $"HEA: {Needs.CurrentHealth:F1}", 32, Colors.Green);
                 current += Vector3.Back * 0.2f;
-                DebugDraw3D.DrawText(current, $"HUG: {Data.CurrentHunger:F1}", 32, Colors.Green);
+                DebugDraw3D.DrawText(current, $"HUG: {Needs.CurrentHunger:F1}", 32, Colors.Green);
                 current += Vector3.Back * 0.2f;
-                DebugDraw3D.DrawText(current, $"FAT: {Data.CurrentFatigue:F1}", 32, Colors.Green);
+                DebugDraw3D.DrawText(current, $"FAT: {Needs.CurrentFatigue:F1}", 32, Colors.Green);
                 current += Vector3.Back * 0.2f;
-                DebugDraw3D.DrawText(current, $"ENT: {Data.CurrentEntertainment:F1}", 32, Colors.Green);
+                DebugDraw3D.DrawText(current, $"ENT: {Needs.CurrentEntertainment:F1}", 32, Colors.Green);
                 current += Vector3.Back * 0.2f;
-                DebugDraw3D.DrawText(current, $"STA: {Data.CurrentStamina:F1}", 32, Colors.Green);
+                DebugDraw3D.DrawText(current, $"STA: {Needs.CurrentStamina:F1}", 32, Colors.Green);
                 current += Vector3.Back * 0.2f;
             }
         }
@@ -153,19 +130,30 @@ namespace Khepri.Entities.Actors
                 switch (moveInput.MovementType)
                 {
                     case MoveType.WALKING:
-                        _stateMachine.TransitionState(StateEvent.WALK);
+                        StateMachine.TransitionState(StateEvent.WALK);
                         break;
                     case MoveType.SPRINTING:
-                        _stateMachine.TransitionState(StateEvent.SPRINT);
+                        StateMachine.TransitionState(StateEvent.SPRINT);
                         break;
                     case MoveType.IDLE:
                     default:
-                        _stateMachine.TransitionState(StateEvent.IDLE);
+                        StateMachine.TransitionState(StateEvent.IDLE);
                         break;
                 }
             }
 
-            _stateMachine.CurrentState.HandleInput(input);
+            StateMachine.CurrentState.HandleInput(input);
+        }
+
+
+        public void AddUsableEntity(IEntity entity)
+        {
+            _usableEntities.Add(entity);
+        }
+
+        public void RemoveUsableEntity(IEntity entity)
+        {
+            _usableEntities.Remove(entity);
         }
 
 

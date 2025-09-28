@@ -1,13 +1,28 @@
 using System;
 using System.Text.Json.Serialization;
 using System.Threading;
-using Khepri.Entities.Components;
+using Godot;
+using Khepri.Controllers;
 
 namespace Khepri.Entities.Actors.Components
 {
     /// <summary> The persistent stats of a unit. These are saved and loaded to keep track of the world. </summary>
-    public class UnitNeeds
+    public partial class NeedComponent : Node
     {
+        /// <summary> Modifies the amount of hunger the unit looses each tick. </summary>
+        [ExportGroup("Settings")]
+        [Export] public Single HungerModifier { get; private set; } = 0.001f;
+
+        /// <summary> Modifies the amount of fatigue the unit looses each tick. </summary>
+        [Export] public Single FatigueModifier { get; private set; } = 0.001f;
+
+        /// <summary> Modifies the amount of entertainment the unit looses each tick. </summary>
+        [Export] public Single EntertainmentModifier { get; private set; } = 0.001f;
+
+        /// <summary> The amount of stamina the unit recovers per tick. </summary>
+        [Export] public Single StaminaModifier { get; private set; } = 1f;
+
+
         /// <summary> The unit's base movement speed. </summary>
         [JsonPropertyName("base_speed")]
         public Single BaseSpeed { get; private set; } = 3f;
@@ -37,9 +52,27 @@ namespace Khepri.Entities.Actors.Components
         [JsonPropertyName("stamina")]
         public Single CurrentStamina { get; private set; } = 100f;
 
-        /// <summary> The data structure representing the unit's inventory. </summary>
-        [JsonPropertyName("inventory")]
-        public EntityInventory Inventory { get; private set; } = new EntityInventory();
+
+        /// <summary> A reference to the world controller. </summary>
+        private WorldController _worldController;
+
+
+        /// <inheritdoc/>
+        public override void _Ready()
+        {
+            _worldController = WorldController.Instance;
+        }
+
+
+        /// <inheritdoc/>
+        public override void _PhysicsProcess(Double delta)
+        {
+            Single gameTimeDelta = (Single)_worldController.GameTimeDelta;
+            UpdateHunger(-gameTimeDelta * HungerModifier);
+            UpdateFatigue(-gameTimeDelta * FatigueModifier);
+            UpdateEntertainment(-gameTimeDelta * EntertainmentModifier);
+            UpdateStamina(gameTimeDelta * StaminaModifier);
+        }
 
 
         /// <inheritdoc/>

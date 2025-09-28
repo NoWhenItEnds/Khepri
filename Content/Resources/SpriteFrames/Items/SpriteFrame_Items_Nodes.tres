@@ -1,0 +1,88 @@
+[gd_resource type="SpriteFrames" load_steps=13 format=3 uid="uid://x4r46q3wagnx"]
+
+[ext_resource type="Texture2D" uid="uid://crb5t1m4ufo22" path="res://Content/Textures/Tilesets/Items/Items_Food_Nodes.png" id="1_emvbo"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kbwym"]
+atlas = ExtResource("1_emvbo")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0mpnw"]
+atlas = ExtResource("1_emvbo")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p1j7y"]
+atlas = ExtResource("1_emvbo")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b2ifs"]
+atlas = ExtResource("1_emvbo")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b8ycu"]
+atlas = ExtResource("1_emvbo")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vw4xw"]
+atlas = ExtResource("1_emvbo")
+region = Rect2(160, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fcthe"]
+atlas = ExtResource("1_emvbo")
+region = Rect2(192, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wbicd"]
+atlas = ExtResource("1_emvbo")
+region = Rect2(224, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wn8b5"]
+atlas = ExtResource("1_emvbo")
+region = Rect2(256, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mdgaj"]
+atlas = ExtResource("1_emvbo")
+region = Rect2(288, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_f6nxu"]
+atlas = ExtResource("1_emvbo")
+region = Rect2(0, 32, 32, 32)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kbwym")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0mpnw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p1j7y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b2ifs")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b8ycu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vw4xw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fcthe")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wbicd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wn8b5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mdgaj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_f6nxu")
+}],
+"loop": true,
+"name": &"Food",
+"speed": 5.0
+}]

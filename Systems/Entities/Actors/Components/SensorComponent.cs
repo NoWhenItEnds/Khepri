@@ -9,11 +9,16 @@ using System.Linq;
 namespace Khepri.Entities.Actors.Components
 {
     /// <summary> The controller or root node of a unit's sensors. </summary>
-    public partial class UnitBrain : Node3D
+    public partial class SensorComponent : Node3D
     {
         /// <summary> A reference to the brain's unit. </summary>
         [ExportGroup("Nodes")]
         [Export] private Unit _unit;
+
+        /// <summary> Represents the unit's rendered line of sight. </summary>
+        /// <remarks> This should only be used by a unit controlled by the player. </remarks>
+        [Export] private Node3D _lights;
+
 
         /// <summary> How long, in hours, a unit should remember an entity before forgetting it if it hasn't been seen (in that period of time). </summary>
         [ExportGroup("Settings")]
@@ -40,6 +45,9 @@ namespace Khepri.Entities.Actors.Components
         public override void _Ready()
         {
             _worldController = WorldController.Instance;
+
+            // Only render the lights if the unit is controlled by the player
+            ToggleLights(PlayerController.Instance.PlayerUnit == _unit);
         }
 
 
@@ -61,6 +69,12 @@ namespace Khepri.Entities.Actors.Components
                     DebugDraw3D.DrawAabb(entity.Entity.CollisionShape.GetAabb(),
                         entity.IsVisible ? Colors.DarkViolet : Colors.MediumPurple);
                 }
+            }
+
+            //  Update unit lights if they are shown.
+            if (_lights.Visible)
+            {
+                _lights.GlobalRotationDegrees = new Vector3(0f, _unit.Direction * -1f - 90f, 0f);
             }
         }
 
@@ -116,7 +130,7 @@ namespace Khepri.Entities.Actors.Components
                 Boolean isAdded = _knownLocations.Add(entity);
                 if (isAdded)    // Reward the unit by discovering new areas by increasing their entertainment.
                 {
-                    _unit.Data.UpdateEntertainment(0.1f);
+                    _unit.Needs.UpdateEntertainment(0.1f);
                 }
             }
             return entity;
@@ -159,6 +173,11 @@ namespace Khepri.Entities.Actors.Components
         {
             return _knownLocations.Select(x => x.Position).Where(x => x.DistanceTo(position) <= radius).ToArray();
         }
+
+
+        /// <summary> Toggle whether the lights are active. </summary>
+        /// <param name="isActive"> Whether the visibility lights should be active or not. </param>
+        public void ToggleLights(Boolean isActive) => _lights.Visible = isActive;
     }
 
 
@@ -189,7 +208,7 @@ namespace Khepri.Entities.Actors.Components
             _worldController = WorldController.Instance;
 
             Entity = entity;
-            LastKnownPosition = entity.CollisionShape.GlobalPosition;
+            LastKnownPosition = entity.WorldPosition;
             LastSeenTimestamp = _worldController.CurrentTime;
         }
 

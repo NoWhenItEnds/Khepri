@@ -70,19 +70,19 @@ namespace Khepri.Models.GOAP
             factory.AddBelief("AgentIsIdle", () => _controlledEntity.NavigationAgent.IsNavigationFinished());
             factory.AddBelief("AgentIsMoving", () => !_controlledEntity.NavigationAgent.IsNavigationFinished());
 
-            factory.AddBelief("AgentIsHealthy", () => _controlledEntity.Data.CurrentHealth >= 90f);
-            factory.AddBelief("AgentIsHurt", () => _controlledEntity.Data.CurrentHealth < 50);
-            factory.AddBelief("AgentIsFed", () => _controlledEntity.Data.CurrentHunger >= 90f);
-            factory.AddBelief("AgentIsHungry", () => _controlledEntity.Data.CurrentHunger < 50f);
-            factory.AddBelief("AgentIsRested", () => _controlledEntity.Data.CurrentFatigue >= 90f);
-            factory.AddBelief("AgentIsTired", () => _controlledEntity.Data.CurrentFatigue < 50f);
-            factory.AddBelief("AgentIsEntertained", () => _controlledEntity.Data.CurrentEntertainment >= 90f);
-            factory.AddBelief("AgentIsBored", () => _controlledEntity.Data.CurrentEntertainment < 50f);
+            factory.AddBelief("AgentIsHealthy", () => _controlledEntity.Needs.CurrentHealth >= 90f);
+            factory.AddBelief("AgentIsHurt", () => _controlledEntity.Needs.CurrentHealth < 50);
+            factory.AddBelief("AgentIsFed", () => _controlledEntity.Needs.CurrentHunger >= 90f);
+            factory.AddBelief("AgentIsHungry", () => _controlledEntity.Needs.CurrentHunger < 50f);
+            factory.AddBelief("AgentIsRested", () => _controlledEntity.Needs.CurrentFatigue >= 90f);
+            factory.AddBelief("AgentIsTired", () => _controlledEntity.Needs.CurrentFatigue < 50f);
+            factory.AddBelief("AgentIsEntertained", () => _controlledEntity.Needs.CurrentEntertainment >= 90f);
+            factory.AddBelief("AgentIsBored", () => _controlledEntity.Needs.CurrentEntertainment < 50f);
 
-            factory.AddBrainBelief("AgentKnowsPlayer", _controlledEntity.Brain, _playerController.PlayerUnit);
-            factory.AddBrainBelief("AgentKnowsFood", _controlledEntity.Brain, typeof(Food));
+            factory.AddBrainBelief("AgentKnowsPlayer", _controlledEntity.Sensors, _playerController.PlayerUnit);
+            factory.AddBrainBelief("AgentKnowsFood", _controlledEntity.Sensors, typeof(Item));
 
-            factory.AddBelief("AgentSeesPlayer", () => _controlledEntity.Brain.KnowsEntity(_playerController.PlayerUnit).IsVisible);
+            factory.AddBelief("AgentSeesPlayer", () => _controlledEntity.Sensors.KnowsEntity(_playerController.PlayerUnit).IsVisible);
         }
 
 

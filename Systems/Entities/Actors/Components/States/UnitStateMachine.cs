@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Godot;
 
 namespace Khepri.Entities.Actors.Components.States
 {
@@ -15,8 +16,12 @@ namespace Khepri.Entities.Actors.Components.States
 
 
     /// <summary> A state machine for unit states. </summary>
-    public class UnitStateMachine
+    public partial class UnitStateMachine : Node
     {
+        /// <summary> A reference to the unit controlled by the state. </summary>
+        [ExportGroup("Nodes")]
+        [Export] private Unit _unit;
+
         /// <summary> The current state of the state machine. </summary>
         public UnitState CurrentState { get; private set; }
 
@@ -28,12 +33,11 @@ namespace Khepri.Entities.Actors.Components.States
         private HashSet<UnitState> _states = new HashSet<UnitState>();
 
 
-        /// <summary> A state machine for unit states. </summary>
-        /// <param name="unit"> The unit controlled by the state machine. </param>
-        public UnitStateMachine(Unit unit)
+        /// <inheritdoc/>
+        public override void _Ready()
         {
             // Set the default state.
-            _defaultState = new IdlingState(unit)
+            _defaultState = new IdlingState(_unit)
                 .WithTransition<WalkingState>(StateEvent.WALK)
                 .WithTransition<SprintingState>(StateEvent.SPRINT);
 
@@ -41,11 +45,11 @@ namespace Khepri.Entities.Actors.Components.States
 
             _states.Add(_defaultState);
 
-            _states.Add(new WalkingState(unit)
+            _states.Add(new WalkingState(_unit)
                 .WithTransition<IdlingState>(StateEvent.IDLE)
                 .WithTransition<SprintingState>(StateEvent.SPRINT));
 
-            _states.Add(new SprintingState(unit)
+            _states.Add(new SprintingState(_unit)
                 .WithTransition<IdlingState>(StateEvent.IDLE)
                 .WithTransition<WalkingState>(StateEvent.WALK));
         }
@@ -62,6 +66,13 @@ namespace Khepri.Entities.Actors.Components.States
                 CurrentState = _states.FirstOrDefault(x => x.GetType() == nextState) ?? _defaultState;
                 CurrentState.Start();
             }
+        }
+
+
+        /// <inheritdoc/>
+        public override void _PhysicsProcess(Double delta)
+        {
+            CurrentState.Update(delta);
         }
     }
 }

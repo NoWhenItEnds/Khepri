@@ -43,7 +43,7 @@ namespace Khepri.Models.GOAP
         /// <param name="key"> The name of belief. </param>
         /// <param name="unitBrain"> A reference to the unit's long term memory. </param>
         /// <param name="entity"> A reference to the entity we're concerned with. </param>
-        public void AddBrainBelief(String key, UnitBrain unitBrain, IEntity entity)
+        public void AddBrainBelief(String key, SensorComponent unitBrain, IEntity entity)
         {
             _beliefs.Add(key, new AgentBelief.Builder(key)
                 .WithCondition(() => unitBrain.KnowsEntity(entity) != null)
@@ -55,7 +55,7 @@ namespace Khepri.Models.GOAP
         /// <param name="key"> The name of belief. </param>
         /// <param name="unitBrain"> A reference to the unit's long term memory. </param>
         /// <param name="entityType"> The type of entity we're concerned with. </param>
-        public void AddBrainBelief(String key, UnitBrain unitBrain, Type entityType)
+        public void AddBrainBelief(String key, SensorComponent unitBrain, Type entityType)
         {
             _beliefs.Add(key, new AgentBelief.Builder(key)
                 .WithCondition(() => unitBrain.KnowsEntityKind(entityType).Length > 0)

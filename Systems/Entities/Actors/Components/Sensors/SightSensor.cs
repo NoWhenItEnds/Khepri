@@ -6,11 +6,11 @@ using System.Collections.Generic;
 namespace Khepri.Entities.Actors.Components.Sensors
 {
     /// <summary> A sensor used to find visual information about the surrounding environment. </summary>
-    public partial class SightSensor : Node3D, ISensor
+    public partial class SightSensor : Node3D
     {
         /// <summary> A reference to the unit sensor parent. Contains the unit's persistent memory. </summary>
         [ExportGroup("Nodes")]
-        [Export] private UnitBrain _unitSensors;
+        [Export] private SensorComponent _sensors;
 
         /// <summary> The area representing the observer's field of view. Items in here are potentially visible. </summary>
         [Export] private Area3D _fieldOfViewArea;
@@ -54,7 +54,7 @@ namespace Khepri.Entities.Actors.Components.Sensors
             if (body is IEntity entity)
             {
                 // Remove the entity from visibility.
-                KnownEntity? trackedObject = _unitSensors.KnowsEntity(entity);
+                KnownEntity? trackedObject = _sensors.KnowsEntity(entity);
                 if (trackedObject != null) { trackedObject.SetIsVisible(false); }
 
                 _nearbyEntities.Remove(entity);
@@ -74,12 +74,12 @@ namespace Khepri.Entities.Actors.Components.Sensors
 
                 if (_lineOfSightRayCast.IsColliding())
                 {
-                    KnownEntity? trackedObject = _unitSensors.KnowsEntity(current);
+                    KnownEntity? trackedObject = _sensors.KnowsEntity(current);
                     if (_lineOfSightRayCast.GetCollider() is IEntity entity && entity == current)  // Is the entity directly visible.
                     {
                         if (trackedObject == null)  // If the entity isn't already known, add it.
                         {
-                            trackedObject = _unitSensors.RememberEntity(current);
+                            trackedObject = _sensors.RememberEntity(current);
                         }
 
                         trackedObject?.SetIsVisible(true);

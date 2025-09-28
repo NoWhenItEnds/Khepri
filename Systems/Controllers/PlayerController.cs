@@ -88,6 +88,10 @@ namespace Khepri.Controllers
                 _isUIOpen = !_isUIOpen;
                 Input.MouseMode = _isUIOpen ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.ConfinedHidden;
             }
+            else if (@event.IsActionReleased("action_use"))
+            {
+                //PlayerUnit.HandleInput(new UseInput());
+            }
         }
 
 
