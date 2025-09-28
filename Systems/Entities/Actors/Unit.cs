@@ -67,6 +67,7 @@ namespace Khepri.Entities.Actors
         {
             _worldController = WorldController.Instance;
 
+            // TODO - Move this to the state machine.
             // Setup the sprite animations.
             foreach (var frames in _spriteFrames)
             {
@@ -123,27 +124,7 @@ namespace Khepri.Entities.Actors
 
         /// <summary> Handle the input sent to the unit by it's controller. </summary>
         /// <param name="input"> The input data class to interpret. </param>
-        public void HandleInput(IInput input)
-        {
-            if (input is MoveInput moveInput)
-            {
-                switch (moveInput.MovementType)
-                {
-                    case MoveType.WALKING:
-                        StateMachine.TransitionState(StateEvent.WALK);
-                        break;
-                    case MoveType.SPRINTING:
-                        StateMachine.TransitionState(StateEvent.SPRINT);
-                        break;
-                    case MoveType.IDLE:
-                    default:
-                        StateMachine.TransitionState(StateEvent.IDLE);
-                        break;
-                }
-            }
-
-            StateMachine.CurrentState.HandleInput(input);
-        }
+        public void HandleInput(IInput input) => StateMachine.HandleInput(input);
 
 
         public void AddUsableEntity(IEntity entity)

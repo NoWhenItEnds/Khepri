@@ -62,9 +62,10 @@ script = ExtResource("4_xo887")
 _unit = NodePath("..")
 _lights = NodePath("Lights")
 
-[node name="Sight Sensor" type="Node3D" parent="Sensor Component" node_paths=PackedStringArray("_fieldOfViewArea", "_lineOfSightRayCast")]
+[node name="Sight Sensor" type="Node3D" parent="Sensor Component" node_paths=PackedStringArray("_sensors", "_fieldOfViewArea", "_lineOfSightRayCast")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 script = ExtResource("4_8qol3")
+_sensors = NodePath("..")
 _fieldOfViewArea = NodePath("Field of View")
 _lineOfSightRayCast = NodePath("RayCast3D")
 

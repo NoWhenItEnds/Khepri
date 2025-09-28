@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Khepri.Models.Input;
 
 namespace Khepri.Entities.Actors.Components.States
 {
@@ -52,6 +53,31 @@ namespace Khepri.Entities.Actors.Components.States
             _states.Add(new SprintingState(_unit)
                 .WithTransition<IdlingState>(StateEvent.IDLE)
                 .WithTransition<WalkingState>(StateEvent.WALK));
+        }
+
+
+        /// <summary> Handle the input sent to the unit by it's controller. </summary>
+        /// <param name="input"> The input data class to interpret. </param>
+        public void HandleInput(IInput input)
+        {
+            if (input is MoveInput moveInput)
+            {
+                switch (moveInput.MovementType)
+                {
+                    case MoveType.WALKING:
+                        TransitionState(StateEvent.WALK);
+                        break;
+                    case MoveType.SPRINTING:
+                        TransitionState(StateEvent.SPRINT);
+                        break;
+                    case MoveType.IDLE:
+                    default:
+                        TransitionState(StateEvent.IDLE);
+                        break;
+                }
+            }
+
+            CurrentState.HandleInput(input);
         }
 
 
