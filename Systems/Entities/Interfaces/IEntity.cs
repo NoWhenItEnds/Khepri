@@ -14,5 +14,10 @@ namespace Khepri.Entities.Interfaces
 
         /// <summary> A reference to the object's collision shape. </summary>
         public CollisionShape3D CollisionShape { get; }
+
+
+        /// <summary> The internal logic to use when the entity is used. </summary>
+        /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
+        public void Use(IEntity activatingEntity);
     }
 }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://ko6nvcupfcf4"]
+[gd_scene load_steps=28 format=3 uid="uid://ko6nvcupfcf4"]
 
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="Script" uid="uid://cgujt8yhxbsew" path="res://Systems/Controllers/WorldController.cs" id="1_8fov1"]
@@ -12,6 +12,7 @@
 [ext_resource type="Shader" uid="uid://ctyba6bkndpm1" path="res://Content/Shaders/Shader_MainCameraMask.gdshader" id="9_gh1u3"]
 [ext_resource type="Script" uid="uid://cyaymrk4jwk3o" path="res://Systems/UI/HUD/Astrolabe.cs" id="11_k5j0c"]
 [ext_resource type="PackedScene" uid="uid://crta0fka14n85" path="res://Content/Prefabs/Entities/Item.tscn" id="11_kupp0"]
+[ext_resource type="Script" uid="uid://6b0qgj67orut" path="res://Systems/Entities/Items/ItemFactory.cs" id="11_uxds2"]
 [ext_resource type="Texture2D" uid="uid://bf4jcda6yqjao" path="res://Content/Textures/UI/HUD/Astrolabe/Astrolabe_Ring.png" id="12_k5j0c"]
 [ext_resource type="Texture2D" uid="uid://dt68ek83vdc6r" path="res://Content/Textures/UI/HUD/Astrolabe/Astrolabe_Indicator.png" id="13_wrnex"]
 [ext_resource type="Texture2D" uid="uid://c01vvl8jnhv8b" path="res://Content/Textures/UI/HUD/StatusBar/StatusBar_Frame.png" id="14_a7rpa"]
@@ -547,8 +548,9 @@ transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, -
 mesh = SubResource("QuadMesh_gh1u3")
 surface_material_override/0 = SubResource("StandardMaterial3D_gh1u3")
 
-[node name="Item" parent="World" instance=ExtResource("11_kupp0")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -2)
+[node name="Items" type="Node3D" parent="World"]
+script = ExtResource("11_uxds2")
+_itemPrefab = ExtResource("11_kupp0")
 
 [node name="UI" type="Control" parent="."]
 layout_mode = 3

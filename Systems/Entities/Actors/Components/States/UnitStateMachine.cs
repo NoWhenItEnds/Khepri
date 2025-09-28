@@ -76,6 +76,10 @@ namespace Khepri.Entities.Actors.Components.States
                         break;
                 }
             }
+            else if (input is UseInput useInput)
+            {
+                useInput.Entity.Use(_unit);
+            }
 
             CurrentState.HandleInput(input);
         }

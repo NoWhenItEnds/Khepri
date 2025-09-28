@@ -1,7 +1,7 @@
 using Godot;
 using Khepri.Entities.Actors;
 using Khepri.Entities.Interfaces;
-using Khepri.Models.Persistent;
+using Khepri.Entities.Items.Components;
 using System;
 
 namespace Khepri.Entities.Items
@@ -20,15 +20,41 @@ namespace Khepri.Entities.Items
         [Export] private Area3D _interactionArea;
 
 
+        /// <summary> The data component representing the item's data. </summary>
+        public ItemDataComponent Data { get; private set; }
+
+
         /// <inheritdoc/>
-        public Guid UId => Data.UId;
+        public Guid UId { get; } = Guid.NewGuid();
 
         /// <inheritdoc/>
         public Vector3 WorldPosition => GlobalPosition;
 
 
-        /// <inheritdoc/>
-        public ItemData Data { get; private set; } = new ItemData();
+        /// <summary> A reference to the item factory. </summary>
+        private ItemFactory _itemFactory;
+
+
+        /// <summary> Initialise the item by giving data. </summary>
+        /// <param name="data"> The raw data to build the item. </param>
+        public void Initialise(ItemDataComponent data)
+        {
+            Data = data;
+        }
+
+
+        /// <summary> Using an item tries to pick it up. </summary>
+        public void Use(IEntity activatingEntity)
+        {
+            if (activatingEntity is Unit unit)
+            {
+                Boolean isSuccessful = unit.Inventory.AddItem(Data);
+                if (isSuccessful)   // If the item was added, free it back to the pool.
+                {
+                    _itemFactory.FreeItem(this);
+                }
+            }
+        }
 
 
         /// <inheritdoc/>
@@ -36,6 +62,8 @@ namespace Khepri.Entities.Items
         {
             _interactionArea.BodyEntered += OnBodyEntered;
             _interactionArea.BodyExited += OnBodyExited;
+
+            _itemFactory = ItemFactory.Instance;
         }
 
 
@@ -66,14 +94,14 @@ namespace Khepri.Entities.Items
 
 
         /// <inheritdoc/>
-        public override Int32 GetHashCode() => HashCode.Combine(Data.UId);
+        public override Int32 GetHashCode() => HashCode.Combine(UId);
 
 
         /// <inheritdoc/>
         public override Boolean Equals(Object obj)
         {
             Item? other = obj as Item;
-            return other != null ? Data.UId.Equals(other.Data.UId) : false;
+            return other != null ? UId.Equals(other.UId) : false;
         }
 
 

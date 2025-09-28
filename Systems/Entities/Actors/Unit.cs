@@ -2,6 +2,7 @@ using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Actors.Components;
 using Khepri.Entities.Actors.Components.States;
+using Khepri.Entities.Components;
 using Khepri.Entities.Interfaces;
 using Khepri.Models.Input;
 using Khepri.Nodes;
@@ -35,6 +36,9 @@ namespace Khepri.Entities.Actors
         /// <summary> The state machine controlling the unit. </summary>
         [Export] public UnitStateMachine StateMachine { get; private set; }
 
+        /// <summary> A reference to the unit's inventory component. </summary>
+        [Export] public EntityInventory Inventory { get; private set; }
+
 
         /// <summary> The animation sheets to use for the unit's animations. </summary>
         [ExportGroup("Resources")]
@@ -59,7 +63,14 @@ namespace Khepri.Entities.Actors
         private WorldController _worldController;
 
         /// <summary> A list of entities that the unit is close enough to interact with. </summary>
-        private HashSet<IEntity> _usableEntities = new HashSet<IEntity>();
+        public HashSet<IEntity> UsableEntities = new HashSet<IEntity>();
+
+
+        /// <inheritdoc/>
+        public void Use(IEntity activatingEntity)
+        {
+            throw new NotImplementedException();
+        }
 
 
         /// <inheritdoc/>
@@ -67,7 +78,6 @@ namespace Khepri.Entities.Actors
         {
             _worldController = WorldController.Instance;
 
-            // TODO - Move this to the state machine.
             // Setup the sprite animations.
             foreach (var frames in _spriteFrames)
             {
@@ -129,12 +139,12 @@ namespace Khepri.Entities.Actors
 
         public void AddUsableEntity(IEntity entity)
         {
-            _usableEntities.Add(entity);
+            UsableEntities.Add(entity);
         }
 
         public void RemoveUsableEntity(IEntity entity)
         {
-            _usableEntities.Remove(entity);
+            UsableEntities.Remove(entity);
         }
 
 

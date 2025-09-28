@@ -4,6 +4,7 @@ using Khepri.Models.Input;
 using Khepri.Nodes;
 using Khepri.Nodes.Singletons;
 using System;
+using System.Linq;
 
 namespace Khepri.Controllers
 {
@@ -90,7 +91,7 @@ namespace Khepri.Controllers
             }
             else if (@event.IsActionReleased("action_use"))
             {
-                //PlayerUnit.HandleInput(new UseInput());
+                PlayerUnit.HandleInput(new UseInput(PlayerUnit.UsableEntities.First()));    // TODO - This should be pulled from ui element.
             }
         }
 

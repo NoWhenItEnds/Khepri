@@ -5,7 +5,7 @@ using System;
 namespace Khepri.Entities
 {
     /// <summary> A structural prop that acts as a wall, either man-made or natural. </summary>
-    public partial class Wall : StaticBody3D, IEntity, ITileable
+    public partial class Wall : StaticBody3D, ITileable
     {
         /// <inheritdoc/>
         [ExportGroup("Nodes")]
