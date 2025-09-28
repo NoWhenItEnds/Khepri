@@ -240,8 +240,9 @@ namespace Khepri.Entities.Actors.Components
             return other != null ? Entity.Equals(other.Entity) : false;
         }
 
+
         /// <inheritdoc/>
-        public bool Equals(KnownEntity other) => Entity.Equals(other.Entity);
+        public Boolean Equals(KnownEntity other) => Entity.Equals(other.Entity);
     }
 
 

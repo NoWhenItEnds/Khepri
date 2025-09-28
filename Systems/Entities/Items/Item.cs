@@ -48,7 +48,7 @@ namespace Khepri.Entities.Items
         {
             if (activatingEntity is Unit unit)
             {
-                Boolean isSuccessful = unit.Inventory.AddItem(Data);
+                Boolean isSuccessful = unit.Inventory.TryAddItem(Data);
                 if (isSuccessful)   // If the item was added, free it back to the pool.
                 {
                     _itemFactory.FreeItem(this);
