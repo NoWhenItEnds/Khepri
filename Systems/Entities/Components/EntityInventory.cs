@@ -9,7 +9,7 @@ namespace Khepri.Entities.Components
     {
         /// <summary> The dimensions of the inventory's grid. </summary>
         [ExportGroup("Settings")]
-        [Export] private Vector2I _inventorySize = new Vector2I(5, 5);
+        [Export] private Vector2I _inventorySize = new Vector2I(10, 10);
 
 
         /// <summary> The items being stored in the entity's inventory. </summary>
@@ -33,7 +33,7 @@ namespace Khepri.Entities.Components
 
             if (position != null)
             {
-                Vector2I currentPosition = new Vector2I(position.GetValueOrDefault().X, position.GetValueOrDefault().Y);
+                Vector2I currentPosition = new Vector2I(Mathf.Clamp(position.GetValueOrDefault().X, 0, _inventorySize.X - 1), Mathf.Clamp(position.GetValueOrDefault().Y, 0, _inventorySize.Y - 1));
                 if (StoredItems[currentPosition.X, currentPosition.Y] == null)
                 {
                     isAdded = SetItem(item, currentPosition);
@@ -54,7 +54,6 @@ namespace Khepri.Entities.Components
                 }
             }
 
-            GD.Print(isAdded);
             return isAdded;
         }
 
@@ -107,6 +106,23 @@ namespace Khepri.Entities.Components
             }
 
             return doesFit;
+        }
+
+
+        /// <summary> Remove an item from the inventory. </summary>
+        /// <param name="item"> The item to remove. </param>
+        public void RemoveItem(ItemDataComponent item)
+        {
+            for (Int32 x = 0; x < StoredItems.GetLength(0); x++)
+            {
+                for (Int32 y = 0; y < StoredItems.GetLength(1); y++)
+                {
+                    if (StoredItems[x, y] == item)
+                    {
+                        StoredItems[x, y] = null;
+                    }
+                }
+            }
         }
     }
 }
