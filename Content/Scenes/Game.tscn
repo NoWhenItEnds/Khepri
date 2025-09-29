@@ -705,6 +705,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Inventory" type="Control" parent="UI/Windows" node_paths=PackedStringArray("_inventoryGrid")]
+z_index = 1
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -722,6 +723,7 @@ _inventoryItemPrefab = ExtResource("22_0itj2")
 _inventoryGrid = NodePath("InventoryGrid")
 
 [node name="InventoryGrid" type="TextureRect" parent="UI/Windows/Inventory"]
+z_as_relative = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5

@@ -50,7 +50,9 @@ namespace Khepri.Controllers
         private void TempSpawn()
         {
             ItemDataComponent data = ItemFactory.Create("apple", ItemType.FOOD);
+            ItemDataComponent data1 = ItemFactory.Create("apple", ItemType.FOOD);
             CreateItem(data, new Vector3(3, 0, -3));
+            CreateItem(data1, new Vector3(3, 0, -4));
         }
 
 

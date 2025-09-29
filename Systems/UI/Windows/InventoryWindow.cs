@@ -4,6 +4,7 @@ using Khepri.Entities.Items.Components;
 using Khepri.UI.Windows.Components;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Khepri.UI.Windows
 {
@@ -27,11 +28,17 @@ namespace Khepri.UI.Windows
         [Export] private Int32 _poolSize = 100;
 
 
+        /// <summary> A pool that holds items that are in the game world. A boolean shows if an object is currently in use. </summary>
+        private Dictionary<InventoryItem, Boolean> _itemPool = new Dictionary<InventoryItem, Boolean>();
+
+        /// <summary> A reference to the currently open inventory. </summary>
+        private EntityInventory _currentInventory;
+
         /// <summary> The number of cells in the inventory. </summary>
         private Vector2I _gridSize = Vector2I.One;
 
-        /// <summary> A pool that holds items that are in the game world. A boolean shows if an object is currently in use. </summary>
-        private Dictionary<InventoryItem, Boolean> _itemPool = new Dictionary<InventoryItem, Boolean>();
+        /// <summary> The currently selected grid cell. </summary>
+        private Vector2I _currentSelection = Vector2I.Zero;
 
 
         /// <inheritdoc/>
@@ -96,6 +103,9 @@ namespace Khepri.UI.Windows
         /// <param name="inventory"> The entity's inventory. </param>
         public void Initialise(EntityInventory inventory)
         {
+            _currentInventory = inventory;
+            _currentSelection = Vector2I.Zero;
+
             // Set inventory size.
             _gridSize = inventory.InventorySize;
             Single halfSize = CellSize * 0.5f;
@@ -106,13 +116,14 @@ namespace Khepri.UI.Windows
 
             // Get the unique items.
             Dictionary<ItemDataComponent, Vector2I> items = new Dictionary<ItemDataComponent, Vector2I>();
-            for (Int32 x = 0; x < inventory.StoredItems.GetLength(0); x++)
+            for (Int32 x = 0; x < inventory.InventorySize.X; x++)
             {
-                for (Int32 y = 0; y < inventory.StoredItems.GetLength(1); y++)
+                for (Int32 y = 0; y < inventory.InventorySize.Y; y++)
                 {
-                    if (inventory.StoredItems[x, y] != null)
+                    ItemDataComponent? data = inventory.GetItem(x, y);
+                    if (data != null)
                     {
-                        items.TryAdd(inventory.StoredItems[x, y], new Vector2I(x, y));
+                        items.TryAdd(data, new Vector2I(x, y));
                     }
                 }
             }
@@ -186,6 +197,92 @@ namespace Khepri.UI.Windows
             _itemPool[item] = false;
             item.GlobalPosition = new Vector2(-100f, -100f);
             item.Visible = false;
+        }
+
+
+        /// <summary> Get a given inventory item at a given position. </summary>
+        /// <param name="position"> The cell position to check. </param>
+        /// <returns> The returned inventory item. Null means that there wasn't one at this position. </returns>
+        private InventoryItem? GetInventoryItem(Vector2I position)
+        {
+            ItemDataComponent? item = _currentInventory.GetItem(position);
+            if (item == null)
+            {
+                return null;
+            }
+
+            return _itemPool.Where(x => x.Value && x.Key.Data == item).Select(x => x.Key).FirstOrDefault() ?? null;
+        }
+
+
+        /// <inheritdoc/>
+        public override void _Input(InputEvent @event)
+        {
+            if (Visible)
+            {
+                if (@event is InputEventMouseMotion mouseEvent)
+                {
+                    _currentSelection = CalculatePosition(mouseEvent.GlobalPosition);
+                }
+                else
+                {
+                    // Handle non-mouse input. Stop all input if the mouse if being used.
+                    if (!Input.IsMouseButtonPressed(MouseButton.Left) && !Input.IsMouseButtonPressed(MouseButton.Right) && @event is not InputEventMouseMotion)
+                    {
+                        Int32 moveHorizontal =
+                            (@event.IsActionPressed("action_move_left") ? -1 : 0) +
+                            (@event.IsActionPressed("action_move_right") ? 1 : 0);
+                        Int32 moveVertical =
+                            (@event.IsActionPressed("action_move_up") ? -1 : 0) +
+                            (@event.IsActionPressed("action_move_down") ? 1 : 0);
+                        Vector2I direction = new Vector2I(moveHorizontal, moveVertical);
+                        if (direction != Vector2I.Zero)
+                        {
+                            // Check how far to move from the current position.
+                            InventoryItem? item = GetInventoryItem(_currentSelection);
+                            if (item != null)
+                            {
+                                Vector2I itemSize = item.Data.GetSize();  // We only need to apply the size if we're going 'forwards', not 'backwards' as the position for a large object will be the top-left.
+                                _currentSelection += direction * new Vector2I(direction.X > 0 ? itemSize.X : 1, direction.Y > 0 ? itemSize.Y : 1);
+                            }
+                            else
+                            {
+                                _currentSelection += direction;
+                            }
+                            _currentSelection = _currentSelection.Clamp(Vector2I.Zero, _gridSize - Vector2I.One);
+                        }
+                    }
+                }
+
+                // Check if we've landed on an object, and need to move to its top left corner.
+                InventoryItem? currentItem = GetInventoryItem(_currentSelection);
+                if (currentItem != null)
+                {
+                    _currentSelection = currentItem.CellPosition;
+                }
+                QueueRedraw();
+            }
+        }
+
+
+        /// <inheritdoc/>
+        public override void _Draw()
+        {
+            if (Visible)
+            {
+                // This relies upon the sort order of this and the grid texture being manually set.
+                Vector2 start = _inventoryGrid.Position + (_currentSelection * CellSize);
+
+                Vector2 size = Vector2.One * CellSize;
+                ItemDataComponent? currentItem = _currentInventory.GetItem(_currentSelection);
+                if (currentItem != null)
+                {
+                    size = currentItem.GetSize() * CellSize;
+                }
+
+                Rect2 selectionRect = new Rect2(start.X, start.Y, size.X, size.Y);
+                DrawRect(selectionRect, Colors.BlueViolet, false, 8f);
+            }
         }
     }
 }

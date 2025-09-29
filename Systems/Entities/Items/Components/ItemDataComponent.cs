@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Godot;
 
 namespace Khepri.Entities.Items.Components
@@ -19,6 +20,11 @@ namespace Khepri.Entities.Items.Components
 
         /// <summary> Relative points representing the grid cells the item occupies in an inventory. </summary>
         public Vector2I[] Points { get; init; }
+
+
+        /// <summary> Gets the size of the item's bounding box by looking for its largest point. </summary>
+        /// <returns> The size of the item's bounding box. </returns>
+        public Vector2I GetSize() => new Vector2I(Points.Max(x => x.X) + 1, Points.Max(x => x.Y) + 1);  // +1 because otherwise it would be the start of the cell, instead of the end.
 
 
         /// <inheritdoc/>

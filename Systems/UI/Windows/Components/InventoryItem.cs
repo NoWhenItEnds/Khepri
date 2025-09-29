@@ -72,7 +72,7 @@ namespace Khepri.UI.Windows.Components
                 Boolean isReturned = _inventory.TryAddItem(Data, CellPosition);
                 if (isReturned)
                 {
-                    GlobalPosition = _window.CalculatePosition(CellPosition);
+                    GlobalPosition = _window.CalculatePosition(CellPosition);   // Use the previously remembered cell position.
                 }
                 else    // If it couldn't be returned, for whatever reason, drop it.
                 {
@@ -127,9 +127,7 @@ namespace Khepri.UI.Windows.Components
 
             _sprite.Animation = itemType;
             _sprite.Frame = itemIndex;
-            Int32 maxX = data.Points.Max(x => x.X);
-            Int32 maxY = data.Points.Max(x => x.Y);
-            Size = new Vector2(maxX + 1, maxY + 1) * _window.CellSize;  // +1 because otherwise it would be the start of the cell, instead of the end.
+            Size = data.GetSize() * _window.CellSize;
         }
 
 

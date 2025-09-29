@@ -24,6 +24,7 @@ namespace Khepri.Entities.Items
 
             return new ItemDataComponent
             {
+                UId = Guid.NewGuid(),
                 Name = name,
                 ItemType = type,
                 SpriteIndex = GetSpriteIndex(itemElement),

@@ -13,13 +13,13 @@ namespace Khepri.Entities.Components
 
 
         /// <summary> The items being stored in the entity's inventory. </summary>
-        public ItemDataComponent[,] StoredItems { get; private set; }
+        private ItemDataComponent[,] _storedItems;
 
 
         /// <inheritdoc/>
         public override void _Ready()
         {
-            StoredItems = new ItemDataComponent[InventorySize.X, InventorySize.Y];
+            _storedItems = new ItemDataComponent[InventorySize.X, InventorySize.Y];
         }
 
 
@@ -34,7 +34,7 @@ namespace Khepri.Entities.Components
             if (position != null)
             {
                 Vector2I currentPosition = new Vector2I(Mathf.Clamp(position.GetValueOrDefault().X, 0, InventorySize.X - 1), Mathf.Clamp(position.GetValueOrDefault().Y, 0, InventorySize.Y - 1));
-                if (StoredItems[currentPosition.X, currentPosition.Y] == null)
+                if (_storedItems[currentPosition.X, currentPosition.Y] == null)
                 {
                     isAdded = SetItem(item, currentPosition);
                 }
@@ -42,9 +42,9 @@ namespace Khepri.Entities.Components
             else
             {
                 // Look for available positions.
-                for (Int32 x = 0; x < StoredItems.GetLength(0); x++)
+                for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
                 {
-                    for (Int32 y = 0; y < StoredItems.GetLength(1); y++)
+                    for (Int32 y = 0; y < _storedItems.GetLength(1); y++)
                     {
                         Vector2I currentPosition = new Vector2I(x, y);
                         isAdded = SetItem(item, currentPosition);
@@ -70,7 +70,7 @@ namespace Khepri.Entities.Components
                 foreach (Vector2I point in item.Points)
                 {
                     Vector2I currentPosition = position + point;
-                    StoredItems[currentPosition.X, currentPosition.Y] = item;
+                    _storedItems[currentPosition.X, currentPosition.Y] = item;
                 }
             }
             return doesFit;
@@ -89,7 +89,7 @@ namespace Khepri.Entities.Components
             {
                 Int32 x = position.X + point.X;
                 Int32 y = position.Y + point.Y;
-                if (x >= InventorySize.X || y >= InventorySize.Y || StoredItems[x, y] != null)
+                if (x >= InventorySize.X || y >= InventorySize.Y || _storedItems[x, y] != null)
                 {
                     doesFit = false;
                     break;
@@ -104,16 +104,56 @@ namespace Khepri.Entities.Components
         /// <param name="item"> The item to remove. </param>
         public void RemoveItem(ItemDataComponent item)
         {
-            for (Int32 x = 0; x < StoredItems.GetLength(0); x++)
+            for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
             {
-                for (Int32 y = 0; y < StoredItems.GetLength(1); y++)
+                for (Int32 y = 0; y < _storedItems.GetLength(1); y++)
                 {
-                    if (StoredItems[x, y] == item)
+                    if (GetItem(x, y) == item)
                     {
-                        StoredItems[x, y] = null;
+                        _storedItems[x, y] = null;
                     }
                 }
             }
+        }
+
+
+        /// <summary> Attempt to get the item at the given cell position. </summary>
+        /// <param name="position"> The positional vector component. </param>
+        /// <returns> The found item, or null if there was none. </returns>
+        public ItemDataComponent? GetItem(Vector2I position) => GetItem(position.X, position.Y);
+
+
+        /// <summary> Attempt to get the item at the given cell position. </summary>
+        /// <param name="x"> The horizontal component. </param>
+        /// <param name="y"> The vertical component. </param>
+        /// <returns> The found item, or null if there was none. </returns>
+        public ItemDataComponent? GetItem(Int32 x, Int32 y)
+        {
+            if (x >= InventorySize.X || y >= InventorySize.Y)
+            {
+                return null;
+            }
+            return _storedItems[x, y] ?? null;
+        }
+
+
+        /// <summary> Get the top-left position of an item in the inventory. </summary>
+        /// <param name="item"> The item to search for. </param>
+        /// <returns> The found grid coordinates. A null means that the item isn't in the inventory. </returns>
+        public Vector2I? GetItemPosition(ItemDataComponent item)
+        {
+            for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
+            {
+                for (Int32 y = 0; y < _storedItems.GetLength(1); y++)
+                {
+                    if (GetItem(x, y) == item)
+                    {
+                        return new Vector2I(x, y);
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }
