@@ -48,7 +48,7 @@ namespace Khepri.Entities.Items
 
         private void TempSpawn()
         {
-            ItemDataComponent data = new ItemDataComponent([new Vector2I(0, 0), new Vector2I(1, 0)]);
+            ItemDataComponent data = new ItemDataComponent([new Vector2I(0, 0)]);
             CreateItem(data, new Vector3(3, 0, -3));
         }
 

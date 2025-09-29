@@ -21,7 +21,7 @@
 [ext_resource type="Texture2D" uid="uid://jm8q7n0aefdj" path="res://Content/Textures/UI/HUD/StatusBar/StatusBar_Progress.png" id="15_rj7tm"]
 [ext_resource type="Texture2D" uid="uid://be0foew3edrpc" path="res://Content/Textures/UI/HUD/StatusBar/StatusBar_Slider.png" id="17_kqbmc"]
 [ext_resource type="Script" uid="uid://vuqou0rktkpf" path="res://Systems/UI/Windows/InventoryWindow.cs" id="20_dulfu"]
-[ext_resource type="Texture2D" uid="uid://cykmv0wmfypeq" path="res://Content/Textures/UI/Windows/Inventory/Inventory_Grid.png" id="20_pt5vb"]
+[ext_resource type="Texture2D" uid="uid://cykmv0wmfypeq" path="res://Content/Textures/UI/Windows/Inventory/Inventory_Grid_Tile.png" id="20_pt5vb"]
 [ext_resource type="PackedScene" uid="uid://bu7yeu1aonvto" path="res://Content/Prefabs/UI/Windows/Components/InventoryItem.tscn" id="22_0itj2"]
 
 [sub_resource type="Environment" id="Environment_gh1u3"]
@@ -706,6 +706,7 @@ grow_vertical = 2
 
 [node name="Inventory" type="Control" parent="UI/Windows" node_paths=PackedStringArray("_inventoryGrid")]
 layout_mode = 1
+anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -723,13 +724,15 @@ _inventoryGrid = NodePath("InventoryGrid")
 [node name="InventoryGrid" type="TextureRect" parent="UI/Windows/Inventory"]
 layout_mode = 1
 anchors_preset = -1
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 96.0
-offset_top = 96.0
-offset_right = -96.0
-offset_bottom = -96.0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.00003
+offset_bottom = 16.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("20_pt5vb")
-stretch_mode = 3
+stretch_mode = 1

@@ -19,19 +19,16 @@ namespace Khepri.UI.Windows
         [Export] private TextureRect _inventoryGrid;
 
 
-        /// <summary> The number of cells wide the inventory is. </summary>
-        [ExportGroup("Settings")]
-        [Export] public Int32 GridWidth { get; private set; } = 10;
-
-        /// <summary> The number of cells high the inventory is. </summary>
-        [Export] public Int32 GridHeight { get; private set; } = 10;
-
         /// <summary> The size of the cell in pixels. </summary>
+        [ExportGroup("Settings")]
         [Export] public Int32 CellSize { get; private set; } = 32;
 
         /// <summary> How many item nodes the item pool should contain. </summary>
         [Export] private Int32 _poolSize = 100;
 
+
+        /// <summary> The number of cells in the inventory. </summary>
+        private Vector2I _gridSize = Vector2I.One;
 
         /// <summary> A pool that holds items that are in the game world. A boolean shows if an object is currently in use. </summary>
         private Dictionary<InventoryItem, Boolean> _itemPool = new Dictionary<InventoryItem, Boolean>();
@@ -99,6 +96,14 @@ namespace Khepri.UI.Windows
         /// <param name="inventory"> The entity's inventory. </param>
         public void Initialise(EntityInventory inventory)
         {
+            // Set inventory size.
+            _gridSize = inventory.InventorySize;
+            Single halfSize = CellSize * 0.5f;
+            _inventoryGrid.OffsetTop = -_gridSize.X * halfSize;
+            _inventoryGrid.OffsetBottom = _gridSize.X * halfSize;
+            _inventoryGrid.OffsetLeft = -_gridSize.Y * halfSize;
+            _inventoryGrid.OffsetRight = _gridSize.Y * halfSize;
+
             // Get the unique items.
             Dictionary<ItemDataComponent, Vector2I> items = new Dictionary<ItemDataComponent, Vector2I>();
             for (Int32 x = 0; x < inventory.StoredItems.GetLength(0); x++)
@@ -159,7 +164,7 @@ namespace Khepri.UI.Windows
         /// <returns> The screen position of the cell's top left corner.</returns>
         public Vector2 CalculatePosition(Vector2I position)
         {
-            Vector2 clampedPosition = new Vector2(Mathf.Clamp(position.X, 0, GridWidth - 1), Mathf.Clamp(position.Y, 0, GridHeight - 1));
+            Vector2 clampedPosition = new Vector2(Mathf.Clamp(position.X, 0, _gridSize.X - 1), Mathf.Clamp(position.Y, 0, _gridSize.Y - 1));
             return _inventoryGrid.GlobalPosition + clampedPosition * CellSize;
         }
 
@@ -170,7 +175,7 @@ namespace Khepri.UI.Windows
         public Vector2I CalculatePosition(Vector2 position)
         {
             Vector2 relativePosition = (position - _inventoryGrid.GlobalPosition) / CellSize;
-            return new Vector2I((Int32)Mathf.Clamp(relativePosition.X, 0, GridWidth - 1), (Int32)Mathf.Clamp(relativePosition.Y, 0, GridHeight - 1));
+            return new Vector2I((Int32)Mathf.Clamp(relativePosition.X, 0, _gridSize.X - 1), (Int32)Mathf.Clamp(relativePosition.Y, 0, _gridSize.Y - 1));
         }
 
 

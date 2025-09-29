@@ -9,7 +9,7 @@ namespace Khepri.Entities.Components
     {
         /// <summary> The dimensions of the inventory's grid. </summary>
         [ExportGroup("Settings")]
-        [Export] private Vector2I _inventorySize = new Vector2I(10, 10);
+        [Export] public Vector2I InventorySize { get; private set; } = new Vector2I(10, 10);
 
 
         /// <summary> The items being stored in the entity's inventory. </summary>
@@ -19,7 +19,7 @@ namespace Khepri.Entities.Components
         /// <inheritdoc/>
         public override void _Ready()
         {
-            StoredItems = new ItemDataComponent[_inventorySize.X, _inventorySize.Y];
+            StoredItems = new ItemDataComponent[InventorySize.X, InventorySize.Y];
         }
 
 
@@ -33,7 +33,7 @@ namespace Khepri.Entities.Components
 
             if (position != null)
             {
-                Vector2I currentPosition = new Vector2I(Mathf.Clamp(position.GetValueOrDefault().X, 0, _inventorySize.X - 1), Mathf.Clamp(position.GetValueOrDefault().Y, 0, _inventorySize.Y - 1));
+                Vector2I currentPosition = new Vector2I(Mathf.Clamp(position.GetValueOrDefault().X, 0, InventorySize.X - 1), Mathf.Clamp(position.GetValueOrDefault().Y, 0, InventorySize.Y - 1));
                 if (StoredItems[currentPosition.X, currentPosition.Y] == null)
                 {
                     isAdded = SetItem(item, currentPosition);
