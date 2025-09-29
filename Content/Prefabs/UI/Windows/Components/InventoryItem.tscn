@@ -1,10 +1,15 @@
 [gd_scene load_steps=3 format=3 uid="uid://bu7yeu1aonvto"]
 
-[ext_resource type="Texture2D" uid="uid://b1qppo5tk4r3s" path="res://icon.svg" id="1_0qunp"]
 [ext_resource type="Script" uid="uid://dilau8b72bh7d" path="res://Systems/UI/Windows/Components/InventoryItem.cs" id="1_urvt6"]
+[ext_resource type="SpriteFrames" uid="uid://x4r46q3wagnx" path="res://Content/Resources/SpriteFrames/Items/SpriteFrame_Items_Nodes.tres" id="2_0qunp"]
 
-[node name="InventoryItem" type="TextureButton"]
-offset_right = 40.0
-offset_bottom = 40.0
-texture_normal = ExtResource("1_0qunp")
+[node name="InventoryItem" type="TextureButton" node_paths=PackedStringArray("_sprite")]
+offset_right = 32.0
+offset_bottom = 32.0
 script = ExtResource("1_urvt6")
+_sprite = NodePath("AnimatedSprite2D")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = ExtResource("2_0qunp")
+animation = &"Food"
+centered = false

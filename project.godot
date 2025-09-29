@@ -27,6 +27,7 @@ project/assembly_name="Khepri"
 
 folder_colors={
 "res://Content/": "blue",
+"res://Data/": "teal",
 "res://Systems/": "purple",
 "res://addons/": "pink"
 }

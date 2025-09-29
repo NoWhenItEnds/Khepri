@@ -21,13 +21,13 @@ namespace Khepri.UI.Windows
 
         /// <summary> The number of cells wide the inventory is. </summary>
         [ExportGroup("Settings")]
-        [Export] private Int32 _gridWidth = 10;
+        [Export] public Int32 GridWidth { get; private set; } = 10;
 
         /// <summary> The number of cells high the inventory is. </summary>
-        [Export] private Int32 _gridHeight = 10;
+        [Export] public Int32 GridHeight { get; private set; } = 10;
 
         /// <summary> The size of the cell in pixels. </summary>
-        [Export] private Int32 _cellSize = 32;
+        [Export] public Int32 CellSize { get; private set; } = 32;
 
         /// <summary> How many item nodes the item pool should contain. </summary>
         [Export] private Int32 _poolSize = 100;
@@ -56,7 +56,6 @@ namespace Khepri.UI.Windows
         /// <summary> Update the window when the size changes. </summary>
         private void OnSizeChanged()
         {
-            Vector2 gridCorner = _inventoryGrid.GlobalPosition;
             foreach (KeyValuePair<InventoryItem, Boolean> item in _itemPool)
             {
                 if (item.Value) // If the item is currently in use.
@@ -160,8 +159,8 @@ namespace Khepri.UI.Windows
         /// <returns> The screen position of the cell's top left corner.</returns>
         public Vector2 CalculatePosition(Vector2I position)
         {
-            Vector2 clampedPosition = new Vector2(Mathf.Clamp(position.X, 0, _gridWidth - 1), Mathf.Clamp(position.Y, 0, _gridHeight - 1));
-            return _inventoryGrid.GlobalPosition + clampedPosition * _cellSize;
+            Vector2 clampedPosition = new Vector2(Mathf.Clamp(position.X, 0, GridWidth - 1), Mathf.Clamp(position.Y, 0, GridHeight - 1));
+            return _inventoryGrid.GlobalPosition + clampedPosition * CellSize;
         }
 
 
@@ -170,8 +169,8 @@ namespace Khepri.UI.Windows
         /// <returns> The cell coordinate of the cell's top left corner.</returns>
         public Vector2I CalculatePosition(Vector2 position)
         {
-            Vector2 relativePosition = (position - _inventoryGrid.GlobalPosition) / _cellSize;
-            return new Vector2I((Int32)Mathf.Clamp(relativePosition.X, 0, _gridWidth - 1), (Int32)Mathf.Clamp(relativePosition.Y, 0, _gridHeight - 1));
+            Vector2 relativePosition = (position - _inventoryGrid.GlobalPosition) / CellSize;
+            return new Vector2I((Int32)Mathf.Clamp(relativePosition.X, 0, GridWidth - 1), (Int32)Mathf.Clamp(relativePosition.Y, 0, GridHeight - 1));
         }
 
 

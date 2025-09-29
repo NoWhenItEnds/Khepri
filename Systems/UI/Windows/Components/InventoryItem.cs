@@ -2,12 +2,17 @@ using Godot;
 using Khepri.Entities.Components;
 using Khepri.Entities.Items.Components;
 using System;
+using System.Linq;
 
 namespace Khepri.UI.Windows.Components
 {
     /// <summary> An inventory item in an inventory grid. </summary>
     public partial class InventoryItem : TextureButton
     {
+        /// <summary> A reference to the item's sprite. </summary>
+        [ExportGroup("Nodes")]
+        [Export] private AnimatedSprite2D _sprite;
+
         /// <summary> The position of the item's top-left position. </summary>
         public Vector2I CellPosition { get; private set; }
 
@@ -96,14 +101,51 @@ namespace Khepri.UI.Windows.Components
             CellPosition = cellPosition;
             _inventory = inventory;
             _window = window;
+
+            SetSprite(data);
+            TextureClickMask = BuildClickMask(data);
         }
 
 
-        /// <summary> Set the item's grid cell position. </summary>
-        /// <param name="cellPosition"> The position of the item's top-left position. </param>
-        public void SetPosition(Vector2I cellPosition)
+        /// <summary> Set the item's sprite based upon the information in the data object. </summary>
+        /// <param name="data"> The raw data to build the item. </param>
+        /// <exception cref="ArgumentException"> If the data contains a type not mapped to the sprite sheet. </exception>
+        private void SetSprite(ItemDataComponent data)
         {
-            CellPosition = cellPosition;
+            String itemType = data.ItemType.ToString().Capitalize();
+            String[] possibleTypes = _sprite.SpriteFrames.GetAnimationNames();
+            if (!possibleTypes.Contains(itemType))
+            {
+                throw new ArgumentException("The map of inventory item sprites doesn't contain a category for the given type!");
+            }
+
+            Int32 itemIndex = Mathf.Clamp(data.SpriteIndex, 0, _sprite.SpriteFrames.GetFrameCount(itemType) - 1);
+
+            _sprite.Animation = itemType;
+            _sprite.Frame = itemIndex;
+            Texture2D currentTexture = _sprite.SpriteFrames.GetFrameTexture(_sprite.Animation, _sprite.Frame);
+            Size = currentTexture.GetSize();
+        }
+
+
+        private Bitmap BuildClickMask(ItemDataComponent data)
+        {
+            Bitmap mask = new Bitmap();
+            mask.Create((Vector2I)Size);
+
+            Int32 cellSize = _window.CellSize;
+            foreach (Vector2I point in data.Points)
+            {
+                for (Int32 x = point.X * cellSize; x < (point.X + 1) * cellSize; x++)
+                {
+                    for (Int32 y = point.Y * cellSize; y < (point.Y + 1) * cellSize; y++)
+                    {
+                        mask.SetBit(x, y, true);
+                    }
+                }
+            }
+
+            return mask;
         }
     }
 }
