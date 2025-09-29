@@ -70,7 +70,11 @@ namespace Khepri.UI.Windows.Components
             else    // Snap it back to its previous position.
             {
                 Boolean isReturned = _inventory.TryAddItem(Data, CellPosition);
-                if (!isReturned)    // If it couldn't be returned, for whatever reason, drop it.
+                if (isReturned)
+                {
+                    GlobalPosition = _window.CalculatePosition(CellPosition);
+                }
+                else    // If it couldn't be returned, for whatever reason, drop it.
                 {
                     // TODO - Drop it.
                 }

@@ -85,24 +85,15 @@ namespace Khepri.Entities.Components
         {
             Boolean doesFit = true;
 
-            // Look for available positions.
-            for (Int32 x = 0; x < StoredItems.GetLength(0); x++)
+            foreach (Vector2I point in item.Points)
             {
-                for (Int32 y = 0; y < StoredItems.GetLength(1); y++)
+                Int32 x = position.X + point.X;
+                Int32 y = position.Y + point.Y;
+                if (x >= InventorySize.X || y >= InventorySize.Y || StoredItems[x, y] != null)
                 {
-                    if (StoredItems[x, y] != null)
-                    {
-                        foreach (Vector2I point in item.Points)
-                        {
-                            if (StoredItems[x + point.X, y + point.Y] != null)
-                            {
-                                doesFit = false;
-                                break;
-                            }
-                        }
-                    }
+                    doesFit = false;
+                    break;
                 }
-                if (!doesFit) { break; }
             }
 
             return doesFit;
