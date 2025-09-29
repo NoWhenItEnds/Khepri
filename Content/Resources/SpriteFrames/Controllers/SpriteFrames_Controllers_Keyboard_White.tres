@@ -1,3 +1,39 @@
-[gd_resource type="SpriteFrames" format=3 uid="uid://cgrn35r1bjnnm"]
+[gd_resource type="SpriteFrames" load_steps=6 format=3 uid="uid://cgrn35r1bjnnm"]
+
+[ext_resource type="Texture2D" uid="uid://c1mq3806hbio8" path="res://Content/Textures/Tilesets/Controllers/Keyboard_White/pk_white_keys_0_one_letter_e.png" id="1_heaq5"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mkq1d"]
+atlas = ExtResource("1_heaq5")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xvdie"]
+atlas = ExtResource("1_heaq5")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hoelv"]
+atlas = ExtResource("1_heaq5")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8s7gj"]
+atlas = ExtResource("1_heaq5")
+region = Rect2(48, 0, 16, 16)
 
 [resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mkq1d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xvdie")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hoelv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8s7gj")
+}],
+"loop": true,
+"name": &"E",
+"speed": 15.0
+}]
