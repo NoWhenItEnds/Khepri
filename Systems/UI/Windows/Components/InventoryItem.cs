@@ -123,8 +123,9 @@ namespace Khepri.UI.Windows.Components
 
             _sprite.Animation = itemType;
             _sprite.Frame = itemIndex;
-            Texture2D currentTexture = _sprite.SpriteFrames.GetFrameTexture(_sprite.Animation, _sprite.Frame);
-            Size = currentTexture.GetSize();
+            Int32 maxX = data.Points.Max(x => x.X);
+            Int32 maxY = data.Points.Max(x => x.Y);
+            Size = new Vector2(maxX + 1, maxY + 1) * _window.CellSize;  // +1 because otherwise it would be the start of the cell, instead of the end.
         }
 
 
