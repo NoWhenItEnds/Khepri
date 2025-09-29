@@ -12,7 +12,7 @@
 [ext_resource type="Shader" uid="uid://ctyba6bkndpm1" path="res://Content/Shaders/Shader_MainCameraMask.gdshader" id="9_gh1u3"]
 [ext_resource type="Script" uid="uid://cyaymrk4jwk3o" path="res://Systems/UI/HUD/Astrolabe.cs" id="11_k5j0c"]
 [ext_resource type="PackedScene" uid="uid://crta0fka14n85" path="res://Content/Prefabs/Entities/Item.tscn" id="11_kupp0"]
-[ext_resource type="Script" uid="uid://6b0qgj67orut" path="res://Systems/Entities/Items/ItemFactory.cs" id="11_uxds2"]
+[ext_resource type="Script" uid="uid://6b0qgj67orut" path="res://Systems/Controllers/ItemController.cs" id="11_uxds2"]
 [ext_resource type="Texture2D" uid="uid://bf4jcda6yqjao" path="res://Content/Textures/UI/HUD/Astrolabe/Astrolabe_Ring.png" id="12_k5j0c"]
 [ext_resource type="Script" uid="uid://c3lsvokkeus1u" path="res://Systems/Controllers/UIController.cs" id="13_oaat0"]
 [ext_resource type="Texture2D" uid="uid://dt68ek83vdc6r" path="res://Content/Textures/UI/HUD/Astrolabe/Astrolabe_Indicator.png" id="13_wrnex"]

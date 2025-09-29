@@ -1,108 +1,104 @@
 using Godot;
 using Khepri.Entities.Items.Components;
-using Khepri.Nodes.Singletons;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
 
 namespace Khepri.Entities.Items
 {
-    /// <summary> A factory for making item objects. </summary>
-    public partial class ItemFactory : SingletonNode3D<ItemFactory>
+    /// <summary> A factory for creating items from external data. </summary>
+    public static class ItemFactory
     {
-        /// <summary> The prefab to use for creating items. </summary>
-        [ExportGroup("Prefabs")]
-        [Export] private PackedScene _itemPrefab;
+        /// <summary> The relative director to the game's item data. </summary>
+        private const String DATA_DIR = "res://Data/Items/";
 
 
-        /// <summary> How many item nodes the item pool should contain. </summary>
-        [ExportGroup("Settings")]
-        [Export] private Int32 _poolSize = 100;
-
-
-        /// <summary> A pool that holds items that are in the game world. A boolean shows if an object is currently in use. </summary>
-        private Dictionary<Item, Boolean> _itemPool = new Dictionary<Item, Boolean>();
-
-
-        /// <inheritdoc/>
-        public override void _Ready()
+        /// <summary> A builder for creating item data. </summary>
+        /// <param name="name"> The unique identifying name or key of the item. </param>
+        /// <param name="type"> What kind of item it is. </param>
+        /// <returns> A reference to the create data object. </returns>
+        public static ItemDataComponent Create(String name, ItemType type)
         {
-            // First look for any existing items.
-            foreach (Node node in GetChildren())
+            JsonElement itemElement = GetItemRoot(name, type);
+
+            return new ItemDataComponent
             {
-                if (node is Item item)
+                Name = name,
+                ItemType = type,
+                SpriteIndex = GetSpriteIndex(itemElement),
+                Points = GetPoints(itemElement)
+            };
+        }
+
+
+        /// <summary> Search the data object for the item root. </summary>
+        /// <param name="name"> The key / name of the object. </param>
+        /// <param name="type"> The kind of object. Determines which json file to search. </param>
+        /// <returns> The json element for the given item key. </returns>
+        /// <exception cref="JsonException"> If the given key couldn't be found in the json file. </exception>
+        private static JsonElement GetItemRoot(String name, ItemType type)
+        {
+            // Load json.
+            String path = Path.Combine(ProjectSettings.GlobalizePath(DATA_DIR), type.ToString().ToLower() + ".json");
+            String json = File.ReadAllText(path);
+
+            JsonElement root = JsonDocument.Parse(json).RootElement;
+            if (root.TryGetProperty(name, out JsonElement item))
+            {
+                return item;
+            }
+            else
+            {
+                throw new JsonException($"The given key '{name}' does not exist in '{path}'.");
+            }
+        }
+
+
+        /// <summary> Get the sprite index property from the json object. </summary>
+        /// <param name="itemElement"> The json element to search. </param>
+        /// <returns> The index of the sprites used to represent this item. </returns>
+        /// <exception cref="JsonException"> If the item doesn't contain a sprite_index property. </exception>
+        private static Int32 GetSpriteIndex(JsonElement itemElement)
+        {
+            if (itemElement.TryGetProperty("sprite_index", out JsonElement element) && element.TryGetInt32(out Int32 spriteIndex))
+            {
+                return spriteIndex;
+            }
+            else
+            {
+                throw new JsonException($"The item doesn't contain a key for 'sprite_index'.");
+            }
+        }
+
+
+        /// <summary> Get the points property from the json object. </summary>
+        /// <param name="itemElement"> The json element to search. </param>
+        /// <returns> Relative points representing the grid cells the item occupies in an inventory. </returns>
+        /// <exception cref="JsonException"> If the item doesn't contain a points property. </exception>
+        private static Vector2I[] GetPoints(JsonElement itemElement)
+        {
+            if (itemElement.TryGetProperty("points", out JsonElement pointsElement))
+            {
+                List<Vector2I> pointArray = new List<Vector2I>();
+                foreach (JsonElement point in pointsElement.EnumerateArray())
                 {
-                    _itemPool.Add(item, true);
+                    List<Int32> posArray = new List<Int32>();
+                    foreach (JsonElement currentPos in point.EnumerateArray())
+                    {
+                        if (currentPos.TryGetInt32(out Int32 pos))
+                        {
+                            posArray.Add(pos);
+                        }
+                    }
+                    pointArray.Add(new Vector2I(posArray[0], posArray[1]));
                 }
+                return pointArray.ToArray();
             }
-
-            // Build the pool.
-            for (Int32 i = 0; i < _poolSize - _itemPool.Count; i++)
+            else
             {
-                Item item = BuildItem();
-                _itemPool.Add(item, false);
+                throw new JsonException($"The item doesn't contain a key for 'points'.");
             }
-
-            TempSpawn();
-        }
-
-
-        private void TempSpawn()
-        {
-            ItemDataComponent data = new ItemDataComponent([new Vector2I(0, 0)]);
-            CreateItem(data, new Vector3(3, 0, -3));
-        }
-
-
-        /// <summary> Create a new item for the pool. </summary>
-        /// <returns> The created item node. </returns>
-        private Item BuildItem()
-        {
-            Item item = _itemPrefab.Instantiate<Item>();
-            AddChild(item);
-            item.GlobalPosition = new Vector3(0f, -10000f, 0f);
-            return item;
-        }
-
-
-        /// <summary> Initialise a new item by pulling from the pool. </summary>
-        /// <param name="data"> The data to initialise the item with. </param>
-        /// <param name="position"> The position to create the object at. </param>
-        /// <returns> The initialise item. </returns>
-        public Item CreateItem(ItemDataComponent data, Vector3 position)
-        {
-            Item result = null;
-
-            // Attempt to find a free item in the pool.
-            foreach (KeyValuePair<Item, Boolean> item in _itemPool)
-            {
-                if (!item.Value)    // If the item is free.
-                {
-                    result = item.Key;
-                    break;
-                }
-            }
-
-            // If an item was not found, expand the pool.
-            if (result == null)
-            {
-                result = BuildItem();
-                _poolSize++;
-            }
-
-            _itemPool[result] = true;
-            result.Initialise(data);
-            result.GlobalPosition = position;
-
-            return result;
-        }
-
-
-        /// <summary> Free an item and return it to the pool. </summary>
-        /// <param name="item"> The item to return. </param>
-        public void FreeItem(Item item)
-        {
-            _itemPool[item] = false;
-            item.GlobalPosition = new Vector3(0f, -10000f, 0f);
         }
     }
 }

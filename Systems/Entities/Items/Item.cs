@@ -1,4 +1,5 @@
 using Godot;
+using Khepri.Controllers;
 using Khepri.Entities.Actors;
 using Khepri.Entities.Interfaces;
 using Khepri.Entities.Items.Components;
@@ -31,8 +32,8 @@ namespace Khepri.Entities.Items
         public Vector3 WorldPosition => GlobalPosition;
 
 
-        /// <summary> A reference to the item factory. </summary>
-        private ItemFactory _itemFactory;
+        /// <summary> A reference to the item controller. </summary>
+        private ItemController _itemController;
 
 
         /// <summary> Initialise the item by giving data. </summary>
@@ -51,7 +52,7 @@ namespace Khepri.Entities.Items
                 Boolean isSuccessful = unit.Inventory.TryAddItem(Data);
                 if (isSuccessful)   // If the item was added, free it back to the pool.
                 {
-                    _itemFactory.FreeItem(this);
+                    _itemController.FreeItem(this);
                 }
             }
         }
@@ -63,7 +64,7 @@ namespace Khepri.Entities.Items
             _interactionArea.BodyEntered += OnBodyEntered;
             _interactionArea.BodyExited += OnBodyExited;
 
-            _itemFactory = ItemFactory.Instance;
+            _itemController = ItemController.Instance;
         }
 
 
