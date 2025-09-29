@@ -40,6 +40,9 @@ namespace Khepri.UI.Windows
         /// <summary> The currently selected grid cell. </summary>
         private Vector2I _currentSelection = Vector2I.Zero;
 
+        /// <summary> A reference to the currently grabbed item. </summary>
+        private InventoryItem? _currentHeldItem = null;
+
 
         /// <inheritdoc/>
         public override void _Ready()
@@ -73,6 +76,13 @@ namespace Khepri.UI.Windows
         /// <summary> Clean the window up if the window is hidden. </summary>
         private void OnVisibilityChanged()
         {
+            //  Return a held item back to its position.
+            if (_currentHeldItem != null)
+            {
+                _currentHeldItem.PlaceItem(_currentHeldItem.CellPosition);
+                _currentHeldItem = null;
+            }
+
             // If the window has been hidden, clean up.
             if (!Visible)
             {
@@ -229,12 +239,31 @@ namespace Khepri.UI.Windows
                     // Handle non-mouse input. Stop all input if the mouse if being used.
                     if (!Input.IsMouseButtonPressed(MouseButton.Left) && !Input.IsMouseButtonPressed(MouseButton.Right) && @event is not InputEventMouseMotion)
                     {
+                        // Move the item.
+                        if (Input.IsActionJustPressed("action_ui_grab"))
+                        {
+                            if (_currentHeldItem == null)
+                            {
+                                _currentHeldItem = GetInventoryItem(_currentSelection);
+                                if (_currentHeldItem != null)
+                                {
+                                    _currentHeldItem.GrabItem();
+                                }
+                            }
+                            else
+                            {
+                                _currentHeldItem.PlaceItem(_currentSelection);
+                                _currentHeldItem = null;
+                            }
+                        }
+
+                        // Move the cursor.
                         Int32 moveHorizontal =
-                            (@event.IsActionPressed("action_move_left") ? -1 : 0) +
-                            (@event.IsActionPressed("action_move_right") ? 1 : 0);
+                            (@event.IsActionPressed("action_ui_left") ? -1 : 0) +
+                            (@event.IsActionPressed("action_ui_right") ? 1 : 0);
                         Int32 moveVertical =
-                            (@event.IsActionPressed("action_move_up") ? -1 : 0) +
-                            (@event.IsActionPressed("action_move_down") ? 1 : 0);
+                            (@event.IsActionPressed("action_ui_up") ? -1 : 0) +
+                            (@event.IsActionPressed("action_ui_down") ? 1 : 0);
                         Vector2I direction = new Vector2I(moveHorizontal, moveVertical);
                         if (direction != Vector2I.Zero)
                         {
@@ -282,6 +311,17 @@ namespace Khepri.UI.Windows
 
                 Rect2 selectionRect = new Rect2(start.X, start.Y, size.X, size.Y);
                 DrawRect(selectionRect, Colors.BlueViolet, false, 8f);
+            }
+        }
+
+
+        /// <inheritdoc/>
+        public override void _PhysicsProcess(Double delta)
+        {
+            // If we have a held object, update its position.
+            if (_currentHeldItem != null)
+            {
+                _currentHeldItem.GlobalPosition = CalculatePosition(_currentSelection);
             }
         }
     }

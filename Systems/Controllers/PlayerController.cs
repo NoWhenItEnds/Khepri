@@ -94,9 +94,13 @@ namespace Khepri.Controllers
                 Input.MouseMode = _isUIOpen ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.ConfinedHidden;
                 _uiController.ShowWindow(_isUIOpen ? WindowType.INVENTORY : WindowType.NONE);
             }
-            else if (@event.IsActionReleased("action_use"))
+
+            if (!_isUIOpen)
             {
-                PlayerUnit.HandleInput(new UseInput(PlayerUnit.UsableEntities.First()));    // TODO - This should be pulled from ui element.
+                if (@event.IsActionReleased("action_use"))
+                {
+                    PlayerUnit.HandleInput(new UseInput(PlayerUnit.UsableEntities.First()));    // TODO - This should be pulled from ui element.
+                }
             }
         }
 

@@ -30,6 +30,9 @@ namespace Khepri.UI.Windows.Components
         private InventoryWindow _window;
 
 
+        /// <summary> If the item it currently being held. </summary>
+        private Boolean _isGrabbed = false;
+
         /// <summary> Whether the item is currently following the mouse. It will when it is clicked. </summary>
         private Boolean _isFollowingMouse = false;
 
@@ -47,8 +50,20 @@ namespace Khepri.UI.Windows.Components
         /// <summary> Pick the item up. </summary>
         private void OnButtonDown()
         {
-            _isFollowingMouse = true;
+            if (!_isGrabbed)
+            {
+                _isFollowingMouse = true;
+                GrabItem();
+            }
+        }
+
+
+        /// <summary> Pick the item up in the inventory. </summary>
+        public void GrabItem()
+        {
+            _isGrabbed = true;
             _inventory.RemoveItem(Data);
+            Modulate = new Color(1, 1, 1, 0.5f);    // Make it transparent to easily see the object being grabbed.
         }
 
 
@@ -59,6 +74,17 @@ namespace Khepri.UI.Windows.Components
 
             Vector2 mousePosition = _viewport.GetMousePosition();
             Vector2I cellPosition = _window.CalculatePosition(mousePosition);
+            PlaceItem(cellPosition);
+        }
+
+
+        /// <summary> Return a grabbed item to the inventory. </summary>
+        /// <param name="cellPosition"> The position to put the item. </param>
+        public void PlaceItem(Vector2I cellPosition)
+        {
+            _isGrabbed = false;
+            Modulate = new Color(1, 1, 1, 1f);  // Fix the object's transparency.
+
             Boolean isAdded = _inventory.TryAddItem(Data, cellPosition);
 
             // If the item was added, update its position.
