@@ -25,7 +25,7 @@ namespace Khepri.Entities.Actors.Components.States
         public override void Update(Double delta)
         {
             // TODO - Have a timer here to do a fidget animation.
-            _unit.AnimatedSprite.TransitionAnimation(this, _unit.Direction.ToDirection());
+            _unit.Sprite.TransitionAnimation(this, _unit.Direction.ToDirection());
 
             _unit.Velocity = new Vector3(0f, 0f, 0f);
 

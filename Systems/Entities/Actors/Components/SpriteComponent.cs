@@ -3,10 +3,10 @@ using Godot;
 using Khepri.Entities.Actors.Components.States;
 using Khepri.Types;
 
-namespace Khepri.Nodes
+namespace Khepri.Entities.Actors.Components
 {
     /// <summary> The layered animated sprites used to render a unit. </summary>
-    public partial class UnitSprite : Node3D
+    public partial class SpriteComponent : Node3D
     {
         /// <summary> A reference to the animated sprite used for rendering the unit's base layer. </summary>
         [ExportGroup("Sprite Nodes")]

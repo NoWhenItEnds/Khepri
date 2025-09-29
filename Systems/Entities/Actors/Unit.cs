@@ -5,7 +5,6 @@ using Khepri.Entities.Actors.Components.States;
 using Khepri.Entities.Components;
 using Khepri.Entities.Interfaces;
 using Khepri.Models.Input;
-using Khepri.Nodes;
 using System;
 using System.Collections.Generic;
 
@@ -25,7 +24,7 @@ namespace Khepri.Entities.Actors
         [Export] public Marker3D CameraPosition { get; private set; }
 
         /// <summary> A reference to the unit's sprite. </summary>
-        [Export] public UnitSprite AnimatedSprite { get; private set; }
+        [Export] public SpriteComponent Sprite { get; private set; }
 
         /// <summary> A reference to the unit's needs component. </summary>
         [Export] public NeedComponent Needs { get; private set; }
@@ -81,9 +80,9 @@ namespace Khepri.Entities.Actors
             // Setup the sprite animations.
             foreach (var frames in _spriteFrames)
             {
-                AnimatedSprite.SetSpriteLayer(frames.Key, frames.Value);
+                Sprite.SetSpriteLayer(frames.Key, frames.Value);
             }
-            AnimatedSprite.Play();
+            Sprite.Play();
         }
 
 
