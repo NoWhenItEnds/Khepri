@@ -107,7 +107,7 @@ namespace Khepri.UI.Windows
                 {
                     if (inventory.StoredItems[x, y] != null)
                     {
-                        items.Add(inventory.StoredItems[x, y], new Vector2I(x, y));
+                        items.TryAdd(inventory.StoredItems[x, y], new Vector2I(x, y));
                     }
                 }
             }

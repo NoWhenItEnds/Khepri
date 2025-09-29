@@ -128,6 +128,9 @@ namespace Khepri.UI.Windows.Components
         }
 
 
+        /// <summary> Build the item's click mask based upon the inventory points. </summary>
+        /// <param name="data"> The raw data to build the item. </param>
+        /// <returns> The constructed click mask. </returns>
         private Bitmap BuildClickMask(ItemDataComponent data)
         {
             Bitmap mask = new Bitmap();
@@ -140,7 +143,10 @@ namespace Khepri.UI.Windows.Components
                 {
                     for (Int32 y = point.Y * cellSize; y < (point.Y + 1) * cellSize; y++)
                     {
-                        mask.SetBit(x, y, true);
+                        if (x < Size.X && y < Size.Y)   // Guard to make sure we don't try to set beyond the mask (if the item's points are larger than the sprite used).
+                        {
+                            mask.SetBit(x, y, true);
+                        }
                     }
                 }
             }
