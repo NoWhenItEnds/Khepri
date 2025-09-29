@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://ko6nvcupfcf4"]
+[gd_scene load_steps=33 format=3 uid="uid://ko6nvcupfcf4"]
 
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="Script" uid="uid://cgujt8yhxbsew" path="res://Systems/Controllers/WorldController.cs" id="1_8fov1"]
@@ -22,6 +22,7 @@
 [ext_resource type="Texture2D" uid="uid://be0foew3edrpc" path="res://Content/Textures/UI/HUD/StatusBar/StatusBar_Slider.png" id="17_kqbmc"]
 [ext_resource type="Script" uid="uid://vuqou0rktkpf" path="res://Systems/UI/Windows/InventoryWindow.cs" id="20_dulfu"]
 [ext_resource type="Texture2D" uid="uid://cykmv0wmfypeq" path="res://Content/Textures/UI/Windows/Inventory/Inventory_Grid_Tile.png" id="20_pt5vb"]
+[ext_resource type="Texture2D" uid="uid://b1qppo5tk4r3s" path="res://icon.svg" id="21_ejcwx"]
 [ext_resource type="PackedScene" uid="uid://bu7yeu1aonvto" path="res://Content/Prefabs/UI/Windows/Components/InventoryItem.tscn" id="22_0itj2"]
 
 [sub_resource type="Environment" id="Environment_gh1u3"]
@@ -571,10 +572,11 @@ _inventoryWindow = NodePath("Windows/Inventory")
 [node name="HUD" type="Control" parent="UI"]
 custom_minimum_size = Vector2(0, 256)
 layout_mode = 1
-anchors_preset = 10
+anchors_preset = 15
 anchor_right = 1.0
-offset_bottom = 256.0
+anchor_bottom = 1.0
 grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Astrolabe" type="Control" parent="UI/HUD" node_paths=PackedStringArray("_ringTexture")]
 layout_mode = 1
@@ -695,6 +697,55 @@ offset_bottom = 32.0
 pivot_offset = Vector2(2, 16)
 texture = ExtResource("17_kqbmc")
 stretch_mode = 2
+
+[node name="Interaction Menu" type="Control" parent="UI/HUD"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -128.0
+offset_top = -128.0
+offset_right = 128.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="UI/HUD/Interaction Menu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/HUD/Interaction Menu/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 2
+
+[node name="NinePatchRect" type="NinePatchRect" parent="UI/HUD/Interaction Menu/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/HUD/Interaction Menu/ScrollContainer/VBoxContainer/NinePatchRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Interaction Icon" type="TextureRect" parent="UI/HUD/Interaction Menu/ScrollContainer/VBoxContainer/NinePatchRect/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("21_ejcwx")
+
+[node name="Interaction Text" type="RichTextLabel" parent="UI/HUD/Interaction Menu/ScrollContainer/VBoxContainer/NinePatchRect/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+text = "PLACEHOLDER"
 
 [node name="Windows" type="Control" parent="UI"]
 layout_mode = 1
