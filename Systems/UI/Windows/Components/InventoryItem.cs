@@ -1,4 +1,5 @@
 using Godot;
+using Khepri.Controllers;
 using Khepri.Entities.Components;
 using Khepri.Entities.Items.Components;
 using System;
@@ -83,7 +84,7 @@ namespace Khepri.UI.Windows.Components
         public void PlaceItem(Vector2I cellPosition)
         {
             _isGrabbed = false;
-            Modulate = new Color(1, 1, 1, 1f);  // Fix the object's transparency.
+            Modulate = Colors.White;  // Fix the object's transparency.
 
             Boolean isAdded = _inventory.TryAddItem(Data, cellPosition);
 
@@ -102,9 +103,19 @@ namespace Khepri.UI.Windows.Components
                 }
                 else    // If it couldn't be returned, for whatever reason, drop it.
                 {
-                    // TODO - Drop it.
+                    DropItem();
                 }
             }
+        }
+
+
+        /// <summary> Drop the item at the player's feet. </summary>
+        public void DropItem()
+        {
+            _inventory.RemoveItem(Data);
+            Vector3 playerPosition = PlayerController.Instance.PlayerUnit.GlobalPosition;
+            ItemController.Instance.CreateItem(Data, playerPosition);
+            _window.FreeItem(this);
         }
 
 

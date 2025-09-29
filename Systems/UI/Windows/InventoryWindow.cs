@@ -175,6 +175,7 @@ namespace Khepri.UI.Windows
             result.Initialise(data, position, inventory, this);
             result.GlobalPosition = CalculatePosition(position);
             result.Visible = true;
+            result.Modulate = Colors.White;
 
             return result;
         }
@@ -202,7 +203,7 @@ namespace Khepri.UI.Windows
 
         /// <summary> Free an item and return it to the pool. </summary>
         /// <param name="item"> The item to return. </param>
-        private void FreeItem(InventoryItem item)
+        public void FreeItem(InventoryItem item)
         {
             _itemPool[item] = false;
             item.GlobalPosition = new Vector2(-100f, -100f);
@@ -240,7 +241,7 @@ namespace Khepri.UI.Windows
                     if (!Input.IsMouseButtonPressed(MouseButton.Left) && !Input.IsMouseButtonPressed(MouseButton.Right) && @event is not InputEventMouseMotion)
                     {
                         // Move the item.
-                        if (Input.IsActionJustPressed("action_ui_grab"))
+                        if (Input.IsActionJustPressed("action_ui_accept"))
                         {
                             if (_currentHeldItem == null)
                             {
@@ -254,6 +255,24 @@ namespace Khepri.UI.Windows
                             {
                                 _currentHeldItem.PlaceItem(_currentSelection);
                                 _currentHeldItem = null;
+                            }
+                        }
+
+                        // Drop the item
+                        if (@event.IsActionReleased("action_ui_cancel"))
+                        {
+                            if (_currentHeldItem != null)   // Return the item back to its previous position in the inventory.
+                            {
+                                _currentHeldItem.PlaceItem(_currentHeldItem.CellPosition);
+                                _currentHeldItem = null;
+                            }
+                            else                            // Drop the item from the inventory.
+                            {
+                                InventoryItem? item = GetInventoryItem(_currentSelection);
+                                if (item != null)
+                                {
+                                    item.DropItem();
+                                }
                             }
                         }
 
