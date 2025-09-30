@@ -79,10 +79,13 @@ namespace Khepri.Models.GOAP
             factory.AddBelief("AgentIsEntertained", () => _controlledEntity.Needs.CurrentEntertainment >= 90f);
             factory.AddBelief("AgentIsBored", () => _controlledEntity.Needs.CurrentEntertainment < 50f);
 
-            factory.AddBrainBelief("AgentKnowsPlayer", _controlledEntity.Sensors, _playerController.PlayerUnit);
-            factory.AddBrainBelief("AgentKnowsFood", _controlledEntity.Sensors, typeof(Item));
+            // TODO - Add belief packages. Such as food beliefs.
+            factory.AddSensorBelief("AgentKnowsPlayer", _controlledEntity.Sensors, _playerController.PlayerUnit);
+            factory.AddItemBelief("AgentKnowsApple", _controlledEntity.Sensors, "apple");
 
-            factory.AddBelief("AgentSeesPlayer", () => _controlledEntity.Sensors.KnowsEntity(_playerController.PlayerUnit).IsVisible);
+            factory.AddBelief("AgentSeesPlayer", () => _controlledEntity.Sensors.TryGetEntity(_playerController.PlayerUnit).IsVisible);
+
+            factory.AddBelief("AgentHasApple", () => _controlledEntity.Inventory.HasItem("apple") > 0);
         }
 
 

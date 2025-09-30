@@ -1,6 +1,7 @@
 using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Interfaces;
+using Khepri.Entities.Items;
 using Khepri.Types.Extensions;
 using System;
 using System.Collections.Generic;
@@ -102,18 +103,18 @@ namespace Khepri.Entities.Actors.Components
         /// <summary> Searches the tracked entity's for a particular entity. </summary>
         /// <param name="entity"> The entity to search for. </param>
         /// <returns> A reference to the tracked entity. A null means that one wasn't found. </returns>
-        public KnownEntity? KnowsEntity(IEntity entity)
+        public KnownEntity? TryGetEntity(IEntity entity)
         {
             return _knownEntities.FirstOrDefault(x => x.Entity == entity);
         }
 
 
-        /// <summary> Searches the tracked entities for an entity of a particular type. This is to search for a kind rather than a specific instance. </summary>
-        /// <param name="entity"> The kind of entity to search for. </param>
-        /// <returns> An array of entities sharing the given type. An empty array indicates that there are none of the desired type. </returns>
-        public KnownEntity[] KnowsEntityKind(Type entity)
+        /// <summary> Attempts to get a kind of item from the unit's memory. </summary>
+        /// <param name="itemName"> The item's unique name or key. </param>
+        /// <returns> An array of all instances of the item the unit is aware of. </returns>
+        public KnownEntity[] TryGetItem(String itemName)
         {
-            return _knownEntities.Where(x => x.Entity.GetType() == entity).ToArray();
+            return _knownEntities.Where(x => x.Entity is Item item && item.Data.Name == itemName).ToArray();
         }
 
 
@@ -150,7 +151,7 @@ namespace Khepri.Entities.Actors.Components
         /// <summary> Searches the tracked entity's for a particular location. </summary>
         /// <param name="position"> The location to search for. </param>
         /// <returns> A reference to the tracked location. A null means that one wasn't found. </returns>
-        public KnownPosition? KnowsPosition(Vector3 position)
+        public KnownPosition? TryGetPosition(Vector3 position)
         {
             Vector3 modifiedPosition = new Vector3((Single)Math.Round(position.X), (Single)Math.Round(position.Y), (Single)Math.Round(position.Z));
             return _knownLocations.FirstOrDefault(x => x.Position == position);

@@ -761,35 +761,6 @@ bbcode_enabled = true
 text = "PLACEHOLDER"
 vertical_alignment = 1
 
-[node name="Interaction Item2" type="NinePatchRect" parent="UI/HUD/Interaction Menu/MarginContainer/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 32)
-layout_mode = 2
-
-[node name="HBoxContainer" type="HBoxContainer" parent="UI/HUD/Interaction Menu/MarginContainer/ScrollContainer/VBoxContainer/Interaction Item2"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Control" type="Control" parent="UI/HUD/Interaction Menu/MarginContainer/ScrollContainer/VBoxContainer/Interaction Item2/HBoxContainer"]
-custom_minimum_size = Vector2(32, 0)
-layout_mode = 2
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="UI/HUD/Interaction Menu/MarginContainer/ScrollContainer/VBoxContainer/Interaction Item2/HBoxContainer/Control"]
-position = Vector2(16, 16)
-scale = Vector2(2, 2)
-sprite_frames = ExtResource("21_ejcwx")
-animation = &"E"
-
-[node name="Interaction Text" type="RichTextLabel" parent="UI/HUD/Interaction Menu/MarginContainer/ScrollContainer/VBoxContainer/Interaction Item2/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-bbcode_enabled = true
-text = "PLACEHOLDER"
-vertical_alignment = 1
-
 [node name="Windows" type="Control" parent="UI"]
 layout_mode = 1
 anchors_preset = 15
@@ -832,3 +803,8 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("20_pt5vb")
 stretch_mode = 1
+
+[node name="Debug" type="Control" parent="UI"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0

@@ -54,7 +54,7 @@ namespace Khepri.Entities.Actors.Components.Sensors
             if (body is IEntity entity)
             {
                 // Remove the entity from visibility.
-                KnownEntity? trackedObject = _sensors.KnowsEntity(entity);
+                KnownEntity? trackedObject = _sensors.TryGetEntity(entity);
                 if (trackedObject != null) { trackedObject.SetIsVisible(false); }
 
                 _nearbyEntities.Remove(entity);
@@ -74,7 +74,7 @@ namespace Khepri.Entities.Actors.Components.Sensors
 
                 if (_lineOfSightRayCast.IsColliding())
                 {
-                    KnownEntity? trackedObject = _sensors.KnowsEntity(current);
+                    KnownEntity? trackedObject = _sensors.TryGetEntity(current);
                     if (_lineOfSightRayCast.GetCollider() is IEntity entity && entity == current)  // Is the entity directly visible.
                     {
                         if (trackedObject == null)  // If the entity isn't already known, add it.

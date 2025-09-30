@@ -36,7 +36,7 @@ namespace Khepri.Models.GOAP.ActionStrategies
         /// <inheritdoc/>
         public void Start()
         {
-            KnownEntity? entity = _unit.Sensors.KnowsEntity(_target);
+            KnownEntity? entity = _unit.Sensors.TryGetEntity(_target);
             if (entity != null)
             {
                 _unit.NavigationAgent.TargetPosition = entity.LastKnownPosition;

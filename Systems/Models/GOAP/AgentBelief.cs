@@ -2,8 +2,11 @@ using Godot;
 using Khepri.Entities.Actors;
 using Khepri.Entities.Actors.Components;
 using Khepri.Entities.Interfaces;
+using Khepri.Entities.Items;
+using Khepri.Entities.Items.Components;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Khepri.Models.GOAP
 {
@@ -40,25 +43,35 @@ namespace Khepri.Models.GOAP
 
         /// <summary> Adds a new belief relating to information stored in an entity's sensors. </summary>
         /// <param name="key"> The name of belief. </param>
-        /// <param name="unitBrain"> A reference to the unit's long term memory. </param>
+        /// <param name="sensor"> A reference to the unit's long term memory. </param>
         /// <param name="entity"> A reference to the entity we're concerned with. </param>
-        public void AddBrainBelief(String key, SensorComponent unitBrain, IEntity entity)
+        public void AddSensorBelief(String key, SensorComponent sensor, IEntity entity)
         {
             _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => unitBrain.KnowsEntity(entity) != null)
+                .WithCondition(() => sensor.TryGetEntity(entity) != null)
                 .Build());
         }
 
 
-        /// <summary> Adds a new belief relating to information stored in an entity's sensors. </summary>
+        /// <summary> Adds a new belief relating to information about a kind of item stored in an entity's sensors. </summary>
         /// <param name="key"> The name of belief. </param>
-        /// <param name="unitBrain"> A reference to the unit's long term memory. </param>
-        /// <param name="entityType"> The type of entity we're concerned with. </param>
-        public void AddBrainBelief(String key, SensorComponent unitBrain, Type entityType)
+        /// <param name="sensor"> A reference to the unit's long term memory. </param>
+        /// <param name="itemKey"> The unique identifying name or key of the item. </param>
+        public void AddItemBelief(String key, SensorComponent sensor, String itemKey)
         {
             _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => unitBrain.KnowsEntityKind(entityType).Length > 0)
+                .WithCondition(() => sensor.TryGetItem(itemKey).Length > 0)
                 .Build());
+        }
+
+
+        /// <summary> Adds a new belief relating to information about a specific item stored in an entity's sensors. </summary>
+        /// <param name="key"> The name of belief. </param>
+        /// <param name="sensor"> A reference to the unit's long term memory. </param>
+        /// <param name="itemData"> The unique instance of the item. </param>
+        public void AddItemBelief(String key, SensorComponent sensor, ItemDataComponent itemData)
+        {
+            // TODO - Implement.
         }
 
 

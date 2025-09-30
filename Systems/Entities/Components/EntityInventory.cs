@@ -1,6 +1,8 @@
 using Godot;
 using Khepri.Entities.Items.Components;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Khepri.Entities.Components
 {
@@ -137,6 +139,50 @@ namespace Khepri.Entities.Components
         }
 
 
+        /// <summary> Attempt to get all the items with a particular kind / name from the inventory. </summary>
+        /// <param name="name"> The item's unique key / name. </param>
+        /// <returns> An array of found item data. </returns>
+        public ItemDataComponent[] GetItem(String name)
+        {
+            HashSet<ItemDataComponent> uniqueItems = new HashSet<ItemDataComponent>();
+
+            for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
+            {
+                for (Int32 y = 0; y < _storedItems.GetLength(1); y++)
+                {
+                    ItemDataComponent? currentItem = GetItem(x, y);
+                    if (currentItem != null)
+                    {
+                        uniqueItems.Add(currentItem);
+                    }
+                }
+            }
+
+            return uniqueItems.ToArray();
+        }
+
+
+        /// <summary> Attempt to get a specific instance of an item by searching for its unique id. </summary>
+        /// <param name="uid"> The item instance's unique id. </param>
+        /// <returns> The found item, or null if there was none. </returns>
+        public ItemDataComponent? GetItem(Guid uid)
+        {
+            for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
+            {
+                for (Int32 y = 0; y < _storedItems.GetLength(1); y++)
+                {
+                    ItemDataComponent? currentItem = GetItem(x, y);
+                    if (currentItem != null && currentItem.UId == uid)
+                    {
+                        return currentItem;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+
         /// <summary> Get the top-left position of an item in the inventory. </summary>
         /// <param name="item"> The item to search for. </param>
         /// <returns> The found grid coordinates. A null means that the item isn't in the inventory. </returns>
@@ -155,5 +201,11 @@ namespace Khepri.Entities.Components
 
             return null;
         }
+
+
+        /// <summary> Checks to see if the inventory contains an instance of a kind of item. </summary>
+        /// <param name="name"> The item's unique key / name. </param>
+        /// <returns> The number of that kind of item in the inventory. </returns>
+        public Int32 HasItem(String name) => GetItem(name).Length;
     }
 }
