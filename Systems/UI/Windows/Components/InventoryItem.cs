@@ -1,7 +1,7 @@
 using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Components;
-using Khepri.Entities.Items.Components;
+using Khepri.Entities.Items;
 using System;
 using System.Linq;
 
@@ -18,7 +18,7 @@ namespace Khepri.UI.Windows.Components
         public Vector2I CellPosition { get; private set; }
 
         /// <summary> The item this button represents. </summary>
-        public ItemDataComponent Data { get; private set; }
+        public ItemData Data { get; private set; }
 
 
         /// <summary> A reference to the game world's viewport. </summary>
@@ -136,7 +136,7 @@ namespace Khepri.UI.Windows.Components
         /// <param name="cellPosition"> The position of the item's top-left position. </param>
         /// <param name="inventory"> A reference to the inventory this item is a part of. </param>
         /// <param name="window"> A reference to the window this item is parented to. </param>
-        public void Initialise(ItemDataComponent data, Vector2I cellPosition, EntityInventory inventory, InventoryWindow window)
+        public void Initialise(ItemData data, Vector2I cellPosition, EntityInventory inventory, InventoryWindow window)
         {
             Data = data;
             CellPosition = cellPosition;
@@ -151,7 +151,7 @@ namespace Khepri.UI.Windows.Components
         /// <summary> Set the item's sprite based upon the information in the data object. </summary>
         /// <param name="data"> The raw data to build the item. </param>
         /// <exception cref="ArgumentException"> If the data contains a type not mapped to the sprite sheet. </exception>
-        private void SetSprite(ItemDataComponent data)
+        private void SetSprite(ItemData data)
         {
             String itemType = data.ItemType.ToString().Capitalize();
             String[] possibleTypes = _sprite.SpriteFrames.GetAnimationNames();
@@ -171,7 +171,7 @@ namespace Khepri.UI.Windows.Components
         /// <summary> Build the item's click mask based upon the inventory points. </summary>
         /// <param name="data"> The raw data to build the item. </param>
         /// <returns> The constructed click mask. </returns>
-        private Bitmap BuildClickMask(ItemDataComponent data)
+        private Bitmap BuildClickMask(ItemData data)
         {
             Bitmap mask = new Bitmap();
             mask.Create((Vector2I)Size);

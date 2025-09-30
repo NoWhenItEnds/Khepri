@@ -1,6 +1,5 @@
 using Godot;
 using Khepri.Entities.Items;
-using Khepri.Entities.Items.Components;
 using Khepri.Nodes.Singletons;
 using System;
 using System.Collections.Generic;
@@ -49,8 +48,8 @@ namespace Khepri.Controllers
 
         private void TempSpawn()
         {
-            ItemDataComponent data = ItemFactory.Create("apple", ItemType.FOOD);
-            ItemDataComponent data1 = ItemFactory.Create("apple", ItemType.FOOD);
+            ItemData data = ItemFactory.Create("apple", ItemType.FOOD);
+            ItemData data1 = ItemFactory.Create("apple", ItemType.FOOD);
             CreateItem(data, new Vector3(3, 0, -3));
             CreateItem(data1, new Vector3(3, 0, -4));
         }
@@ -71,7 +70,7 @@ namespace Khepri.Controllers
         /// <param name="data"> The data to initialise the item with. </param>
         /// <param name="position"> The position to create the object at. </param>
         /// <returns> The initialise item. </returns>
-        public Item CreateItem(ItemDataComponent data, Vector3 position)
+        public Item CreateItem(ItemData data, Vector3 position)
         {
             Item result = null;
 

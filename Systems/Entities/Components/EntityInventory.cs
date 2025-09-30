@@ -1,5 +1,5 @@
 using Godot;
-using Khepri.Entities.Items.Components;
+using Khepri.Entities.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,13 +15,13 @@ namespace Khepri.Entities.Components
 
 
         /// <summary> The items being stored in the entity's inventory. </summary>
-        private ItemDataComponent[,] _storedItems;
+        private ItemData[,] _storedItems;
 
 
         /// <inheritdoc/>
         public override void _Ready()
         {
-            _storedItems = new ItemDataComponent[InventorySize.X, InventorySize.Y];
+            _storedItems = new ItemData[InventorySize.X, InventorySize.Y];
         }
 
 
@@ -29,7 +29,7 @@ namespace Khepri.Entities.Components
         /// <param name="item"> The item to add. </param>
         /// <param name="position"> The position within the inventory to add the item to. Null means trying to make it fit in the first available space. </param>
         /// <returns> Whether the item was added successfully. </returns>
-        public Boolean TryAddItem(ItemDataComponent item, Vector2I? position = null)
+        public Boolean TryAddItem(ItemData item, Vector2I? position = null)
         {
             Boolean isAdded = false;
 
@@ -64,7 +64,7 @@ namespace Khepri.Entities.Components
         /// <param name="item"> The item to add. </param>
         /// <param name="position"> The top-left most position within the inventory to add the item to. </param>
         /// <returns> Whether the item was added successfully. </returns>
-        private Boolean SetItem(ItemDataComponent item, Vector2I position)
+        private Boolean SetItem(ItemData item, Vector2I position)
         {
             Boolean doesFit = CheckItemFits(item, position);
             if (doesFit)
@@ -83,7 +83,7 @@ namespace Khepri.Entities.Components
         /// <param name="item"> The item to check. </param>
         /// <param name="position"> The position of the top-left corner to check from. </param>
         /// <returns> Whether the item will fit at the given position. </returns>
-        private Boolean CheckItemFits(ItemDataComponent item, Vector2I position)
+        private Boolean CheckItemFits(ItemData item, Vector2I position)
         {
             Boolean doesFit = true;
 
@@ -104,7 +104,7 @@ namespace Khepri.Entities.Components
 
         /// <summary> Remove an item from the inventory. </summary>
         /// <param name="item"> The item to remove. </param>
-        public void RemoveItem(ItemDataComponent item)
+        public void RemoveItem(ItemData item)
         {
             for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
             {
@@ -122,14 +122,14 @@ namespace Khepri.Entities.Components
         /// <summary> Attempt to get the item at the given cell position. </summary>
         /// <param name="position"> The positional vector component. </param>
         /// <returns> The found item, or null if there was none. </returns>
-        public ItemDataComponent? GetItem(Vector2I position) => GetItem(position.X, position.Y);
+        public ItemData? GetItem(Vector2I position) => GetItem(position.X, position.Y);
 
 
         /// <summary> Attempt to get the item at the given cell position. </summary>
         /// <param name="x"> The horizontal component. </param>
         /// <param name="y"> The vertical component. </param>
         /// <returns> The found item, or null if there was none. </returns>
-        public ItemDataComponent? GetItem(Int32 x, Int32 y)
+        public ItemData? GetItem(Int32 x, Int32 y)
         {
             if (x >= InventorySize.X || y >= InventorySize.Y)
             {
@@ -142,15 +142,15 @@ namespace Khepri.Entities.Components
         /// <summary> Attempt to get all the items with a particular kind / name from the inventory. </summary>
         /// <param name="name"> The item's unique key / name. </param>
         /// <returns> An array of found item data. </returns>
-        public ItemDataComponent[] GetItem(String name)
+        public ItemData[] GetItem(String name)
         {
-            HashSet<ItemDataComponent> uniqueItems = new HashSet<ItemDataComponent>();
+            HashSet<ItemData> uniqueItems = new HashSet<ItemData>();
 
             for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
             {
                 for (Int32 y = 0; y < _storedItems.GetLength(1); y++)
                 {
-                    ItemDataComponent? currentItem = GetItem(x, y);
+                    ItemData? currentItem = GetItem(x, y);
                     if (currentItem != null)
                     {
                         uniqueItems.Add(currentItem);
@@ -165,13 +165,13 @@ namespace Khepri.Entities.Components
         /// <summary> Attempt to get a specific instance of an item by searching for its unique id. </summary>
         /// <param name="uid"> The item instance's unique id. </param>
         /// <returns> The found item, or null if there was none. </returns>
-        public ItemDataComponent? GetItem(Guid uid)
+        public ItemData? GetItem(Guid uid)
         {
             for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
             {
                 for (Int32 y = 0; y < _storedItems.GetLength(1); y++)
                 {
-                    ItemDataComponent? currentItem = GetItem(x, y);
+                    ItemData? currentItem = GetItem(x, y);
                     if (currentItem != null && currentItem.UId == uid)
                     {
                         return currentItem;
@@ -186,7 +186,7 @@ namespace Khepri.Entities.Components
         /// <summary> Get the top-left position of an item in the inventory. </summary>
         /// <param name="item"> The item to search for. </param>
         /// <returns> The found grid coordinates. A null means that the item isn't in the inventory. </returns>
-        public Vector2I? GetItemPosition(ItemDataComponent item)
+        public Vector2I? GetItemPosition(ItemData item)
         {
             for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
             {

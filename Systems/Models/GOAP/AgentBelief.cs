@@ -3,7 +3,7 @@ using Khepri.Entities.Actors;
 using Khepri.Entities.Actors.Components;
 using Khepri.Entities.Interfaces;
 using Khepri.Entities.Items;
-using Khepri.Entities.Items.Components;
+using Khepri.Entities.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,7 +69,7 @@ namespace Khepri.Models.GOAP
         /// <param name="key"> The name of belief. </param>
         /// <param name="sensor"> A reference to the unit's long term memory. </param>
         /// <param name="itemData"> The unique instance of the item. </param>
-        public void AddItemBelief(String key, SensorComponent sensor, ItemDataComponent itemData)
+        public void AddItemBelief(String key, SensorComponent sensor, ItemData itemData)
         {
             // TODO - Implement.
         }

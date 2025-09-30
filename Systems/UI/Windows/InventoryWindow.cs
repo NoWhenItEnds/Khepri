@@ -1,6 +1,6 @@
 using Godot;
 using Khepri.Entities.Components;
-using Khepri.Entities.Items.Components;
+using Khepri.Entities.Items;
 using Khepri.UI.Windows.Components;
 using System;
 using System.Collections.Generic;
@@ -125,12 +125,12 @@ namespace Khepri.UI.Windows
             _inventoryGrid.OffsetRight = _gridSize.Y * halfSize;
 
             // Get the unique items.
-            Dictionary<ItemDataComponent, Vector2I> items = new Dictionary<ItemDataComponent, Vector2I>();
+            Dictionary<ItemData, Vector2I> items = new Dictionary<ItemData, Vector2I>();
             for (Int32 x = 0; x < inventory.InventorySize.X; x++)
             {
                 for (Int32 y = 0; y < inventory.InventorySize.Y; y++)
                 {
-                    ItemDataComponent? data = inventory.GetItem(x, y);
+                    ItemData? data = inventory.GetItem(x, y);
                     if (data != null)
                     {
                         items.TryAdd(data, new Vector2I(x, y));
@@ -138,7 +138,7 @@ namespace Khepri.UI.Windows
                 }
             }
 
-            foreach (KeyValuePair<ItemDataComponent, Vector2I> item in items)
+            foreach (KeyValuePair<ItemData, Vector2I> item in items)
             {
                 CreateItem(item.Key, item.Value, inventory);
             }
@@ -150,7 +150,7 @@ namespace Khepri.UI.Windows
         /// <param name="position"> The cell position to create the object at. This is the object's top-left corner. </param>
         /// <param name="inventory"> A reference to the inventory this item is a part of. </param>
         /// <returns> The initialise item. </returns>
-        private InventoryItem CreateItem(ItemDataComponent data, Vector2I position, EntityInventory inventory)
+        private InventoryItem CreateItem(ItemData data, Vector2I position, EntityInventory inventory)
         {
             InventoryItem result = null;
 
@@ -216,7 +216,7 @@ namespace Khepri.UI.Windows
         /// <returns> The returned inventory item. Null means that there wasn't one at this position. </returns>
         private InventoryItem? GetInventoryItem(Vector2I position)
         {
-            ItemDataComponent? item = _currentInventory.GetItem(position);
+            ItemData? item = _currentInventory.GetItem(position);
             if (item == null)
             {
                 return null;
@@ -322,7 +322,7 @@ namespace Khepri.UI.Windows
                 Vector2 start = _inventoryGrid.Position + (_currentSelection * CellSize);
 
                 Vector2 size = Vector2.One * CellSize;
-                ItemDataComponent? currentItem = _currentInventory.GetItem(_currentSelection);
+                ItemData? currentItem = _currentInventory.GetItem(_currentSelection);
                 if (currentItem != null)
                 {
                     size = currentItem.GetSize() * CellSize;

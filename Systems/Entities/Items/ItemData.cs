@@ -2,10 +2,10 @@ using System;
 using System.Linq;
 using Godot;
 
-namespace Khepri.Entities.Items.Components
+namespace Khepri.Entities.Items
 {
     /// <summary> A type of entity representing something that can be grabbed and placed in an inventory. </summary>
-    public class ItemDataComponent : IEquatable<ItemDataComponent>
+    public class ItemData : IEquatable<ItemData>
     {
         public Guid UId { get; init; }
 
@@ -34,13 +34,13 @@ namespace Khepri.Entities.Items.Components
         /// <inheritdoc/>
         public override Boolean Equals(Object obj)
         {
-            ItemDataComponent? other = obj as ItemDataComponent;
+            ItemData? other = obj as ItemData;
             return other != null ? UId.Equals(other.UId) : false;
         }
 
 
         /// <inheritdoc/>
-        public bool Equals(ItemDataComponent other) => UId.Equals(other.UId);
+        public bool Equals(ItemData other) => UId.Equals(other.UId);
     }
 
 

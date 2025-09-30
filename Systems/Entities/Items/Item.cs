@@ -2,7 +2,6 @@ using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Actors;
 using Khepri.Entities.Interfaces;
-using Khepri.Entities.Items.Components;
 using System;
 
 namespace Khepri.Entities.Items
@@ -22,7 +21,7 @@ namespace Khepri.Entities.Items
 
 
         /// <summary> The data component representing the item's data. </summary>
-        public ItemDataComponent Data { get; private set; }
+        public ItemData Data { get; private set; }
 
 
         /// <inheritdoc/>
@@ -38,7 +37,7 @@ namespace Khepri.Entities.Items
 
         /// <summary> Initialise the item by giving data. </summary>
         /// <param name="data"> The raw data to build the item. </param>
-        public void Initialise(ItemDataComponent data)
+        public void Initialise(ItemData data)
         {
             Data = data;
         }

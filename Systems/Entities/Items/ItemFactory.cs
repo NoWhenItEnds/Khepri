@@ -1,5 +1,4 @@
 using Godot;
-using Khepri.Entities.Items.Components;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,11 +17,11 @@ namespace Khepri.Entities.Items
         /// <param name="name"> The unique identifying name or key of the item. </param>
         /// <param name="type"> What kind of item it is. </param>
         /// <returns> A reference to the create data object. </returns>
-        public static ItemDataComponent Create(String name, ItemType type)
+        public static ItemData Create(String name, ItemType type)
         {
             JsonElement itemElement = GetItemRoot(name, type);
 
-            return new ItemDataComponent
+            return new ItemData
             {
                 UId = Guid.NewGuid(),
                 Name = name,
