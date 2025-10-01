@@ -1,5 +1,6 @@
 using Godot;
 using Khepri.Entities.Actors;
+using Khepri.Models.GOAP;
 using System;
 using System.Collections.Generic;
 
@@ -11,6 +12,8 @@ namespace Khepri.UI.Debug.Units
         /// <summary> The prefab to use when spawning unit menus. </summary>
         [ExportGroup("Prefabs")]
         [Export] private PackedScene _unitMenuPrefab;
+
+        [Export] private AgentController _enemyController;   // TODO - REPLACE!!!
 
         [Export] private Unit _enemyUnit;   // TODO - REPLACE!!!
 
@@ -53,7 +56,7 @@ namespace Khepri.UI.Debug.Units
             if (window != null)
             {
                 AddChild(window);
-                window.Initialise(unit);
+                window.Initialise(_enemyController, unit);
                 _activeMenus.Add(unit, window);
             }
         }

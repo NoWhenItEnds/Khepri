@@ -41,47 +41,77 @@ namespace Khepri.Models.GOAP
         }
 
 
-        /// <summary> Adds a new belief relating to information stored in an entity's sensors. </summary>
+        /// <summary> Adds a belief about a kind of item stored in the unit's sensors. </summary>
         /// <param name="key"> The name of belief. </param>
-        /// <param name="sensor"> A reference to the unit's long term memory. </param>
-        /// <param name="entity"> A reference to the entity we're concerned with. </param>
-        public void AddSensorBelief(String key, SensorComponent sensor, IEntity entity)
-        {
-            _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => sensor.TryGetEntity(entity) != null)
-                .Build());
-        }
-
-
-        /// <summary> Adds a new belief relating to information about a kind of item stored in an entity's sensors. </summary>
-        /// <param name="key"> The name of belief. </param>
-        /// <param name="sensor"> A reference to the unit's long term memory. </param>
         /// <param name="itemKey"> The unique identifying name or key of the item. </param>
-        public void AddItemBelief(String key, SensorComponent sensor, String itemKey)
+        public void AddKnownItemBelief(String key, String itemKey)
         {
             _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => sensor.TryGetItem(itemKey).Length > 0)
+                .WithCondition(() => _unit.Sensors.TryGetItem(itemKey).Length > 0)
                 .Build());
         }
 
 
-        /// <summary> Adds a new belief relating to information about a specific item stored in an entity's sensors. </summary>
+        /// <summary> Adds a belief about a specific of item stored in the unit's sensors. </summary>
         /// <param name="key"> The name of belief. </param>
-        /// <param name="sensor"> A reference to the unit's long term memory. </param>
         /// <param name="itemData"> The unique instance of the item. </param>
-        public void AddItemBelief(String key, SensorComponent sensor, ItemData itemData)
+        public void AddKnownItemBelief(String key, ItemData itemData)
         {
-            // TODO - Implement.
+            _beliefs.Add(key, new AgentBelief.Builder(key)
+                .WithCondition(() => _unit.Sensors.TryGetItem(itemData.UId) != null)
+                .Build());
         }
 
 
-        /// <summary> Add a new locational belief that requires the unit to be in range of a target node. </summary>
+        /// <summary> Adds a belief about a kind of item stored in the unit's inventory. </summary>
         /// <param name="key"> The name of belief. </param>
-        /// <param name="distance"> The acceptable distance or range from the location. </param>
-        /// <param name="targetNode"> The node that is being targeted. </param>
-        public void AddLocationBelief(String key, Single distance, Node3D targetNode)
+        /// <param name="itemKey"> The unique identifying name or key of the item. </param>
+        public void AddInventoryBelief(String key, String itemKey)
         {
-            AddLocationBelief(key, distance, targetNode.GlobalPosition);
+            _beliefs.Add(key, new AgentBelief.Builder(key)
+                .WithCondition(() => _unit.Inventory.HasItem(itemKey) > 0)
+                .Build());
+        }
+
+
+        /// <summary> Adds a belief about a specific item stored in the unit's inventory. </summary>
+        /// <param name="key"> The name of belief. </param>
+        /// <param name="itemData"> The unique instance of the item. </param>
+        public void AddInventoryBelief(String key, ItemData itemData)
+        {
+            _beliefs.Add(key, new AgentBelief.Builder(key)
+                .WithCondition(() => _unit.Inventory.HasItem(itemData.UId))
+                .Build());
+        }
+
+
+        /// <summary> Adds a belief about whether the agent is currently within interaction range of a kind of item. </summary>
+        /// <param name="key"> The name of belief. </param>
+        /// <param name="itemKey"> The unique identifying name or key of the item. </param>
+        /// <param name="distance"> The acceptable distance or range from the location. </param>
+        public void AddItemLocationBelief(String key, String itemKey, Single distance)
+        {
+            // TODO - Is this the best way? Probably not.
+            _beliefs.Add(key, new AgentBelief.Builder(key)
+                .WithCondition(() => _unit.Sensors.TryGetItem(itemKey).Length > 0)
+                .WithLocation(() => _unit.Sensors.TryGetItem(itemKey).FirstOrDefault().LastKnownPosition)
+                .WithCondition(() => InRangeOf(_unit.Sensors.TryGetItem(itemKey).FirstOrDefault().LastKnownPosition, distance))
+                .Build());
+        }
+
+
+        /// <summary> Adds a belief about whether the agent is currently within interaction range of a specific item. </summary>
+        /// <param name="key"> The name of belief. </param>
+        /// <param name="itemData"> The unique instance of the item. </param>
+        /// <param name="distance"> The acceptable distance or range from the location. </param>
+        public void AddItemLocationBelief(String key, ItemData itemData, Single distance)
+        {
+            // TODO - Is this the best way? Probably not.
+            _beliefs.Add(key, new AgentBelief.Builder(key)
+                .WithCondition(() => _unit.Sensors.TryGetItem(itemData.UId) != null)
+                .WithLocation(() => _unit.Sensors.TryGetItem(itemData.UId).LastKnownPosition)
+                .WithCondition(() => InRangeOf(_unit.Sensors.TryGetItem(itemData.UId).LastKnownPosition, distance))
+                .Build());
         }
 
 

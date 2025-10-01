@@ -1,7 +1,10 @@
 using Godot;
 using Khepri.Entities.Actors;
 using Khepri.Entities.Actors.Components;
+using Khepri.Models.GOAP;
 using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Khepri.UI.Debug.Units
 {
@@ -16,6 +19,8 @@ namespace Khepri.UI.Debug.Units
         [Export] private RichTextLabel _beliefsLabel;
 
 
+        private AgentController _controller;
+
         /// <summary> The unit this menu represents. </summary>
         private Unit _unit;
 
@@ -25,6 +30,9 @@ namespace Khepri.UI.Debug.Units
 
         /// <summary> The format to use to show unit needs. </summary>
         private const String NEEDS_FORMAT = "HEA: {0:F1}\nHUG: {1:F1}\nFAT: {2:F1}\nENT: {3:F1}\nSTA: {4:F1}";
+
+        /// <summary> The format to use to show unit beliefs. </summary>
+        private const String BELIEF_FORMAT = "{0}: {1}";
 
 
         /// <inheritdoc/>
@@ -36,8 +44,9 @@ namespace Khepri.UI.Debug.Units
 
         /// <summary> Construct the menu. </summary>
         /// <param name="unit"> The unit this menu represents. </param>
-        public void Initialise(Unit unit)
+        public void Initialise(AgentController controller, Unit unit)
         {
+            _controller = controller;
             _unit = unit;
         }
 
@@ -52,6 +61,14 @@ namespace Khepri.UI.Debug.Units
             // Update information.
             NeedComponent needs = _unit.Needs;
             _needsLabel.Text = String.Format(NEEDS_FORMAT, needs.CurrentHealth, needs.CurrentHunger, needs.CurrentFatigue, needs.CurrentEntertainment, needs.CurrentStamina);
+
+            // Update Beliefs.
+            StringBuilder beliefBuilder = new StringBuilder();
+            foreach (KeyValuePair<String, AgentBelief> beliefs in _controller.AvailableBeliefs)
+            {
+                beliefBuilder.AppendLine(String.Format(BELIEF_FORMAT, beliefs.Key, beliefs.Value.Evaluate()));
+            }
+            _beliefsLabel.Text = beliefBuilder.ToString();
         }
     }
 }

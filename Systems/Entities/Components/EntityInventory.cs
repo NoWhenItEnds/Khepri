@@ -44,9 +44,9 @@ namespace Khepri.Entities.Components
             else
             {
                 // Look for available positions.
-                for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
+                for (Int32 y = 0; y < _storedItems.GetLength(1); y++)
                 {
-                    for (Int32 y = 0; y < _storedItems.GetLength(1); y++)
+                    for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
                     {
                         Vector2I currentPosition = new Vector2I(x, y);
                         isAdded = SetItem(item, currentPosition);
@@ -106,9 +106,9 @@ namespace Khepri.Entities.Components
         /// <param name="item"> The item to remove. </param>
         public void RemoveItem(ItemData item)
         {
-            for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
+            for (Int32 y = 0; y < _storedItems.GetLength(1); y++)
             {
-                for (Int32 y = 0; y < _storedItems.GetLength(1); y++)
+                for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
                 {
                     if (GetItem(x, y) == item)
                     {
@@ -146,9 +146,9 @@ namespace Khepri.Entities.Components
         {
             HashSet<ItemData> uniqueItems = new HashSet<ItemData>();
 
-            for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
+            for (Int32 y = 0; y < _storedItems.GetLength(1); y++)
             {
-                for (Int32 y = 0; y < _storedItems.GetLength(1); y++)
+                for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
                 {
                     ItemData? currentItem = GetItem(x, y);
                     if (currentItem != null)
@@ -167,9 +167,9 @@ namespace Khepri.Entities.Components
         /// <returns> The found item, or null if there was none. </returns>
         public ItemData? GetItem(Guid uid)
         {
-            for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
+            for (Int32 y = 0; y < _storedItems.GetLength(1); y++)
             {
-                for (Int32 y = 0; y < _storedItems.GetLength(1); y++)
+                for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
                 {
                     ItemData? currentItem = GetItem(x, y);
                     if (currentItem != null && currentItem.UId == uid)
@@ -188,9 +188,9 @@ namespace Khepri.Entities.Components
         /// <returns> The found grid coordinates. A null means that the item isn't in the inventory. </returns>
         public Vector2I? GetItemPosition(ItemData item)
         {
-            for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
+            for (Int32 y = 0; y < _storedItems.GetLength(1); y++)
             {
-                for (Int32 y = 0; y < _storedItems.GetLength(1); y++)
+                for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
                 {
                     if (GetItem(x, y) == item)
                     {
@@ -207,5 +207,11 @@ namespace Khepri.Entities.Components
         /// <param name="name"> The item's unique key / name. </param>
         /// <returns> The number of that kind of item in the inventory. </returns>
         public Int32 HasItem(String name) => GetItem(name).Length;
+
+
+        /// <summary> Checks to see if the inventory contains a specific item. </summary>
+        /// <param name="uid"> The item's unique identifier. </param>
+        /// <returns> Whether the specific item is in the inventory. </returns>
+        public Boolean HasItem(Guid uid) => GetItem(uid) != null;
     }
 }

@@ -89,7 +89,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -2)
 
 [node name="Enemy Unit" parent="World" instance=ExtResource("2_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.065, 0, -0.318)
-_showNeeds = true
 
 [node name="Playground" type="NavigationRegion3D" parent="World"]
 navigation_mesh = SubResource("NavigationMesh_fdsh7")
@@ -814,7 +813,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Unit Window" type="Control" parent="UI/Debug" node_paths=PackedStringArray("_enemyUnit")]
+[node name="Unit Window" type="Control" parent="UI/Debug" node_paths=PackedStringArray("_enemyController", "_enemyUnit")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -823,4 +822,5 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("25_rvbhf")
 _unitMenuPrefab = ExtResource("26_1mywo")
+_enemyController = NodePath("../../../Controllers/Agent Controller")
 _enemyUnit = NodePath("../../../World/Enemy Unit")

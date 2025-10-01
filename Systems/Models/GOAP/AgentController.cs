@@ -1,7 +1,6 @@
 using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Actors;
-using Khepri.Entities.Items;
 using Khepri.Models.GOAP.ActionStrategies;
 using System;
 using System.Collections.Generic;
@@ -18,26 +17,26 @@ namespace Khepri.Models.GOAP
 
 
         /// <summary> The current goal the agent is trying to accomplish. </summary>
-        private AgentGoal? _currentGoal = null;
+        public AgentGoal? CurrentGoal { get; private set; } = null;
 
         /// <summary> The current plan the agent is using to address its current goal. </summary>
-        private ActionPlan? _currentPlan = null;
+        public ActionPlan? CurrentPlan { get; private set; } = null;
 
         /// <summary> The current action the agent is in the process of doing. </summary>
-        private AgentAction? _currentAction = null;
+        public AgentAction? CurrentAction { get; private set; } = null;
 
         /// <summary> An ordered array of the previous goals the agent tried to accomplish. </summary>
         /// <remarks> [0] is the latest. [^1] is the oldest. </remarks>
-        private AgentGoal[] _previousGoals = new AgentGoal[10];
+        public AgentGoal[] PreviousGoals { get; private set; } = new AgentGoal[10];
 
         /// <summary> The 'truths' the agent knows. The beliefs it has about the world state. </summary>
-        private Dictionary<String, AgentBelief> _availableBeliefs;
+        public Dictionary<String, AgentBelief> AvailableBeliefs { get; private set; }
 
         /// <summary> The goals that the agent will seek to address. </summary>
-        private HashSet<AgentGoal> _availableGoals;
+        public HashSet<AgentGoal> AvailableGoals { get; private set; }
 
         /// <summary> The potential actions this agent has access to. </summary>
-        public HashSet<AgentAction> AvailableActions;
+        public HashSet<AgentAction> AvailableActions { get; private set; }
 
 
         /// <summary> A reference to the player's controller. </summary>
@@ -62,8 +61,8 @@ namespace Khepri.Models.GOAP
         /// <summary> Set's the agent's initial beliefs. </summary>
         private void InitialiseBeliefs()    // TODO - These should be pulled from a JSON or something.
         {
-            _availableBeliefs = new Dictionary<string, AgentBelief>();   // Initialise a new set of beliefs by clearing the current.
-            BeliefFactory factory = new BeliefFactory(_controlledEntity, _availableBeliefs);
+            AvailableBeliefs = new Dictionary<string, AgentBelief>();   // Initialise a new set of beliefs by clearing the current.
+            BeliefFactory factory = new BeliefFactory(_controlledEntity, AvailableBeliefs);
 
             factory.AddBelief("Nothing", () => false);  // Always has a belief, even if it never will successfully evaluate.
 
@@ -80,12 +79,12 @@ namespace Khepri.Models.GOAP
             factory.AddBelief("AgentIsBored", () => _controlledEntity.Needs.CurrentEntertainment < 50f);
 
             // TODO - Add belief packages. Such as food beliefs that contains both the Knows and Sees for the item.
-            factory.AddSensorBelief("AgentKnowsPlayer", _controlledEntity.Sensors, _playerController.PlayerUnit);
-            factory.AddItemBelief("AgentKnowsApple", _controlledEntity.Sensors, "apple");
+            factory.AddKnownItemBelief("AgentKnowsApple", "apple");
+            factory.AddItemLocationBelief("AgentAtApple", "apple", 1f);
+            factory.AddInventoryBelief("AgentHasApple", "apple");
 
-            factory.AddBelief("AgentSeesPlayer", () => _controlledEntity.Sensors.TryGetEntity(_playerController.PlayerUnit).IsVisible);
-
-            factory.AddBelief("AgentHasApple", () => _controlledEntity.Inventory.HasItem("apple") > 0);
+            //factory.AddSensorBelief("AgentKnowsPlayer", _controlledEntity.Sensors, _playerController.PlayerUnit);
+            //factory.AddBelief("AgentSeesPlayer", () => _controlledEntity.Sensors.TryGetEntity(_playerController.PlayerUnit).IsVisible);
         }
 
 
@@ -96,31 +95,33 @@ namespace Khepri.Models.GOAP
 
             AvailableActions.Add(new AgentAction.Builder("Relax")
                 .WithStrategy(new IdleActionStrategy(_controlledEntity, 5f))
-                .AddOutcome(_availableBeliefs["Nothing"])
+                .AddOutcome(AvailableBeliefs["Nothing"])
                 .Build());
 
-            AvailableActions.Add(new AgentAction.Builder("Wander Around")
+            AvailableActions.Add(new AgentAction.Builder("WanderAround")
                 .WithStrategy(new WanderActionStrategy(_controlledEntity, 2f))
-                .AddOutcome(_availableBeliefs["AgentIsMoving"])
+                .AddOutcome(AvailableBeliefs["AgentIsMoving"])
                 .Build());
 
-            /*
-            AvailableActions.Add(new AgentAction.Builder("Find Food")
-                .WithStrategy(new FindActionStrategy(_controlledEntity, typeof(Food)))
-                .AddOutcome(_availableBeliefs["AgentKnowsPlayer"])
-                .Build());
-*/
-            AvailableActions.Add(new AgentAction.Builder("Locate Player")   // TODO - Remember that we have a ".WithCost()" method we should use.
-                .WithStrategy(new LocateActionStrategy(_controlledEntity, PlayerController.Instance.PlayerUnit))
-                .AddPrecondition(_availableBeliefs["AgentKnowsPlayer"])
-                .AddOutcome(_availableBeliefs["AgentSeesPlayer"])
+            AvailableActions.Add(new AgentAction.Builder("GoToApple")   // TODO - Have harvest apple with a higher cost.
+                .WithStrategy(new GoToItemActionStrategy(_controlledEntity, "apple"))
+                .WithCost(10)
+                .AddPrecondition(AvailableBeliefs["AgentKnowsApple"])
+                .AddOutcome(AvailableBeliefs["AgentAtApple"])
                 .Build());
 
-            AvailableActions.Add(new AgentAction.Builder("Stalk Player")
-                .WithStrategy(new StalkActionStrategy(_controlledEntity, _playerController.PlayerUnit))
-                .AddPrecondition(_availableBeliefs["AgentSeesPlayer"])
-                .AddPrecondition(_availableBeliefs["AgentIsBored"])
-                .AddOutcome(_availableBeliefs["AgentIsEntertained"])
+            AvailableActions.Add(new AgentAction.Builder("PickupApple")
+                .WithStrategy(new PickupActionStrategy(_controlledEntity, "apple"))
+                .WithCost(0)
+                .AddPrecondition(AvailableBeliefs["AgentAtApple"])
+                .AddOutcome(AvailableBeliefs["AgentHasApple"])
+                .Build());
+
+            AvailableActions.Add(new AgentAction.Builder("EatApple")
+                .WithStrategy(new UseItemActionStrategy(_controlledEntity, "apple"))
+                .WithCost(5)    // This is how which items the agent prefers is encoded. Favorite items have a lower cost.
+                .AddPrecondition(AvailableBeliefs["AgentHasApple"])
+                .AddOutcome(AvailableBeliefs["AgentIsFed"])
                 .Build());
         }
 
@@ -128,29 +129,24 @@ namespace Khepri.Models.GOAP
         /// <summary> Set's the agent's initial goals. </summary>
         private void InitialiseGoals()
         {
-            _availableGoals = new HashSet<AgentGoal>();
+            AvailableGoals = new HashSet<AgentGoal>();
 
 
-            _availableGoals.Add(new AgentGoal.Builder("Chill Out")
+            AvailableGoals.Add(new AgentGoal.Builder("ChillOut")
                 .WithPriority(0)
-                .WithDesiredOutcome(_availableBeliefs["Nothing"])
+                .WithDesiredOutcome(AvailableBeliefs["Nothing"])
                 .Build());
 
-            _availableGoals.Add(new AgentGoal.Builder("Wander")
+            AvailableGoals.Add(new AgentGoal.Builder("Wander")
                 .WithPriority(0)
-                .WithDesiredOutcome(_availableBeliefs["AgentIsMoving"])
+                .WithDesiredOutcome(AvailableBeliefs["AgentIsMoving"])
                 .Build());
 
-            _availableGoals.Add(new AgentGoal.Builder("Find Entertainment")
-                .WithPriority(1)
-                .WithDesiredOutcome(_availableBeliefs["AgentIsEntertained"])
-                .Build());
 
-            /*
-            _availableGoals.Add(new AgentGoal.Builder("KeepHealthUp")
-                .WithPriority(2)
-                .WithDesiredOutcome(_availableBeliefs["AgentIsHealthy"])
-                .Build());*/
+            AvailableGoals.Add(new AgentGoal.Builder("KeepFed")
+                .WithPriority(10)
+                .WithDesiredOutcome(AvailableBeliefs["AgentIsFed"])
+                .Build());
         }
 
 
@@ -158,7 +154,7 @@ namespace Khepri.Models.GOAP
         public void ReevaluatePlan()
         {
             // Remove the current objective to force the planner to reevaluate.
-            _currentAction = null;
+            CurrentAction = null;
             ArchiveCurrentGoal();
         }
 
@@ -167,48 +163,48 @@ namespace Khepri.Models.GOAP
         public override void _PhysicsProcess(Double delta)
         {
             // Update the plan and current action if there is one
-            if (_currentAction == null)
+            if (CurrentAction == null)
             {
                 GD.Print("Calculating any potential new plan.");
                 CalculatePlan();
 
-                if (_currentPlan != null && _currentPlan.Actions.Count > 0)
+                if (CurrentPlan != null && CurrentPlan.Actions.Count > 0)
                 {
-                    _currentGoal = _currentPlan.AgentGoal;
-                    GD.Print($"Goal: {_currentGoal.Name} with {_currentPlan.Actions.Count} actions in plan");
+                    CurrentGoal = CurrentPlan.AgentGoal;
+                    GD.Print($"Goal: {CurrentGoal.Name} with {CurrentPlan.Actions.Count} actions in plan");
 
-                    _currentAction = _currentPlan.Actions.Pop();
-                    GD.Print($"Popped action: {_currentAction.Name}");
+                    CurrentAction = CurrentPlan.Actions.Pop();
+                    GD.Print($"Popped action: {CurrentAction.Name}");
 
                     // Verify all precondition effects are true
-                    if (_currentAction.Preconditions.All(b => b.Evaluate()))
+                    if (CurrentAction.Preconditions.All(b => b.Evaluate()))
                     {
-                        _currentAction.Start();
+                        CurrentAction.Start();
                     }
                     else
                     {
                         GD.Print("Preconditions not met, clearing current action and goal");
 
-                        _currentAction = null;
-                        _currentGoal = null;
+                        CurrentAction = null;
+                        CurrentGoal = null;
                     }
                 }
             }
 
 
             // If we have a current action, execute it
-            if (_currentPlan != null && _currentAction != null)
+            if (CurrentPlan != null && CurrentAction != null)
             {
-                _currentAction.Update(delta);
+                CurrentAction.Update(delta);
 
-                if (_currentAction.IsComplete)
+                if (CurrentAction.IsComplete)
                 {
-                    GD.Print($"{_currentAction.Name} complete");
+                    GD.Print($"{CurrentAction.Name} complete");
 
-                    _currentAction.Stop();
-                    _currentAction = null;
+                    CurrentAction.Stop();
+                    CurrentAction = null;
 
-                    if (_currentPlan.Actions.Count == 0)
+                    if (CurrentPlan.Actions.Count == 0)
                     {
                         GD.Print("Plan complete");
 
@@ -222,20 +218,20 @@ namespace Khepri.Models.GOAP
         /// <summary> Attempt to calculate a new plan. </summary>
         private void CalculatePlan()
         {
-            Single priorityLevel = _currentGoal?.Priority ?? 0;
+            Single priorityLevel = CurrentGoal?.Priority ?? 0;
 
-            HashSet<AgentGoal> goalsToCheck = _availableGoals;
+            HashSet<AgentGoal> goalsToCheck = AvailableGoals;
 
             // If we have a current goal, we only want to check goals with higher priority.
-            if (_currentGoal != null)
+            if (CurrentGoal != null)
             {
-                goalsToCheck = new HashSet<AgentGoal>(_availableGoals.Where(g => g.Priority > priorityLevel));
+                goalsToCheck = new HashSet<AgentGoal>(AvailableGoals.Where(g => g.Priority > priorityLevel));
             }
 
-            ActionPlan? potentialPlan = _planner.BuildPlan(this, goalsToCheck, _previousGoals[0]);
+            ActionPlan? potentialPlan = _planner.BuildPlan(this, goalsToCheck, PreviousGoals[0]);
             if (potentialPlan != null)
             {
-                _currentPlan = potentialPlan;
+                CurrentPlan = potentialPlan;
             }
         }
 
@@ -244,11 +240,11 @@ namespace Khepri.Models.GOAP
         private void ArchiveCurrentGoal()
         {
             AgentGoal[] newValues = new AgentGoal[10];
-            newValues[0] = _currentGoal;
-            Array.Copy(_previousGoals, 0, newValues, 1, _previousGoals.Length - 1);
-            _previousGoals = newValues;
+            newValues[0] = CurrentGoal;
+            Array.Copy(PreviousGoals, 0, newValues, 1, PreviousGoals.Length - 1);
+            PreviousGoals = newValues;
 
-            _currentGoal = null;
+            CurrentGoal = null;
         }
     }
 }
