@@ -79,7 +79,7 @@ namespace Khepri.Models.GOAP
             factory.AddBelief("AgentIsEntertained", () => _controlledEntity.Needs.CurrentEntertainment >= 90f);
             factory.AddBelief("AgentIsBored", () => _controlledEntity.Needs.CurrentEntertainment < 50f);
 
-            // TODO - Add belief packages. Such as food beliefs.
+            // TODO - Add belief packages. Such as food beliefs that contains both the Knows and Sees for the item.
             factory.AddSensorBelief("AgentKnowsPlayer", _controlledEntity.Sensors, _playerController.PlayerUnit);
             factory.AddItemBelief("AgentKnowsApple", _controlledEntity.Sensors, "apple");
 

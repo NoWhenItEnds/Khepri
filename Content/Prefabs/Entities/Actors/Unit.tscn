@@ -16,7 +16,7 @@ height = 0.45
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_jo3tn"]
 radius = 2.0
 
-[node name="Unit" type="CharacterBody3D" node_paths=PackedStringArray("CollisionShape", "NavigationAgent", "CameraPosition", "Sprite", "Needs", "Sensors", "StateMachine", "Inventory")]
+[node name="Unit" type="CharacterBody3D" node_paths=PackedStringArray("CollisionShape", "NavigationAgent", "CameraPosition", "VisibilityNotifier", "Sprite", "Needs", "Sensors", "StateMachine", "Inventory")]
 axis_lock_angular_x = true
 axis_lock_angular_y = true
 axis_lock_angular_z = true
@@ -24,6 +24,7 @@ script = ExtResource("1_igitp")
 CollisionShape = NodePath("CollisionShape3D")
 NavigationAgent = NodePath("NavigationAgent3D")
 CameraPosition = NodePath("Camera Position")
+VisibilityNotifier = NodePath("VisibleOnScreenNotifier3D")
 Sprite = NodePath("Sprite Component")
 Needs = NodePath("Need Component")
 Sensors = NodePath("Sensor Component")
@@ -42,6 +43,13 @@ path_height_offset = 1.0
 debug_enabled = true
 debug_path_custom_color = Color(1, 0, 1, 1)
 
+[node name="VisibleOnScreenNotifier3D" type="VisibleOnScreenNotifier3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+aabb = AABB(-0.25, -0.25, -0.25, 0.5, 0.5, 0.5)
+
+[node name="Camera Position" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+
 [node name="Sprite Component" type="Node3D" parent="." node_paths=PackedStringArray("_baseLayer")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 script = ExtResource("2_oq4pe")
@@ -55,9 +63,6 @@ shaded = true
 texture_filter = 0
 sprite_frames = ExtResource("3_2si40")
 animation = &"Walk_S"
-
-[node name="Camera Position" type="Marker3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
 
 [node name="Sensor Component" type="Node3D" parent="." node_paths=PackedStringArray("_unit", "_lights")]
 script = ExtResource("4_xo887")

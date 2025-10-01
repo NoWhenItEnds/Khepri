@@ -1,0 +1,38 @@
+[gd_scene load_steps=2 format=3 uid="uid://cf52786ejxpwc"]
+
+[ext_resource type="Script" uid="uid://oy0tdlkcdkr8" path="res://Systems/UI/Debug/Units/DebugUnitMenu.cs" id="1_1am5n"]
+
+[node name="Debug Unit Menu" type="PanelContainer" node_paths=PackedStringArray("_needsLabel", "_beliefsLabel")]
+anchors_preset = -1
+offset_right = 128.0
+offset_bottom = 256.0
+script = ExtResource("1_1am5n")
+_needsLabel = NodePath("MarginContainer/ScrollContainer/TabContainer/Needs")
+_beliefsLabel = NodePath("MarginContainer/ScrollContainer/TabContainer/Beliefs")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="TabContainer" type="TabContainer" parent="MarginContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="Needs" type="RichTextLabel" parent="MarginContainer/ScrollContainer/TabContainer"]
+layout_mode = 2
+bbcode_enabled = true
+text = "Belief A: True
+Belief B: False"
+metadata/_tab_index = 0
+
+[node name="Beliefs" type="RichTextLabel" parent="MarginContainer/ScrollContainer/TabContainer"]
+visible = false
+layout_mode = 2
+bbcode_enabled = true
+text = "Belief A: True
+Belief B: False"
+metadata/_tab_index = 1

@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://ko6nvcupfcf4"]
+[gd_scene load_steps=35 format=3 uid="uid://ko6nvcupfcf4"]
 
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="Script" uid="uid://cgujt8yhxbsew" path="res://Systems/Controllers/WorldController.cs" id="1_8fov1"]
@@ -24,6 +24,8 @@
 [ext_resource type="Texture2D" uid="uid://cykmv0wmfypeq" path="res://Content/Textures/UI/Windows/Inventory/Inventory_Grid_Tile.png" id="20_pt5vb"]
 [ext_resource type="SpriteFrames" uid="uid://cgrn35r1bjnnm" path="res://Content/Resources/SpriteFrames/Controllers/SpriteFrames_Controllers_Keyboard_White.tres" id="21_ejcwx"]
 [ext_resource type="PackedScene" uid="uid://bu7yeu1aonvto" path="res://Content/Prefabs/UI/Windows/Components/InventoryItem.tscn" id="22_0itj2"]
+[ext_resource type="Script" uid="uid://d3kcgr1eohghu" path="res://Systems/UI/Debug/Units/DebugUnitWindow.cs" id="25_rvbhf"]
+[ext_resource type="PackedScene" uid="uid://cf52786ejxpwc" path="res://Content/Prefabs/UI/Debug/DebugUnitMenu.tscn" id="26_1mywo"]
 
 [sub_resource type="Environment" id="Environment_gh1u3"]
 
@@ -812,7 +814,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Actors" type="Control" parent="UI/Debug"]
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="Unit Window" type="Control" parent="UI/Debug" node_paths=PackedStringArray("_enemyUnit")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("25_rvbhf")
+_unitMenuPrefab = ExtResource("26_1mywo")
+_enemyUnit = NodePath("../../../World/Enemy Unit")

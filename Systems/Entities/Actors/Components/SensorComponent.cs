@@ -118,6 +118,15 @@ namespace Khepri.Entities.Actors.Components
         }
 
 
+        /// <summary> Attempts to get a specific item using its unique id. </summary>
+        /// <param name="uid"> The item's unique identifier. </param>
+        /// <returns> A reference to the tracked entity. A null means that one wasn't found. </returns>
+        public KnownEntity? TryGetItem(Guid uid)
+        {
+            return _knownEntities.Where(x => x.Entity is Item item && item.Data.UId == uid).FirstOrDefault();
+        }
+
+
         /// <summary> Attempts to register the position as one it has visited recently. </summary>
         /// <param name="position"> The position in world space to register. </param>
         /// <returns> The known position data class representing this memory. </returns>

@@ -23,6 +23,9 @@ namespace Khepri.Entities.Actors
         /// <summary> The position to position a camera when it's following this unit. </summary>
         [Export] public Marker3D CameraPosition { get; private set; }
 
+        /// <summary> A component that can be polled to check if the unit is currently visible to the camera. </summary>
+        [Export] public VisibleOnScreenNotifier3D VisibilityNotifier { get; private set; }
+
         /// <summary> A reference to the unit's sprite. </summary>
         [Export] public SpriteComponent Sprite { get; private set; }
 
@@ -42,11 +45,6 @@ namespace Khepri.Entities.Actors
         /// <summary> The animation sheets to use for the unit's animations. </summary>
         [ExportGroup("Resources")]
         [Export] private Godot.Collections.Dictionary<UnitSpriteLayer, SpriteFrames> _spriteFrames;
-
-
-        /// <summary> Whether the unit's needs should be shown as a debug overlay. </summary>
-        [ExportGroup("Debug")]
-        [Export] private Boolean _showNeeds = false;
 
 
         /// <inheritdoc/>
@@ -90,9 +88,6 @@ namespace Khepri.Entities.Actors
         public override void _PhysicsProcess(Double delta)
         {
             UpdateDirection();
-
-            // Show debug stuff.
-            DrawDebug();
         }
 
 
@@ -107,26 +102,6 @@ namespace Khepri.Entities.Actors
                     directionRad += Mathf.Tau;
                 }
                 Direction = Mathf.RadToDeg(directionRad);
-            }
-        }
-
-
-        private void DrawDebug()
-        {
-            Vector3 current = GlobalPosition + new Vector3(1, 1, -1);
-            // Show debug stuff.
-            if (_showNeeds)
-            {
-                DebugDraw3D.DrawText(current, $"HEA: {Needs.CurrentHealth:F1}", 32, Colors.Green);
-                current += Vector3.Back * 0.2f;
-                DebugDraw3D.DrawText(current, $"HUG: {Needs.CurrentHunger:F1}", 32, Colors.Green);
-                current += Vector3.Back * 0.2f;
-                DebugDraw3D.DrawText(current, $"FAT: {Needs.CurrentFatigue:F1}", 32, Colors.Green);
-                current += Vector3.Back * 0.2f;
-                DebugDraw3D.DrawText(current, $"ENT: {Needs.CurrentEntertainment:F1}", 32, Colors.Green);
-                current += Vector3.Back * 0.2f;
-                DebugDraw3D.DrawText(current, $"STA: {Needs.CurrentStamina:F1}", 32, Colors.Green);
-                current += Vector3.Back * 0.2f;
             }
         }
 
