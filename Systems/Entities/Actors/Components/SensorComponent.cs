@@ -100,6 +100,10 @@ namespace Khepri.Entities.Actors.Components
         }
 
 
+        /// <summary> Get an array of all the currently known entities. </summary>
+        public KnownEntity[] GetEntities() => _knownEntities.ToArray();
+
+
         /// <summary> Searches the tracked entity's for a particular entity. </summary>
         /// <param name="entity"> The entity to search for. </param>
         /// <returns> A reference to the tracked entity. A null means that one wasn't found. </returns>
@@ -155,6 +159,10 @@ namespace Khepri.Entities.Actors.Components
             Vector3 modifiedPosition = new Vector3((Single)Math.Round(position.X), (Single)Math.Round(position.Y), (Single)Math.Round(position.Z));
             return _knownLocations.RemoveWhere(x => x.Position == modifiedPosition) > 0;
         }
+
+
+        /// <summary> Get an array of all the currently known locations. </summary>
+        public KnownPosition[] GetLocations() => _knownLocations.ToArray();
 
 
         /// <summary> Searches the tracked entity's for a particular location. </summary>

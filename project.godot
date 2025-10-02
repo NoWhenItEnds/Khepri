@@ -32,6 +32,10 @@ folder_colors={
 "res://addons/": "pink"
 }
 
+[gui]
+
+theme/custom_font="uid://hbd0ruwd6w7c"
+
 [input]
 
 action_move_up={

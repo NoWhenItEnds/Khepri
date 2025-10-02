@@ -80,7 +80,7 @@ namespace Khepri.Models.GOAP
 
             // TODO - Add belief packages. Such as food beliefs that contains both the Knows and Sees for the item.
             factory.AddKnownItemBelief("AgentKnowsApple", "apple");
-            factory.AddItemLocationBelief("AgentAtApple", "apple", 1f);
+            factory.AddItemLocationBelief("AgentAtApple", "apple", 1f); // TODO - This should be based upon something.
             factory.AddInventoryBelief("AgentHasApple", "apple");
 
             //factory.AddSensorBelief("AgentKnowsPlayer", _controlledEntity.Sensors, _playerController.PlayerUnit);

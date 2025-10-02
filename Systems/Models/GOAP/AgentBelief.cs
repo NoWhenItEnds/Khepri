@@ -94,7 +94,6 @@ namespace Khepri.Models.GOAP
             // TODO - Is this the best way? Probably not.
             _beliefs.Add(key, new AgentBelief.Builder(key)
                 .WithCondition(() => _unit.Sensors.TryGetItem(itemKey).Length > 0)
-                .WithLocation(() => _unit.Sensors.TryGetItem(itemKey).FirstOrDefault().LastKnownPosition)
                 .WithCondition(() => InRangeOf(_unit.Sensors.TryGetItem(itemKey).FirstOrDefault().LastKnownPosition, distance))
                 .Build());
         }
@@ -109,7 +108,6 @@ namespace Khepri.Models.GOAP
             // TODO - Is this the best way? Probably not.
             _beliefs.Add(key, new AgentBelief.Builder(key)
                 .WithCondition(() => _unit.Sensors.TryGetItem(itemData.UId) != null)
-                .WithLocation(() => _unit.Sensors.TryGetItem(itemData.UId).LastKnownPosition)
                 .WithCondition(() => InRangeOf(_unit.Sensors.TryGetItem(itemData.UId).LastKnownPosition, distance))
                 .Build());
         }
@@ -123,7 +121,6 @@ namespace Khepri.Models.GOAP
         {
             _beliefs.Add(key, new AgentBelief.Builder(key)
                 .WithCondition(() => InRangeOf(targetLocation, distance))
-                .WithLocation(() => targetLocation)
                 .Build());
         }
 
@@ -142,14 +139,8 @@ namespace Khepri.Models.GOAP
         /// <summary> The identifying name or key of the belief. </summary>
         public String Name { get; private set; }
 
-        /// <summary> The function the belief uses to evaluate the nature of the condition. </summary>
-        private Func<Boolean> _condition = () => false;
-
-        /// <summary> The function used to find locational information about the belief. </summary>
-        private Func<Vector3> _observedLocation = () => Vector3.Zero;
-
-        /// <summary> Returns locational information about the belief. </summary>
-        public Vector3 Location => _observedLocation();
+        /// <summary> The functions the belief uses to evaluate the nature of the condition. </summary>
+        private List<Func<Boolean>> _conditions = new List<Func<Boolean>>();
 
 
         /// <summary> The identifying name or key of the belief. </summary>
@@ -162,7 +153,18 @@ namespace Khepri.Models.GOAP
 
         /// <summary> Calculate the condition to find out if the belief is true. </summary>
         /// <returns> Evaluates the belief to see if it is true or not. </returns>
-        public Boolean Evaluate() => _condition();
+        public Boolean Evaluate()
+        {
+            Boolean result = false;
+
+            foreach (Func<Boolean> condition in _conditions)
+            {
+                result = condition();
+                if (!result) { break; }
+            }
+
+            return result;
+        }
 
 
         /// <inheritdoc/>
@@ -200,16 +202,7 @@ namespace Khepri.Models.GOAP
             /// <param name="condition"> The delegate used to evaluate the condition. </param>
             public Builder WithCondition(Func<Boolean> condition)
             {
-                _belief._condition = condition;
-                return this;
-            }
-
-
-            /// <summary> Add an observed location to the belief. </summary>
-            /// <param name="location"> The delegate used to evaluate the location. </param>
-            public Builder WithLocation(Func<Vector3> location)
-            {
-                _belief._observedLocation = location;
+                _belief._conditions.Add(condition);
                 return this;
             }
 
