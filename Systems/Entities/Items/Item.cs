@@ -7,7 +7,7 @@ using System;
 namespace Khepri.Entities.Items
 {
     /// <summary> A node representing an item in the game world. </summary>
-    public partial class Item : Node3D, IEntity
+    public partial class Item : StaticBody3D, IEntity
     {
         /// <inheritdoc/>
         [ExportGroup("Nodes")]
@@ -90,6 +90,8 @@ namespace Khepri.Entities.Items
         {
             Double bobOffset = Math.Sin(Engine.GetFramesDrawn() * 0.01f) * 2f;
             _sprite.Offset = new Vector2(0f, (Single)bobOffset);
+
+            _sprite.SortingOffset = (Int32)GlobalPosition.Y * 10000 + GlobalPosition.Z;
         }
 
 
