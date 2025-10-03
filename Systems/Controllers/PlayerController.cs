@@ -1,9 +1,10 @@
 using Godot;
-using Khepri.Entities;
+using Khepri.Entities.Actors;
 using Khepri.Models.Input;
 using Khepri.Nodes;
 using Khepri.Nodes.Singletons;
 using System;
+using System.Linq;
 
 namespace Khepri.Controllers
 {
@@ -21,6 +22,9 @@ namespace Khepri.Controllers
         /// <summary> The game world's main camera the player views through. </summary>
         private WorldCamera _worldCamera;
 
+        /// <summary> A reference to the game world's UI controller. </summary>
+        private UIController _uiController;
+
 
         /// <summary> Whether the ui is currently open. </summary>
         private Boolean _isUIOpen = false;
@@ -34,6 +38,7 @@ namespace Khepri.Controllers
         {
             _viewport = GetViewport();
             _worldCamera = WorldCamera.Instance;
+            _uiController = UIController.Instance;
 
             // Set up initial state.
             _worldCamera.SetTarget(PlayerUnit.CameraPosition);
@@ -87,6 +92,15 @@ namespace Khepri.Controllers
             {
                 _isUIOpen = !_isUIOpen;
                 Input.MouseMode = _isUIOpen ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.ConfinedHidden;
+                _uiController.ShowWindow(_isUIOpen ? WindowType.INVENTORY : WindowType.NONE);
+            }
+
+            if (!_isUIOpen)
+            {
+                if (@event.IsActionReleased("action_use"))
+                {
+                    PlayerUnit.HandleInput(new UseInput(PlayerUnit.UsableEntities.First()));    // TODO - This should be pulled from ui element.
+                }
             }
         }
 

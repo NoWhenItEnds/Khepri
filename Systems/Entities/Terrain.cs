@@ -5,7 +5,7 @@ using System;
 namespace Khepri.Entities
 {
     /// <summary> A static piece of the terrain that can be walked on such as earth or flooring. </summary>
-    public partial class Terrain : StaticBody3D, IEntity, ITileable
+    public partial class Terrain : StaticBody3D, ITileable
     {
         /// <inheritdoc/>
         [ExportGroup("Nodes")]

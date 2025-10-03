@@ -1,9 +1,12 @@
 using Godot;
-using Khepri.Entities;
+using Khepri.Entities.Actors;
+using Khepri.Entities.Actors.Components;
 using Khepri.Entities.Interfaces;
-using Khepri.Entities.UnitComponents;
+using Khepri.Entities.Items;
+using Khepri.Entities.Items;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Khepri.Models.GOAP
 {
@@ -38,37 +41,75 @@ namespace Khepri.Models.GOAP
         }
 
 
-        /// <summary> Adds a new belief relating to information stored in an entity's sensors. </summary>
+        /// <summary> Adds a belief about a kind of item stored in the unit's sensors. </summary>
         /// <param name="key"> The name of belief. </param>
-        /// <param name="unitBrain"> A reference to the unit's long term memory. </param>
-        /// <param name="entity"> A reference to the entity we're concerned with. </param>
-        public void AddBrainBelief(String key, UnitBrain unitBrain, ISmartEntity entity)
+        /// <param name="itemKey"> The unique identifying name or key of the item. </param>
+        public void AddKnownItemBelief(String key, String itemKey)
         {
             _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => unitBrain.KnowsEntity(entity) != null)
+                .WithCondition(() => _unit.Sensors.TryGetItem(itemKey).Length > 0)
                 .Build());
         }
 
 
-        /// <summary> Adds a new belief relating to information stored in an entity's sensors. </summary>
+        /// <summary> Adds a belief about a specific of item stored in the unit's sensors. </summary>
         /// <param name="key"> The name of belief. </param>
-        /// <param name="unitBrain"> A reference to the unit's long term memory. </param>
-        /// <param name="entityType"> The type of entity we're concerned with. </param>
-        public void AddBrainBelief(String key, UnitBrain unitBrain, Type entityType)
+        /// <param name="itemData"> The unique instance of the item. </param>
+        public void AddKnownItemBelief(String key, ItemData itemData)
         {
             _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => unitBrain.KnowsEntityKind(entityType).Length > 0)
+                .WithCondition(() => _unit.Sensors.TryGetItem(itemData.UId) != null)
                 .Build());
         }
 
 
-        /// <summary> Add a new locational belief that requires the unit to be in range of a target node. </summary>
+        /// <summary> Adds a belief about a kind of item stored in the unit's inventory. </summary>
         /// <param name="key"> The name of belief. </param>
+        /// <param name="itemKey"> The unique identifying name or key of the item. </param>
+        public void AddInventoryBelief(String key, String itemKey)
+        {
+            _beliefs.Add(key, new AgentBelief.Builder(key)
+                .WithCondition(() => _unit.Inventory.HasItem(itemKey) > 0)
+                .Build());
+        }
+
+
+        /// <summary> Adds a belief about a specific item stored in the unit's inventory. </summary>
+        /// <param name="key"> The name of belief. </param>
+        /// <param name="itemData"> The unique instance of the item. </param>
+        public void AddInventoryBelief(String key, ItemData itemData)
+        {
+            _beliefs.Add(key, new AgentBelief.Builder(key)
+                .WithCondition(() => _unit.Inventory.HasItem(itemData.UId))
+                .Build());
+        }
+
+
+        /// <summary> Adds a belief about whether the agent is currently within interaction range of a kind of item. </summary>
+        /// <param name="key"> The name of belief. </param>
+        /// <param name="itemKey"> The unique identifying name or key of the item. </param>
         /// <param name="distance"> The acceptable distance or range from the location. </param>
-        /// <param name="targetNode"> The node that is being targeted. </param>
-        public void AddLocationBelief(String key, Single distance, Node3D targetNode)
+        public void AddItemLocationBelief(String key, String itemKey, Single distance)
         {
-            AddLocationBelief(key, distance, targetNode.GlobalPosition);
+            // TODO - Is this the best way? Probably not.
+            _beliefs.Add(key, new AgentBelief.Builder(key)
+                .WithCondition(() => _unit.Sensors.TryGetItem(itemKey).Length > 0)
+                .WithCondition(() => InRangeOf(_unit.Sensors.TryGetItem(itemKey).FirstOrDefault().LastKnownPosition, distance))
+                .Build());
+        }
+
+
+        /// <summary> Adds a belief about whether the agent is currently within interaction range of a specific item. </summary>
+        /// <param name="key"> The name of belief. </param>
+        /// <param name="itemData"> The unique instance of the item. </param>
+        /// <param name="distance"> The acceptable distance or range from the location. </param>
+        public void AddItemLocationBelief(String key, ItemData itemData, Single distance)
+        {
+            // TODO - Is this the best way? Probably not.
+            _beliefs.Add(key, new AgentBelief.Builder(key)
+                .WithCondition(() => _unit.Sensors.TryGetItem(itemData.UId) != null)
+                .WithCondition(() => InRangeOf(_unit.Sensors.TryGetItem(itemData.UId).LastKnownPosition, distance))
+                .Build());
         }
 
 
@@ -80,7 +121,6 @@ namespace Khepri.Models.GOAP
         {
             _beliefs.Add(key, new AgentBelief.Builder(key)
                 .WithCondition(() => InRangeOf(targetLocation, distance))
-                .WithLocation(() => targetLocation)
                 .Build());
         }
 
@@ -99,14 +139,8 @@ namespace Khepri.Models.GOAP
         /// <summary> The identifying name or key of the belief. </summary>
         public String Name { get; private set; }
 
-        /// <summary> The function the belief uses to evaluate the nature of the condition. </summary>
-        private Func<Boolean> _condition = () => false;
-
-        /// <summary> The function used to find locational information about the belief. </summary>
-        private Func<Vector3> _observedLocation = () => Vector3.Zero;
-
-        /// <summary> Returns locational information about the belief. </summary>
-        public Vector3 Location => _observedLocation();
+        /// <summary> The functions the belief uses to evaluate the nature of the condition. </summary>
+        private List<Func<Boolean>> _conditions = new List<Func<Boolean>>();
 
 
         /// <summary> The identifying name or key of the belief. </summary>
@@ -119,7 +153,18 @@ namespace Khepri.Models.GOAP
 
         /// <summary> Calculate the condition to find out if the belief is true. </summary>
         /// <returns> Evaluates the belief to see if it is true or not. </returns>
-        public Boolean Evaluate() => _condition();
+        public Boolean Evaluate()
+        {
+            Boolean result = false;
+
+            foreach (Func<Boolean> condition in _conditions)
+            {
+                result = condition();
+                if (!result) { break; }
+            }
+
+            return result;
+        }
 
 
         /// <inheritdoc/>
@@ -157,16 +202,7 @@ namespace Khepri.Models.GOAP
             /// <param name="condition"> The delegate used to evaluate the condition. </param>
             public Builder WithCondition(Func<Boolean> condition)
             {
-                _belief._condition = condition;
-                return this;
-            }
-
-
-            /// <summary> Add an observed location to the belief. </summary>
-            /// <param name="location"> The delegate used to evaluate the location. </param>
-            public Builder WithLocation(Func<Vector3> location)
-            {
-                _belief._observedLocation = location;
+                _belief._conditions.Add(condition);
                 return this;
             }
 

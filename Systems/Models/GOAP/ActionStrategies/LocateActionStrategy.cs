@@ -1,7 +1,7 @@
 using Godot;
-using Khepri.Entities;
+using Khepri.Entities.Actors;
+using Khepri.Entities.Actors.Components;
 using Khepri.Entities.Interfaces;
-using Khepri.Entities.UnitComponents;
 using Khepri.Models.Input;
 using System;
 
@@ -20,13 +20,13 @@ namespace Khepri.Models.GOAP.ActionStrategies
         private readonly Unit _unit;
 
         /// <summary> A reference to the target being searched for. </summary>
-        private readonly ISmartEntity _target;
+        private readonly IEntity _target;
 
 
         /// <summary> Search for a specific entity. </summary>
         /// <param name="unit"> A reference to the unit being manipulated. </param>
         /// <param name="target"> A reference to the target being searched for. </param>
-        public LocateActionStrategy(Unit unit, ISmartEntity target)
+        public LocateActionStrategy(Unit unit, IEntity target)
         {
             _unit = unit;
             _target = target;
@@ -36,7 +36,7 @@ namespace Khepri.Models.GOAP.ActionStrategies
         /// <inheritdoc/>
         public void Start()
         {
-            KnownEntity? entity = _unit.Brain.KnowsEntity(_target);
+            KnownEntity? entity = _unit.Sensors.TryGetEntity(_target);
             if (entity != null)
             {
                 _unit.NavigationAgent.TargetPosition = entity.LastKnownPosition;

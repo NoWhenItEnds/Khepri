@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using Godot;
-using Khepri.Entities;
+using Khepri.Entities.Actors;
 using Khepri.Models.Input;
 
 namespace Khepri.Models.GOAP.ActionStrategies
@@ -39,7 +39,7 @@ namespace Khepri.Models.GOAP.ActionStrategies
         public void Start()
         {
             // We want to choose a position somewhat distant to the unit as our start point.
-            Vector3[] knownPositions = _unit.Brain.GetKnownPositions();
+            Vector3[] knownPositions = _unit.Sensors.GetKnownPositions();
             Vector3[] flitteredPositions = knownPositions
                 .OrderByDescending(x => x.DistanceTo(_unit.GlobalPosition))
                 .Take((Int32)Math.Ceiling(knownPositions.Length / 2f)).ToArray();   // Take the more distant points.

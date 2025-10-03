@@ -1,4 +1,4 @@
-using Khepri.Entities;
+using Khepri.Entities.Actors;
 using System;
 
 namespace Khepri.Models.GOAP.ActionStrategies

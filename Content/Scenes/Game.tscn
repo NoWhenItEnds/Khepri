@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://ko6nvcupfcf4"]
+[gd_scene load_steps=35 format=3 uid="uid://ko6nvcupfcf4"]
 
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="Script" uid="uid://cgujt8yhxbsew" path="res://Systems/Controllers/WorldController.cs" id="1_8fov1"]
@@ -11,12 +11,21 @@
 [ext_resource type="PackedScene" uid="uid://b4pnoeq7plx01" path="res://Content/Prefabs/Entities/Environment/Tree.tscn" id="8_vstfe"]
 [ext_resource type="Shader" uid="uid://ctyba6bkndpm1" path="res://Content/Shaders/Shader_MainCameraMask.gdshader" id="9_gh1u3"]
 [ext_resource type="Script" uid="uid://cyaymrk4jwk3o" path="res://Systems/UI/HUD/Astrolabe.cs" id="11_k5j0c"]
+[ext_resource type="PackedScene" uid="uid://crta0fka14n85" path="res://Content/Prefabs/Entities/Item.tscn" id="11_kupp0"]
+[ext_resource type="Script" uid="uid://6b0qgj67orut" path="res://Systems/Controllers/ItemController.cs" id="11_uxds2"]
 [ext_resource type="Texture2D" uid="uid://bf4jcda6yqjao" path="res://Content/Textures/UI/HUD/Astrolabe/Astrolabe_Ring.png" id="12_k5j0c"]
+[ext_resource type="Script" uid="uid://c3lsvokkeus1u" path="res://Systems/Controllers/UIController.cs" id="13_oaat0"]
 [ext_resource type="Texture2D" uid="uid://dt68ek83vdc6r" path="res://Content/Textures/UI/HUD/Astrolabe/Astrolabe_Indicator.png" id="13_wrnex"]
 [ext_resource type="Texture2D" uid="uid://c01vvl8jnhv8b" path="res://Content/Textures/UI/HUD/StatusBar/StatusBar_Frame.png" id="14_a7rpa"]
 [ext_resource type="Script" uid="uid://bvp2kcvx54mn7" path="res://Systems/UI/HUD/StatusBars.cs" id="14_rj7tm"]
 [ext_resource type="Texture2D" uid="uid://jm8q7n0aefdj" path="res://Content/Textures/UI/HUD/StatusBar/StatusBar_Progress.png" id="15_rj7tm"]
 [ext_resource type="Texture2D" uid="uid://be0foew3edrpc" path="res://Content/Textures/UI/HUD/StatusBar/StatusBar_Slider.png" id="17_kqbmc"]
+[ext_resource type="Script" uid="uid://vuqou0rktkpf" path="res://Systems/UI/Windows/InventoryWindow.cs" id="20_dulfu"]
+[ext_resource type="Texture2D" uid="uid://cykmv0wmfypeq" path="res://Content/Textures/UI/Windows/Inventory/Inventory_Grid_Tile.png" id="20_pt5vb"]
+[ext_resource type="SpriteFrames" uid="uid://cgrn35r1bjnnm" path="res://Content/Resources/SpriteFrames/Controllers/SpriteFrames_Controllers_Keyboard_White.tres" id="21_ejcwx"]
+[ext_resource type="PackedScene" uid="uid://bu7yeu1aonvto" path="res://Content/Prefabs/UI/Windows/Components/InventoryItem.tscn" id="22_0itj2"]
+[ext_resource type="Script" uid="uid://d3kcgr1eohghu" path="res://Systems/UI/Debug/Units/DebugUnitWindow.cs" id="25_rvbhf"]
+[ext_resource type="PackedScene" uid="uid://cf52786ejxpwc" path="res://Content/Prefabs/UI/Debug/DebugUnitMenu.tscn" id="26_1mywo"]
 
 [sub_resource type="Environment" id="Environment_gh1u3"]
 
@@ -80,7 +89,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -2)
 
 [node name="Enemy Unit" parent="World" instance=ExtResource("2_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.065, 0, -0.318)
-_showNeeds = true
 
 [node name="Playground" type="NavigationRegion3D" parent="World"]
 navigation_mesh = SubResource("NavigationMesh_fdsh7")
@@ -546,24 +554,34 @@ transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, -
 mesh = SubResource("QuadMesh_gh1u3")
 surface_material_override/0 = SubResource("StandardMaterial3D_gh1u3")
 
-[node name="UI" type="Control" parent="."]
+[node name="Items" type="Node3D" parent="World"]
+script = ExtResource("11_uxds2")
+_itemPrefab = ExtResource("11_kupp0")
+
+[node name="UI" type="Control" parent="." node_paths=PackedStringArray("_astrolabe", "_statusBars", "_inventoryWindow")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("13_oaat0")
+_astrolabe = NodePath("HUD/Astrolabe")
+_statusBars = NodePath("HUD/Status Bars")
+_inventoryWindow = NodePath("Windows/Inventory")
 
 [node name="HUD" type="Control" parent="UI"]
 custom_minimum_size = Vector2(0, 256)
 layout_mode = 1
-anchors_preset = 10
+anchors_preset = 15
 anchor_right = 1.0
-offset_bottom = 256.0
+anchor_bottom = 1.0
 grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Astrolabe" type="Control" parent="UI/HUD" node_paths=PackedStringArray("_ringTexture")]
 layout_mode = 1
+anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -128.0
@@ -611,6 +629,7 @@ stretch_mode = 2
 
 [node name="Status Bars" type="Control" parent="UI/HUD" node_paths=PackedStringArray("_needsContainer", "_staminaBar", "_healthBar", "_hungerBar", "_fatigueBar", "_entertainmentBar", "_statusBarSlider")]
 layout_mode = 1
+anchors_preset = 0
 offset_right = 256.0
 offset_bottom = 80.0
 script = ExtResource("14_rj7tm")
@@ -679,3 +698,129 @@ offset_bottom = 32.0
 pivot_offset = Vector2(2, 16)
 texture = ExtResource("17_kqbmc")
 stretch_mode = 2
+
+[node name="Interaction Menu" type="Control" parent="UI/HUD"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -128.0
+offset_top = -128.0
+offset_right = 128.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/HUD/Interaction Menu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ScrollContainer" type="ScrollContainer" parent="UI/HUD/Interaction Menu/MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/HUD/Interaction Menu/MarginContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 2
+
+[node name="Interaction Item" type="NinePatchRect" parent="UI/HUD/Interaction Menu/MarginContainer/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/HUD/Interaction Menu/MarginContainer/ScrollContainer/VBoxContainer/Interaction Item"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control" type="Control" parent="UI/HUD/Interaction Menu/MarginContainer/ScrollContainer/VBoxContainer/Interaction Item/HBoxContainer"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="UI/HUD/Interaction Menu/MarginContainer/ScrollContainer/VBoxContainer/Interaction Item/HBoxContainer/Control"]
+position = Vector2(16, 16)
+scale = Vector2(2, 2)
+sprite_frames = ExtResource("21_ejcwx")
+animation = &"E"
+
+[node name="Interaction Text" type="RichTextLabel" parent="UI/HUD/Interaction Menu/MarginContainer/ScrollContainer/VBoxContainer/Interaction Item/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+text = "PLACEHOLDER"
+vertical_alignment = 1
+
+[node name="Windows" type="Control" parent="UI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Inventory" type="Control" parent="UI/Windows" node_paths=PackedStringArray("_inventoryGrid")]
+z_index = 1
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -256.0
+offset_top = -256.0
+offset_right = 256.0
+offset_bottom = 256.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("20_dulfu")
+_inventoryItemPrefab = ExtResource("22_0itj2")
+_inventoryGrid = NodePath("InventoryGrid")
+
+[node name="InventoryGrid" type="TextureRect" parent="UI/Windows/Inventory"]
+z_as_relative = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.00003
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("20_pt5vb")
+stretch_mode = 1
+
+[node name="Debug" type="Control" parent="UI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Unit Window" type="Control" parent="UI/Debug" node_paths=PackedStringArray("_enemyController", "_enemyUnit")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("25_rvbhf")
+_unitMenuPrefab = ExtResource("26_1mywo")
+_enemyController = NodePath("../../../Controllers/Agent Controller")
+_enemyUnit = NodePath("../../../World/Enemy Unit")
