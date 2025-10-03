@@ -17,18 +17,24 @@ namespace Khepri.Entities.Items
         /// <param name="name"> The unique identifying name or key of the item. </param>
         /// <param name="type"> What kind of item it is. </param>
         /// <returns> A reference to the create data object. </returns>
+        /// <exception cref="NotImplementedException"> If the given item type wasn't recognised. </exception>
         public static ItemData Create(String name, ItemType type)
         {
             JsonElement itemElement = GetItemRoot(name, type);
 
-            return new ItemData
+            switch (type)
             {
-                UId = Guid.NewGuid(),
-                Name = name,
-                ItemType = type,
-                SpriteIndex = GetSpriteIndex(itemElement),
-                Points = GetPoints(itemElement)
-            };
+                case ItemType.FOOD:
+                    return new FoodData
+                    {
+                        UId = Guid.NewGuid(),
+                        Name = name,
+                        SpriteIndex = GetSpriteIndex(itemElement),
+                        Points = GetPoints(itemElement)
+                    };
+                default:
+                    throw new NotImplementedException($"The given item type, {type}, was not recognised.");
+            }
         }
 
 

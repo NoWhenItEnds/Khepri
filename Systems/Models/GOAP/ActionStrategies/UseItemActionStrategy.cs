@@ -1,5 +1,6 @@
-using Godot;
 using Khepri.Entities.Actors;
+using Khepri.Entities.Items;
+using Khepri.Types.Exceptions;
 using System;
 
 namespace Khepri.Models.GOAP.ActionStrategies
@@ -49,13 +50,33 @@ namespace Khepri.Models.GOAP.ActionStrategies
         /// <inheritdoc/>
         public void Start()
         {
+            ItemData item;
+
             if (_itemName != null)  // If we're using the item name, try to find a known item of the same kind.
             {
-                // TODO - Have use.
+                ItemData[] items = _unit.Inventory.GetItem(_itemName);
+                if (items.Length > 0)
+                {
+                    item = items[0];
+                }
+                else
+                {
+                    throw new ActionStrategyException("Somehow the strategy found items that don't exist. WTF.");
+                }
             }
             else                    // Else, try to find the specific item.
             {
-                // TODO - Have use.
+                item = _unit.Inventory.GetItem(_itemId.Value);
+                if (item == null)
+                {
+                    throw new ActionStrategyException("Somehow the strategy found an item that didn't exist. WTF.");
+                }
+            }
+
+            Boolean isUsed = item.Use(_unit);
+            if (isUsed && item is FoodData food && food.Portions <= 0)
+            {
+                _unit.Inventory.RemoveItem(item);
             }
 
             IsComplete = true;
@@ -63,14 +84,10 @@ namespace Khepri.Models.GOAP.ActionStrategies
 
 
         /// <inheritdoc/>
-        public void Update(Double delta)
-        {
-        }
+        public void Update(Double delta) { }
 
 
         /// <inheritdoc/>
-        public void Stop()
-        {
-        }
+        public void Stop() { }
     }
 }

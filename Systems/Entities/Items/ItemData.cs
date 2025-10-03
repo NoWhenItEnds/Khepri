@@ -1,25 +1,33 @@
 using System;
 using System.Linq;
 using Godot;
+using Khepri.Entities.Actors;
 
 namespace Khepri.Entities.Items
 {
     /// <summary> A type of entity representing something that can be grabbed and placed in an inventory. </summary>
-    public class ItemData : IEquatable<ItemData>
+    public abstract class ItemData : IEquatable<ItemData>
     {
+        /// <summary> What kind of item it is. </summary>
+        public abstract ItemType ItemType { get; }
+
+        /// <summary> The unique identifier of this item instance. </summary>
         public Guid UId { get; init; }
 
         /// <summary> The unique identifying name or key of the item. </summary>
         public String Name { get; init; }
-
-        /// <summary> What kind of item it is. </summary>
-        public ItemType ItemType { get; init; }
 
         /// <summary> The index of the sprites used to represent this item. </summary>
         public Int32 SpriteIndex { get; init; }
 
         /// <summary> Relative points representing the grid cells the item occupies in an inventory. </summary>
         public Vector2I[] Points { get; init; }
+
+
+        /// <summary> Perform a use item action on the item. </summary>
+        /// <param name="unit"> The actor using the item. </param>
+        /// <returns> Whether the item was successfully used. </returns>
+        public abstract Boolean Use(Unit unit);
 
 
         /// <summary> Gets the size of the item's bounding box by looking for its largest point. </summary>

@@ -36,7 +36,7 @@ namespace Khepri.Controllers
             }
 
             // Build the pool.
-            for (Int32 i = 0; i < _poolSize - _itemPool.Count; i++)
+            for (Int32 i = 0; i < _poolSize; i++)
             {
                 Item item = BuildItem();
                 _itemPool.Add(item, false);
@@ -94,6 +94,7 @@ namespace Khepri.Controllers
             _itemPool[result] = true;
             result.Initialise(data);
             result.GlobalPosition = position;
+            result.Name = data.Name;
 
             return result;
         }

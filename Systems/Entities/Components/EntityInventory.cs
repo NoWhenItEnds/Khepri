@@ -14,6 +14,10 @@ namespace Khepri.Entities.Components
         [Export] public Vector2I InventorySize { get; private set; } = new Vector2I(10, 10);
 
 
+        /// <summary> An event that is triggered when the inventory has been altered. </summary>
+        public event Action InventoryUpdated;
+
+
         /// <summary> The items being stored in the entity's inventory. </summary>
         private ItemData[,] _storedItems;
 
@@ -113,6 +117,7 @@ namespace Khepri.Entities.Components
                     if (GetItem(x, y) == item)
                     {
                         _storedItems[x, y] = null;
+                        InventoryUpdated?.Invoke();
                     }
                 }
             }

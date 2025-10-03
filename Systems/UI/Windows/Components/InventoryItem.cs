@@ -145,6 +145,7 @@ namespace Khepri.UI.Windows.Components
 
             SetSprite(data);
             TextureClickMask = BuildClickMask(data);
+            Name = data.Name;
         }
 
 
