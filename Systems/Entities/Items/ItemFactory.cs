@@ -30,7 +30,11 @@ namespace Khepri.Entities.Items
                         UId = Guid.NewGuid(),
                         Name = name,
                         SpriteIndex = GetSpriteIndex(itemElement),
-                        Points = GetPoints(itemElement)
+                        Points = GetPoints(itemElement),
+                        HealthRecovery = GetHeath(itemElement),
+                        HungerRecovery = GetHunger(itemElement),
+                        FatigueRecovery = GetFatigue(itemElement),
+                        EntertainmentRecovery = GetEntertainment(itemElement)
                     };
                 default:
                     throw new NotImplementedException($"The given item type, {type}, was not recognised.");
@@ -104,6 +108,70 @@ namespace Khepri.Entities.Items
             else
             {
                 throw new JsonException($"The item doesn't contain a key for 'points'.");
+            }
+        }
+
+
+        /// <summary> Get the health property from the json object. </summary>
+        /// <param name="itemElement"> The json element to search. </param>
+        /// <returns> The index of the sprites used to represent this item. </returns>
+        private static Single GetHeath(JsonElement itemElement)
+        {
+            if (itemElement.TryGetProperty("health_recovery", out JsonElement element) && element.TryGetSingle(out Single healthRecovery))
+            {
+                return healthRecovery;
+            }
+            else
+            {
+                return 0f;
+            }
+        }
+
+
+        /// <summary> Get the hunger property from the json object. </summary>
+        /// <param name="itemElement"> The json element to search. </param>
+        /// <returns> The index of the sprites used to represent this item. </returns>
+        private static Single GetHunger(JsonElement itemElement)
+        {
+            if (itemElement.TryGetProperty("hunger_recovery", out JsonElement element) && element.TryGetSingle(out Single hungerRecovery))
+            {
+                return hungerRecovery;
+            }
+            else
+            {
+                return 0f;
+            }
+        }
+
+
+        /// <summary> Get the fatigue property from the json object. </summary>
+        /// <param name="itemElement"> The json element to search. </param>
+        /// <returns> The index of the sprites used to represent this item. </returns>
+        private static Single GetFatigue(JsonElement itemElement)
+        {
+            if (itemElement.TryGetProperty("fatigue_recovery", out JsonElement element) && element.TryGetSingle(out Single fatigueRecovery))
+            {
+                return fatigueRecovery;
+            }
+            else
+            {
+                return 0f;
+            }
+        }
+
+
+        /// <summary> Get the entertainment property from the json object. </summary>
+        /// <param name="itemElement"> The json element to search. </param>
+        /// <returns> The index of the sprites used to represent this item. </returns>
+        private static Single GetEntertainment(JsonElement itemElement)
+        {
+            if (itemElement.TryGetProperty("entertainment_recovery", out JsonElement element) && element.TryGetSingle(out Single entertainmentRecovery))
+            {
+                return entertainmentRecovery;
+            }
+            else
+            {
+                return 0f;
             }
         }
     }

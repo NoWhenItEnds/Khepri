@@ -14,7 +14,7 @@ namespace Khepri.Entities.Items
         public Single HealthRecovery { get; init; }
 
         /// <summary> The amount of hunger the item recovers. </summary>
-        public Single HungerRecovery { get; init; } = 50f;
+        public Single HungerRecovery { get; init; }
 
         /// <summary> The amount of fatigue the item recovers. </summary>
         public Single FatigueRecovery { get; init; }

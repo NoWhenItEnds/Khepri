@@ -43,7 +43,7 @@ namespace Khepri.UI.Debug.Units
         private const String BELIEF_FORMAT = "[color={1}]- {0}[/color]";
 
         /// <summary> The format to use to show sensor information. </summary>
-        private const String SENSOR_FORMAT = "{0} <{1:F1}, {2:F1}, {3:F1}> {4:F1}m";
+        private const String SENSOR_FORMAT = "[b]{0}[/b] <{1:F1}, {2:F1}, {3:F1}> {4:F1}m";
 
 
         /// <inheritdoc/>

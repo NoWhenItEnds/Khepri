@@ -93,21 +93,5 @@ namespace Khepri.Entities.Items
 
             _sprite.SortingOffset = (Int32)GlobalPosition.Y * 10000 + GlobalPosition.Z;
         }
-
-
-        /// <inheritdoc/>
-        public override Int32 GetHashCode() => HashCode.Combine(UId);
-
-
-        /// <inheritdoc/>
-        public override Boolean Equals(Object obj)
-        {
-            Item? other = obj as Item;
-            return other != null ? UId.Equals(other.UId) : false;
-        }
-
-
-        /// <inheritdoc/>
-        public bool Equals(IEntity other) => UId.Equals(other.UId);
     }
 }

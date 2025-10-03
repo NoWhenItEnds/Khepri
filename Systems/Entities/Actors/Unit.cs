@@ -120,21 +120,5 @@ namespace Khepri.Entities.Actors
         {
             UsableEntities.Remove(entity);
         }
-
-
-        /// <inheritdoc/>
-        public override Int32 GetHashCode() => HashCode.Combine(UId);
-
-
-        /// <inheritdoc/>
-        public override Boolean Equals(Object obj)
-        {
-            Unit? other = obj as Unit;
-            return other != null ? UId.Equals(other.UId) : false;
-        }
-
-
-        /// <inheritdoc/>
-        public bool Equals(IEntity other) => UId.Equals(other.UId);
     }
 }
