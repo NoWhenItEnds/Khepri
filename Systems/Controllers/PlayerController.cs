@@ -16,6 +16,10 @@ namespace Khepri.Controllers
         [Export] public Unit PlayerUnit { get; private set; }
 
 
+        /// <summary> Emitted when the player's interaction selection changed. </summary>
+        public event Action<Int32> SelectionChanged;
+
+
         /// <summary> Whether the user is currently using a controller. </summary>
         public Boolean IsUsingJoypad { get; private set; } = false;
 
@@ -32,6 +36,9 @@ namespace Khepri.Controllers
 
         /// <summary> Whether the ui is currently open. </summary>
         private Boolean _isUIOpen = false;
+
+        /// <summary> The index of the currently selected item on the UI. </summary>
+        private Int32 _currentSelection = 0;
 
 
         /// <inheritdoc/>
@@ -98,9 +105,23 @@ namespace Khepri.Controllers
 
             if (!_isUIOpen)
             {
-                if (@event.IsActionReleased("action_use"))
+                if (PlayerUnit.UsableEntities.Count > 0)
                 {
-                    PlayerUnit.HandleInput(new UseInput(PlayerUnit.UsableEntities.First()));    // TODO - This should be pulled from ui element.
+                    if (@event.IsActionReleased("action_use"))
+                    {
+                        PlayerUnit.HandleInput(new UseInput(PlayerUnit.UsableEntities.ToArray()[_currentSelection]));
+                        _currentSelection = Math.Clamp(_currentSelection, 0, PlayerUnit.UsableEntities.Count - 1);
+                    }
+                    else if (@event.IsActionReleased("action_ui_up"))
+                    {
+                        _currentSelection = Math.Clamp(_currentSelection + 1, 0, PlayerUnit.UsableEntities.Count - 1);
+                        SelectionChanged?.Invoke(_currentSelection);
+                    }
+                    else if (@event.IsActionReleased("action_ui_down"))
+                    {
+                        _currentSelection = Math.Clamp(_currentSelection - 1, 0, PlayerUnit.UsableEntities.Count - 1);
+                        SelectionChanged?.Invoke(_currentSelection);
+                    }
                 }
             }
         }

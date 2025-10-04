@@ -24,14 +24,12 @@ namespace Khepri.UI.HUD.Interaction
 
         private List<InteractionItem> _spawnedItems = new List<InteractionItem>();
 
-        /// <summary> The current selection on the interaction menu. </summary>
-        private Int32 _currentSelection = 0;
-
 
         /// <inheritdoc/>
         public override void _Ready()
         {
             _playerController = PlayerController.Instance;
+            _playerController.SelectionChanged += OnSelectionChanged;
         }
 
 
@@ -70,6 +68,16 @@ namespace Khepri.UI.HUD.Interaction
             _container.AddChild(item);
             item.Initialise(entity);
             return item;
+        }
+
+
+        private void OnSelectionChanged(Int32 selectionIndex)
+        {
+            InteractionItem selectedItem = _spawnedItems[selectionIndex];
+            foreach (InteractionItem item in _spawnedItems)
+            {
+                item.SetSelected(item == selectedItem);
+            }
         }
     }
 }

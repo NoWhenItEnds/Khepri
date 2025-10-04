@@ -36,7 +36,7 @@ namespace Khepri.UI.HUD.Interaction
         public override void _Ready()
         {
             _playerController = PlayerController.Instance;
-            _sprite.Play();
+            SetSelected(false);
         }
 
 
@@ -52,8 +52,15 @@ namespace Khepri.UI.HUD.Interaction
             }
             else if (Entity is Device device)
             {
-                _label.Text = String.Format(DEVICE_LABEL_FORMAT, device.Data.Name.Capitalize());
+                //_label.Text = String.Format(DEVICE_LABEL_FORMAT, device.Data.Name.Capitalize());
             }
+        }
+
+
+        public void SetSelected(Boolean isSelected)
+        {
+            //_sprite.Animation = isSelected ? "E" : "None";
+            _sprite.Play(isSelected ? "E" : "None");
         }
 
 

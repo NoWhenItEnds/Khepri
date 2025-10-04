@@ -25,7 +25,7 @@ layout_mode = 2
 position = Vector2(16, 16)
 scale = Vector2(2, 2)
 sprite_frames = ExtResource("2_4gegn")
-animation = &"E"
+animation = &"None"
 
 [node name="Interaction Text" type="RichTextLabel" parent="HBoxContainer"]
 layout_mode = 2
