@@ -7,9 +7,16 @@ namespace Khepri.Controllers
     /// <summary> Controls the world's state such as its time and seasons. </summary>
     public partial class WorldController : SingletonNode<WorldController>
     {
-        /// <summary> The scaling applied to the game world time. Modifies it from the real-world time by the given factor. </summary>
+        /// <summary> The observer's latitude. </summary>
         [ExportGroup("Settings")]
-        [Export] private Single _timescale = 24f;
+        [Export] public Double Latitude { get; private set; } = -31.80529;
+
+        /// <summary> The observer's longitude. </summary>
+        [Export] public Double Longitude { get; private set; } = 115.74419;
+
+        /// <summary> How quickly time is moving. </summary>
+        /// <remarks> One in game day takes two hours. </remarks>
+        [Export] private Single _timescale = 12f;
 
 
         /// <summary> The world's current time. </summary>
