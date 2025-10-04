@@ -1,6 +1,5 @@
 using Godot;
 using Khepri.Controllers;
-using Khepri.Entities.Interfaces;
 using Khepri.Entities.Items;
 using Khepri.Types.Extensions;
 using System;

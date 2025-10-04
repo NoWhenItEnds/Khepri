@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-namespace Khepri.Entities.Interfaces
+namespace Khepri.Entities
 {
     /// <summary> The entity is persistent, meaning that its information should be remembered between game sessions. </summary>
     public interface IEntity
@@ -18,6 +18,7 @@ namespace Khepri.Entities.Interfaces
 
         /// <summary> The internal logic to use when the entity is used. </summary>
         /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
-        public void Use(IEntity activatingEntity);
+        /// <returns> If the entity was successfully used. </returns>
+        public Boolean Use(IEntity activatingEntity);
     }
 }

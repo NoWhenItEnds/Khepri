@@ -1,7 +1,6 @@
 using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Actors;
-using Khepri.Entities.Interfaces;
 using System;
 
 namespace Khepri.Entities.Items
@@ -43,17 +42,19 @@ namespace Khepri.Entities.Items
         }
 
 
-        /// <summary> Using an item tries to pick it up. </summary>
-        public void Use(IEntity activatingEntity)
+        /// <inheritdoc/>
+        public Boolean Use(IEntity activatingEntity)
         {
+            Boolean isSuccessful = false;
             if (activatingEntity is Unit unit)
             {
-                Boolean isSuccessful = unit.Inventory.TryAddItem(Data);
+                isSuccessful = unit.Inventory.TryAddItem(Data);
                 if (isSuccessful)   // If the item was added, free it back to the pool.
                 {
                     _itemController.FreeItem(this);
                 }
             }
+            return isSuccessful;
         }
 
 
@@ -67,6 +68,8 @@ namespace Khepri.Entities.Items
         }
 
 
+        /// <summary> When a unit enters the usable range. </summary>
+        /// <param name="body"> A reference to the unit. </param>
         private void OnBodyEntered(Node3D body)
         {
             if (body is Unit unit)
@@ -76,6 +79,8 @@ namespace Khepri.Entities.Items
         }
 
 
+        /// <summary> When a unit leaves the usable range. </summary>
+        /// <param name="body"> A reference to the unit. </param>
         private void OnBodyExited(Node3D body)
         {
             if (body is Unit unit)

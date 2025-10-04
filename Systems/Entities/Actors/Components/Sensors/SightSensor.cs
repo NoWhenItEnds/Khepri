@@ -1,5 +1,4 @@
 using Godot;
-using Khepri.Entities.Interfaces;
 using System;
 using System.Collections.Generic;
 

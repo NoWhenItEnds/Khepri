@@ -1,4 +1,4 @@
-using Khepri.Entities.Interfaces;
+using Khepri.Entities;
 
 namespace Khepri.Models.Input
 {

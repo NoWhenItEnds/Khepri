@@ -1,11 +1,11 @@
 using Godot;
 using Khepri.Entities.Actors;
-using Khepri.Entities.Interfaces;
 using System;
 
 namespace Khepri.Entities.Devices
 {
-    public partial class Device : StaticBody3D, IEntity
+    /// <summary> An entity that can be interacted with by a unit for a unique effect. </summary>
+    public abstract partial class Device : StaticBody3D, IEntity
     {
         /// <inheritdoc/>
         [ExportGroup("Nodes")]
@@ -29,13 +29,37 @@ namespace Khepri.Entities.Devices
         public Vector3 WorldPosition => GlobalPosition;
 
 
-        /// <summary> Using an item tries to pick it up. </summary>
-        public void Use(IEntity activatingEntity)
+        /// <inheritdoc/>
+        public override void _Ready()
         {
-            if (activatingEntity is Unit unit)
+            _interactionArea.BodyEntered += OnBodyEntered;
+            _interactionArea.BodyExited += OnBodyExited;
+        }
+
+
+        /// <summary> When a unit enters the usable range. </summary>
+        /// <param name="body"> A reference to the unit. </param>
+        private void OnBodyEntered(Node3D body)
+        {
+            if (body is Unit unit)
             {
-                throw new NotImplementedException();
+                unit.AddUsableEntity(this);
             }
         }
+
+
+        /// <summary> When a unit leaves the usable range. </summary>
+        /// <param name="body"> A reference to the unit. </param>
+        private void OnBodyExited(Node3D body)
+        {
+            if (body is Unit unit)
+            {
+                unit.RemoveUsableEntity(this);
+            }
+        }
+
+
+        /// <summary> Using an item tries to pick it up. </summary>
+        public abstract Boolean Use(IEntity activatingEntity);
     }
 }

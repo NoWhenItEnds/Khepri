@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-namespace Khepri.Entities.Interfaces
+namespace Khepri.Entities
 {
     /// <summary> Indicates that the entity is tiling, and should consider other nearby examples of itself to determine is qualities. </summary>
     public interface ITileable

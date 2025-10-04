@@ -16,6 +16,10 @@ namespace Khepri.Controllers
         [Export] public Unit PlayerUnit { get; private set; }
 
 
+        /// <summary> Whether the user is currently using a controller. </summary>
+        public Boolean IsUsingJoypad { get; private set; } = false;
+
+
         /// <summary> A reference to the window node. </summary>
         private Viewport _viewport;
 
@@ -28,9 +32,6 @@ namespace Khepri.Controllers
 
         /// <summary> Whether the ui is currently open. </summary>
         private Boolean _isUIOpen = false;
-
-        /// <summary> Whether the user is currently using a controller. </summary>
-        private Boolean _isUsingJoypad = false;
 
 
         /// <inheritdoc/>
@@ -66,7 +67,7 @@ namespace Khepri.Controllers
 
                 // Handle camera.
                 Vector2 ratio = Vector2.Zero;
-                if (_isUsingJoypad)
+                if (IsUsingJoypad)
                 {
                     Single cameraHorizontal = Input.GetAxis("action_camera_left", "action_camera_right");
                     Single cameraVertical = Input.GetAxis("action_camera_up", "action_camera_down");
@@ -112,11 +113,11 @@ namespace Khepri.Controllers
             switch (@event)
             {
                 case InputEventKey or InputEventMouse:
-                    _isUsingJoypad = false;
+                    IsUsingJoypad = false;
                     break;
                 case InputEventJoypadButton:
                 case InputEventJoypadMotion { AxisValue: < -0.1f or > 0.1f }:
-                    _isUsingJoypad = true;
+                    IsUsingJoypad = true;
                     break;
             }
         }

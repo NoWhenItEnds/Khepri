@@ -1,6 +1,8 @@
+using System;
 using Godot;
 using Khepri.Nodes.Singletons;
 using Khepri.UI.HUD;
+using Khepri.UI.HUD.Interaction;
 using Khepri.UI.Windows;
 
 namespace Khepri.Controllers
@@ -15,6 +17,9 @@ namespace Khepri.Controllers
 
         /// <summary> A reference to the player status bars in the HUD. </summary>
         [Export] private StatusBars _statusBars;
+
+        /// <summary> A reference to the menu that displays interactable elements. </summary>
+        [Export] private InteractionMenu _interactionMenu;
 
 
         /// <summary> A reference to the inventory window element. </summary>
@@ -42,13 +47,25 @@ namespace Khepri.Controllers
             switch (window)
             {
                 case WindowType.INVENTORY:
+                    ToggleHUD(false);
                     _inventoryWindow.Visible = true;
                     _inventoryWindow.Initialise(_playerController.PlayerUnit.Inventory);
                     break;
                 default:
+                    ToggleHUD(true);
                     _inventoryWindow.Visible = false;
                     break;
             }
+        }
+
+
+        /// <summary> Toggles whether the HUD is currently active. </summary>
+        /// <param name="isActive"> The state to set HUD elements. </param>
+        private void ToggleHUD(Boolean isActive)
+        {
+            _astrolabe.Visible = isActive;
+            _statusBars.Visible = isActive;
+            _interactionMenu.Visible = isActive;
         }
     }
 

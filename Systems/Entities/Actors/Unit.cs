@@ -3,7 +3,6 @@ using Khepri.Controllers;
 using Khepri.Entities.Actors.Components;
 using Khepri.Entities.Actors.Components.States;
 using Khepri.Entities.Components;
-using Khepri.Entities.Interfaces;
 using Khepri.Models.Input;
 using System;
 using System.Collections.Generic;
@@ -56,15 +55,15 @@ namespace Khepri.Entities.Actors
         /// <summary> The current direction the unit is facing. </summary>
         public Single Direction { get; private set; } = 0f;
 
-        /// <summary> A reference to the world controller. </summary>
-        private WorldController _worldController;
-
         /// <summary> A list of entities that the unit is close enough to interact with. </summary>
         public HashSet<IEntity> UsableEntities = new HashSet<IEntity>();
 
+        /// <summary> A reference to the world controller. </summary>
+        private WorldController _worldController;
+
 
         /// <inheritdoc/>
-        public void Use(IEntity activatingEntity)
+        public Boolean Use(IEntity activatingEntity)
         {
             throw new NotImplementedException();
         }
