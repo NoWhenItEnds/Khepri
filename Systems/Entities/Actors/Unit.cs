@@ -10,7 +10,7 @@ using System.Collections.Generic;
 namespace Khepri.Entities.Actors
 {
     /// <summary> An active entity controlled by something. </summary>
-    public partial class Unit : CharacterBody3D, IEntity
+    public partial class Unit : CharacterBody3D, IEntity, IControllable
     {
         /// <inheritdoc/>
         [ExportGroup("Nodes")]
@@ -105,8 +105,7 @@ namespace Khepri.Entities.Actors
         }
 
 
-        /// <summary> Handle the input sent to the unit by it's controller. </summary>
-        /// <param name="input"> The input data class to interpret. </param>
+        /// <inheritdoc/>
         public void HandleInput(IInput input) => StateMachine.HandleInput(input);
 
 

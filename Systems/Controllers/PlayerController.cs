@@ -1,4 +1,5 @@
 using Godot;
+using Khepri.Entities;
 using Khepri.Entities.Actors;
 using Khepri.Models.Input;
 using Khepri.Nodes;
@@ -14,6 +15,9 @@ namespace Khepri.Controllers
         /// <summary> The unit currently controlled by the player. </summary>
         [ExportGroup("Nodes")]
         [Export] public Unit PlayerUnit { get; private set; }
+
+        /// <summary> The current entity that the player is controlling. </summary>
+        private IControllable _currentControllable;
 
 
         /// <summary> Emitted when the player's interaction selection changed. </summary>
@@ -34,9 +38,6 @@ namespace Khepri.Controllers
         private UIController _uiController;
 
 
-        /// <summary> Whether the ui is currently open. </summary>
-        private Boolean _isUIOpen = false;
-
         /// <summary> The index of the currently selected item on the UI. </summary>
         private Int32 _currentSelection = 0;
 
@@ -49,6 +50,7 @@ namespace Khepri.Controllers
             _uiController = UIController.Instance;
 
             // Set up initial state.
+            _currentControllable = PlayerUnit;
             _worldCamera.SetTarget(PlayerUnit.CameraPosition);
             Input.MouseMode = Input.MouseModeEnum.ConfinedHidden;
         }
@@ -57,7 +59,7 @@ namespace Khepri.Controllers
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
-            if (!_isUIOpen)
+            if (!_uiController.IsWindowOpen || PlayerUnit != _currentControllable)  // TODO - This feels like a hack to check it like this to allow the player to control a window.
             {
                 Single moveHorizontal = Input.GetAxis("action_move_left", "action_move_right");
                 Single moveVertical = Input.GetAxis("action_move_up", "action_move_down");
@@ -70,7 +72,7 @@ namespace Khepri.Controllers
                 }
 
                 MoveInput moveInput = new MoveInput(moveDirection, movementType);
-                PlayerUnit.HandleInput(moveInput);
+                _currentControllable.HandleInput(moveInput);
 
                 // Handle camera.
                 Vector2 ratio = Vector2.Zero;
@@ -98,12 +100,12 @@ namespace Khepri.Controllers
 
             if (@event.IsActionReleased("action_toggle_ui"))
             {
-                _isUIOpen = !_isUIOpen;
-                Input.MouseMode = _isUIOpen ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.ConfinedHidden;
-                _uiController.ShowWindow(_isUIOpen ? WindowType.INVENTORY : WindowType.NONE);
+                Input.MouseMode = !_uiController.IsWindowOpen ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.ConfinedHidden;
+                _uiController.ShowWindow(!_uiController.IsWindowOpen ? WindowType.INVENTORY : WindowType.NONE);
+                SetControllable(null);  // TODO - Is this the best place to reset the controller?
             }
 
-            if (!_isUIOpen)
+            if (!_uiController.IsWindowOpen)
             {
                 if (PlayerUnit.UsableEntities.Count > 0)
                 {
@@ -141,6 +143,14 @@ namespace Khepri.Controllers
                     IsUsingJoypad = true;
                     break;
             }
+        }
+
+
+        /// <summary> Set the current entity being controlled by the controller. </summary>
+        /// <param name="controllable"> The new entity to control. A null resets it back to the default unit. </param>
+        public void SetControllable(IControllable? controllable = null)
+        {
+            _currentControllable = controllable ?? PlayerUnit;
         }
     }
 }
