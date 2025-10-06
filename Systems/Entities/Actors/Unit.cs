@@ -63,13 +63,6 @@ namespace Khepri.Entities.Actors
 
 
         /// <inheritdoc/>
-        public Boolean Use(IEntity activatingEntity)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        /// <inheritdoc/>
         public override void _Ready()
         {
             _worldController = WorldController.Instance;
@@ -117,6 +110,27 @@ namespace Khepri.Entities.Actors
         public void RemoveUsableEntity(IEntity entity)
         {
             UsableEntities.Remove(entity);
+        }
+
+
+        /// <inheritdoc/>
+        public Boolean Examine(Unit activatingEntity)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        /// <inheritdoc/>
+        public Boolean Use(Unit activatingEntity)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        /// <inheritdoc/>
+        public Boolean Grab(Unit activatingEntity)
+        {
+            throw new NotImplementedException();
         }
     }
 }

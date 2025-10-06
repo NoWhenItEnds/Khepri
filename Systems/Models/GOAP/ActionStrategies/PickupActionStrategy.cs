@@ -1,6 +1,7 @@
 using Godot;
 using Khepri.Entities.Actors;
 using Khepri.Entities.Items;
+using Khepri.Models.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,7 +70,7 @@ namespace Khepri.Models.GOAP.ActionStrategies
 
                 if (item != null)  // If the item was actually found.
                 {
-                    item.Use(_unit);    // TODO - Make pickup.
+                    _unit.HandleInput(new GrabInput(item)); // TODO - What if inventory is full? Make eat from ground?
                     IsComplete = true;
                 }
             }

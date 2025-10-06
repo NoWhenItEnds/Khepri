@@ -11,7 +11,7 @@ namespace Khepri.Types.Extensions
         /// <param name="altitude"> The rotation north from the celestial horizon in degrees. </param>
         /// <param name="latitude"> The observer's latitude. </param>
         /// <param name="localSiderealTime"> The observer's local sidereal time, including their longitude. </param>
-        /// <returns> The coordinates of a celestial object in degrees. </returns>
+        /// <returns> The coordinates of a celestial object in degrees. X = right ascension. Y = declination. </returns>
         /// <remarks> https://stackoverflow.com/questions/70977467/wrong-result-calculation-hour-angle-from-altitude-azimuth </remarks>
         public static Vector2 ConvertToEquatorial(Double azimuth, Double altitude, Double latitude, Double localSiderealTime)
         {
@@ -33,7 +33,7 @@ namespace Khepri.Types.Extensions
         /// <param name="declination"> The rotation north from the celestial horizon in degrees. </param>
         /// <param name="latitude"> The observer's latitude. </param>
         /// <param name="localSiderealTime"> The observer's local sidereal time, including their longitude. </param>
-        /// <returns> The coordinates of a celestial object relative to the observer in degrees. </returns>
+        /// <returns> The coordinates of a celestial object relative to the observer in degrees. X = azimuth, Y = altitude. </returns>
         public static Vector2 ConvertToHorizontal(Double rightAscension, Double declination, Double latitude, Double localSiderealTime)
         {
             // Compute hour angle in degrees, normalized to 0-360.

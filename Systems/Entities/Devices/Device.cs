@@ -59,7 +59,15 @@ namespace Khepri.Entities.Devices
         }
 
 
-        /// <summary> Using an item tries to pick it up. </summary>
-        public abstract Boolean Use(IEntity activatingEntity);
+        /// <inheritdoc/>
+        public abstract Boolean Examine(Unit activatingEntity);
+
+
+        /// <inheritdoc/>
+        public abstract Boolean Use(Unit activatingEntity);
+
+
+        /// <inheritdoc/>
+        public abstract Boolean Grab(Unit activatingEntity);
     }
 }

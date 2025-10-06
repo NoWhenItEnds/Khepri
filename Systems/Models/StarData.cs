@@ -1,6 +1,7 @@
 using CsvHelper;
 using CsvHelper.Configuration;
 using Godot;
+using Khepri.Types.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;

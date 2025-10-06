@@ -48,26 +48,6 @@ namespace Khepri.Entities.Devices
 
 
         /// <inheritdoc/>
-        public override Boolean Use(IEntity activatingEntity)
-        {
-            Boolean isSuccessful = false;
-            if (activatingEntity is Unit unit)
-            {
-                if (unit == _playerController.PlayerUnit)
-                {
-                    _uiController.ShowTelescope(this);
-                    _playerController.SetControllable(this);
-                }
-                else
-                {
-                    // TODO - Let AI fiddle with telescope. Set to homeworld?
-                }
-            }
-            return isSuccessful;
-        }
-
-
-        /// <inheritdoc/>
         public void HandleInput(IInput input)
         {
             if (input is MoveInput moveInput)
@@ -80,6 +60,37 @@ namespace Khepri.Entities.Devices
             {
                 throw new NotImplementedException();
             }
+        }
+
+
+        /// <inheritdoc/>
+        public override Boolean Examine(Unit activatingEntity)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        /// <inheritdoc/>
+        public override Boolean Use(Unit activatingEntity)
+        {
+            Boolean isSuccessful = false;
+            if (activatingEntity == _playerController.PlayerUnit)
+            {
+                _uiController.ShowTelescope(this);
+                _playerController.SetControllable(this);
+            }
+            else
+            {
+                // TODO - Let AI fiddle with telescope. Set to homeworld?
+            }
+            return isSuccessful;
+        }
+
+
+        /// <inheritdoc/>
+        public override Boolean Grab(Unit activatingEntity)
+        {
+            throw new NotImplementedException();
         }
     }
 }

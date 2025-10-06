@@ -43,22 +43,6 @@ namespace Khepri.Entities.Items
 
 
         /// <inheritdoc/>
-        public Boolean Use(IEntity activatingEntity)
-        {
-            Boolean isSuccessful = false;
-            if (activatingEntity is Unit unit)
-            {
-                isSuccessful = unit.Inventory.TryAddItem(Data);
-                if (isSuccessful)   // If the item was added, free it back to the pool.
-                {
-                    _itemController.FreeItem(this);
-                }
-            }
-            return isSuccessful;
-        }
-
-
-        /// <inheritdoc/>
         public override void _Ready()
         {
             _interactionArea.BodyEntered += OnBodyEntered;
@@ -97,6 +81,33 @@ namespace Khepri.Entities.Items
             _sprite.Offset = new Vector2(0f, (Single)bobOffset);
 
             _sprite.SortingOffset = (Int32)GlobalPosition.Y * 10000 + GlobalPosition.Z;
+        }
+
+
+        /// <inheritdoc/>
+        public Boolean Examine(Unit activatingEntity)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        /// <inheritdoc/>
+        public Boolean Use(Unit activatingEntity)
+        {
+            // TODO - Depending upon the result, the item may need to be removed. AKA. It is eaten.
+            return Data.Use(activatingEntity);
+        }
+
+
+        /// <inheritdoc/>
+        public Boolean Grab(Unit activatingEntity)
+        {
+            Boolean isSuccessful = activatingEntity.Inventory.TryAddItem(Data);
+            if (isSuccessful)   // If the item was added, free it back to the pool.
+            {
+                _itemController.FreeItem(this);
+            }
+            return isSuccessful;
         }
     }
 }

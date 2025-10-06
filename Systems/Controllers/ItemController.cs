@@ -67,6 +67,18 @@ namespace Khepri.Controllers
 
 
         /// <summary> Initialise a new item by pulling from the pool. </summary>
+        /// <param name="itemName"> The common name of the item to spawn. </param>
+        /// <param name="itemType"> The kind of item it is. Allows it to be searched. </param>
+        /// <param name="position"> The position to create the object at. </param>
+        /// <returns> The initialised item. </returns>
+        public Item CreateItem(String itemName, ItemType itemType, Vector3 position)
+        {
+            ItemData data = ItemFactory.Create(itemName, itemType);
+            return CreateItem(data, position);
+        }
+
+
+        /// <summary> Initialise a new item by pulling from the pool. </summary>
         /// <param name="data"> The data to initialise the item with. </param>
         /// <param name="position"> The position to create the object at. </param>
         /// <returns> The initialise item. </returns>

@@ -1,4 +1,5 @@
 using Godot;
+using Khepri.Entities.Actors;
 using System;
 
 namespace Khepri.Entities
@@ -16,9 +17,21 @@ namespace Khepri.Entities
         public CollisionShape3D CollisionShape { get; }
 
 
+        /// <summary> The internal logic to use when the entity is examined. </summary>
+        /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
+        /// <returns> If the entity was successfully examined. </returns>
+        public Boolean Examine(Unit activatingEntity);
+
+
+        /// <summary> The internal logic to use when the entity is picked up. </summary>
+        /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
+        /// <returns> If the entity was successfully picked up. </returns>
+        public Boolean Grab(Unit activatingEntity);
+
+
         /// <summary> The internal logic to use when the entity is used. </summary>
         /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
         /// <returns> If the entity was successfully used. </returns>
-        public Boolean Use(IEntity activatingEntity);
+        public Boolean Use(Unit activatingEntity);
     }
 }

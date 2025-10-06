@@ -73,7 +73,7 @@ namespace Khepri.Models.GOAP.ActionStrategies
                 }
             }
 
-            Boolean isUsed = item.Use(_unit);
+            Boolean isUsed = item.Use(_unit);   // TODO - Move to being used by state machine i.e. HandleInput();
             if (isUsed && item is FoodData food && food.Portions <= 0)
             {
                 _unit.Inventory.RemoveItem(item);

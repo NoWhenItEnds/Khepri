@@ -76,9 +76,17 @@ namespace Khepri.Entities.Actors.Components.States
                         break;
                 }
             }
+            else if (input is ExamineInput examineInput)    // TODO - State change?
+            {
+                examineInput.Entity.Examine(_unit);
+            }
             else if (input is UseInput useInput)
             {
                 useInput.Entity.Use(_unit);
+            }
+            else if (input is GrabInput grabInput)
+            {
+                grabInput.Entity.Grab(_unit);
             }
 
             CurrentState.HandleInput(input);

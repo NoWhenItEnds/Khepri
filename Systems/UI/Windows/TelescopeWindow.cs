@@ -4,6 +4,8 @@ using Khepri.Entities.Devices;
 using Khepri.Models;
 using Khepri.Types.Extensions;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Khepri.UI.Windows
 {
@@ -35,6 +37,9 @@ namespace Khepri.UI.Windows
 
         /// <summary> The declination of the currently targeted star. </summary>
         [Export] private RichTextLabel _starDeclination;
+
+        [ExportGroup("Resources")]
+        [Export] private ShaderMaterial _starfieldShader;
 
 
         /// <summary> The format to use for azimuth and right ascension labels. </summary>
@@ -77,12 +82,36 @@ namespace Khepri.UI.Windows
                 _lookRightAscension.Text = String.Format(HORIZONTAL_FORMAT, "RGA", equatorial.X);
                 _lookDeclination.Text = String.Format(VERTICAL_FORMAT, "DEC", equatorial.Y);
 
-                StarData closestStar = _currentTelescope.ClosestStar;
-                _starId.Text = closestStar.GetId();
-                _starProperName.Text = closestStar.Proper;
-                _starRightAscension.Text = String.Format(HORIZONTAL_FORMAT, "RGA", Mathf.RadToDeg(closestStar.RightAscension));
-                _starDeclination.Text = String.Format(VERTICAL_FORMAT, "DEC", Mathf.RadToDeg(closestStar.Declination));
+                // TODO - Optimise call.
+                //StarData closestStar = _currentTelescope.ClosestStar;
+                //_starId.Text = closestStar.GetId();
+                //_starProperName.Text = closestStar.Proper;
+                //_starRightAscension.Text = String.Format(HORIZONTAL_FORMAT, "RGA", Mathf.RadToDeg(closestStar.RightAscension));
+                //_starDeclination.Text = String.Format(VERTICAL_FORMAT, "DEC", Mathf.RadToDeg(closestStar.Declination));
+
+                SetStarfieldShader(equatorial.Y);
             }
+        }
+
+
+        private void SetStarfieldShader(Single declination)
+        {
+            StarData[] stars = _worldController.GetStars(declination);
+
+            Random random = new Random();
+            Vector3[] positions = stars
+                .Select(s => MathExtensions.ConvertToHorizontal(s.RightAscension, s.Declination, _worldController.Latitude, _worldController.LocalSiderealTime))
+                .Select(h => MathExtensions.SphericalToCartesian(h.Y, h.X)).ToArray();
+
+            Color[] colours = new Color[positions.Length];
+            for (Int32 i = 0; i < colours.Length; i++)
+            {
+                colours[i] = new Color(random.NextSingle(), random.NextSingle(), random.NextSingle());
+            }
+
+            _starfieldShader.SetShaderParameter("size", positions.Length);
+            _starfieldShader.SetShaderParameter("positions", positions);
+            _starfieldShader.SetShaderParameter("colours", colours);
         }
     }
 }

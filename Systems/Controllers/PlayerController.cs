@@ -109,9 +109,19 @@ namespace Khepri.Controllers
             {
                 if (PlayerUnit.UsableEntities.Count > 0)
                 {
-                    if (@event.IsActionReleased("action_use"))
+                    if (@event.IsActionReleased("action_examine"))
+                    {
+                        PlayerUnit.HandleInput(new ExamineInput(PlayerUnit.UsableEntities.ToArray()[_currentSelection]));
+                        _currentSelection = Math.Clamp(_currentSelection, 0, PlayerUnit.UsableEntities.Count - 1);
+                    }
+                    else if (@event.IsActionReleased("action_use"))
                     {
                         PlayerUnit.HandleInput(new UseInput(PlayerUnit.UsableEntities.ToArray()[_currentSelection]));
+                        _currentSelection = Math.Clamp(_currentSelection, 0, PlayerUnit.UsableEntities.Count - 1);
+                    }
+                    else if (@event.IsActionReleased("action_grab"))
+                    {
+                        PlayerUnit.HandleInput(new GrabInput(PlayerUnit.UsableEntities.ToArray()[_currentSelection]));
                         _currentSelection = Math.Clamp(_currentSelection, 0, PlayerUnit.UsableEntities.Count - 1);
                     }
                     else if (@event.IsActionReleased("action_ui_up"))
