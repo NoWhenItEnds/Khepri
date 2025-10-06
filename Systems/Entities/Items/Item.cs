@@ -36,9 +36,11 @@ namespace Khepri.Entities.Items
 
         /// <summary> Initialise the item by giving data. </summary>
         /// <param name="data"> The raw data to build the item. </param>
-        public void Initialise(ItemData data)
+        public void Initialise(ItemData data, Vector3 position)
         {
             Data = data;
+            Name = data.Name;
+            GlobalPosition = position;
         }
 
 
@@ -105,7 +107,7 @@ namespace Khepri.Entities.Items
             Boolean isSuccessful = activatingEntity.Inventory.TryAddItem(Data);
             if (isSuccessful)   // If the item was added, free it back to the pool.
             {
-                _itemController.FreeItem(this);
+                _itemController.RemoveItem(this);
             }
             return isSuccessful;
         }

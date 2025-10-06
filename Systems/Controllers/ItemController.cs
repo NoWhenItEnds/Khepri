@@ -1,8 +1,8 @@
 using Godot;
 using Khepri.Entities.Items;
 using Khepri.Nodes.Singletons;
+using Khepri.Types;
 using System;
-using System.Collections.Generic;
 
 namespace Khepri.Controllers
 {
@@ -14,55 +14,21 @@ namespace Khepri.Controllers
         [Export] private PackedScene _itemPrefab;
 
 
-        /// <summary> How many item nodes the item pool should contain. </summary>
-        [ExportGroup("Settings")]
-        [Export] private Int32 _poolSize = 100;
-
-
-        /// <summary> A pool that holds items that are in the game world. A boolean shows if an object is currently in use. </summary>
-        private Dictionary<Item, Boolean> _itemPool = new Dictionary<Item, Boolean>();
+        private ObjectPool<Item> _itemPool;
 
 
         /// <inheritdoc/>
         public override void _Ready()
         {
-            // First look for any existing items.
-            foreach (Node node in GetChildren())
-            {
-                if (node is Item item)
-                {
-                    _itemPool.Add(item, true);
-                }
-            }
-
-            // Build the pool.
-            for (Int32 i = 0; i < _poolSize; i++)
-            {
-                Item item = BuildItem();
-                _itemPool.Add(item, false);
-            }
-
+            _itemPool = new ObjectPool<Item>(this, _itemPrefab);
             TempSpawn();
         }
 
 
         private void TempSpawn()
         {
-            ItemData data = ItemFactory.Create("apple", ItemType.FOOD);
-            ItemData data1 = ItemFactory.Create("apple", ItemType.FOOD);
-            CreateItem(data, new Vector3(3, 0, -3));
-            CreateItem(data1, new Vector3(3, 0, -4));
-        }
-
-
-        /// <summary> Create a new item for the pool. </summary>
-        /// <returns> The created item node. </returns>
-        private Item BuildItem()
-        {
-            Item item = _itemPrefab.Instantiate<Item>();
-            AddChild(item);
-            item.GlobalPosition = new Vector3(0f, -10000f, 0f);
-            return item;
+            Item item0 = CreateItem("apple", ItemType.FOOD, new Vector3(3, 0, -3));
+            Item item1 = CreateItem("apple", ItemType.FOOD, new Vector3(3, 0, -4));
         }
 
 
@@ -79,45 +45,18 @@ namespace Khepri.Controllers
 
 
         /// <summary> Initialise a new item by pulling from the pool. </summary>
-        /// <param name="data"> The data to initialise the item with. </param>
         /// <param name="position"> The position to create the object at. </param>
-        /// <returns> The initialise item. </returns>
+        /// <returns> The initialised item. </returns>
         public Item CreateItem(ItemData data, Vector3 position)
         {
-            Item result = null;
-
-            // Attempt to find a free item in the pool.
-            foreach (KeyValuePair<Item, Boolean> item in _itemPool)
-            {
-                if (!item.Value)    // If the item is free.
-                {
-                    result = item.Key;
-                    break;
-                }
-            }
-
-            // If an item was not found, expand the pool.
-            if (result == null)
-            {
-                result = BuildItem();
-                _poolSize++;
-            }
-
-            _itemPool[result] = true;
-            result.Initialise(data);
-            result.GlobalPosition = position;
-            result.Name = data.Name;
-
-            return result;
+            Item item = _itemPool.CreateObject();
+            item.Initialise(data, position);
+            return item;
         }
 
 
-        /// <summary> Free an item and return it to the pool. </summary>
-        /// <param name="item"> The item to return. </param>
-        public void FreeItem(Item item)
-        {
-            _itemPool[item] = false;
-            item.GlobalPosition = new Vector3(0f, -10000f, 0f);
-        }
+        /// <summary> Dispose of an item, returning it back to the item pool. </summary>
+        /// <param name="item"> The item to dispose. </param>
+        public void RemoveItem(Item item) => _itemPool.FreeItem(item);
     }
 }
