@@ -115,7 +115,7 @@ namespace Khepri.UI.Windows.Components
             _inventory.RemoveItem(Data);
             Vector3 playerPosition = PlayerController.Instance.PlayerUnit.GlobalPosition;
             ItemController.Instance.CreateItem(Data, playerPosition);
-            _window.FreeItem(this);
+            _window.RemoveItem(this);
         }
 
 
@@ -143,7 +143,9 @@ namespace Khepri.UI.Windows.Components
             _inventory = inventory;
             _window = window;
 
+            GlobalPosition = window.CalculatePosition(cellPosition);
             SetSprite(data);
+            Modulate = Colors.White;
             TextureClickMask = BuildClickMask(data);
             Name = data.Name;
         }

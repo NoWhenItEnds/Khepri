@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Khepri.Types
 {
@@ -66,12 +67,15 @@ namespace Khepri.Types
             {
                 case Node2D node2D:
                     node2D.GlobalPosition = new Vector2(-10000f, -10000f);
+                    node2D.Visible = false;
                     break;
                 case Node3D node3D:
                     node3D.GlobalPosition = new Vector3(0f, -10000f, 0f);
+                    node3D.Visible = false;
                     break;
                 case Control control:
                     control.GlobalPosition = new Vector2(-100f, -100f);
+                    control.Visible = false;
                     break;
             }
 
@@ -104,7 +108,32 @@ namespace Khepri.Types
 
             _objectPool[result] = true;
 
+            // Make the pulled object visible.
+            switch (result)
+            {
+                case Node2D node2D:
+                    node2D.Visible = true;
+                    break;
+                case Node3D node3D:
+                    node3D.Visible = true;
+                    break;
+                case Control control:
+                    control.Visible = true;
+                    break;
+            }
+
             return result;
+        }
+
+
+        /// <summary> Free all the currently in use items. </summary>
+        public void FreeAll()
+        {
+            T[] activeObjects = GetActiveObjects();
+            foreach (T obj in activeObjects)
+            {
+                FreeItem(obj);
+            }
         }
 
 
@@ -119,14 +148,25 @@ namespace Khepri.Types
             {
                 case Node2D node2D:
                     node2D.GlobalPosition = new Vector2(-10000f, -10000f);
+                    node2D.Visible = false;
                     break;
                 case Node3D node3D:
                     node3D.GlobalPosition = new Vector3(0f, -10000f, 0f);
+                    node3D.Visible = false;
                     break;
                 case Control control:
                     control.GlobalPosition = new Vector2(-100f, -100f);
+                    control.Visible = false;
                     break;
             }
+        }
+
+
+        /// <summary> Get an array of all the currently active objects. </summary>
+        /// <returns> All the objects that are currently in use. </returns>
+        public T[] GetActiveObjects()
+        {
+            return _objectPool.Where(x => x.Value).Select(x => x.Key).ToArray();
         }
     }
 }

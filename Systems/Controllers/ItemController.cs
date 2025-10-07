@@ -14,6 +14,7 @@ namespace Khepri.Controllers
         [Export] private PackedScene _itemPrefab;
 
 
+        /// <summary> A pool of instantiated items to pull from first. </summary>
         private ObjectPool<Item> _itemPool;
 
 

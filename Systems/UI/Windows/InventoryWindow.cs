@@ -1,6 +1,7 @@
 using Godot;
 using Khepri.Entities.Components;
 using Khepri.Entities.Items;
+using Khepri.Types;
 using Khepri.UI.Windows.Components;
 using System;
 using System.Collections.Generic;
@@ -24,12 +25,8 @@ namespace Khepri.UI.Windows
         [ExportGroup("Settings")]
         [Export] public Int32 CellSize { get; private set; } = 32;
 
-        /// <summary> How many item nodes the item pool should contain. </summary>
-        [Export] private Int32 _poolSize = 100;
-
-
-        /// <summary> A pool that holds items that are in the game world. A boolean shows if an object is currently in use. </summary>
-        private Dictionary<InventoryItem, Boolean> _itemPool = new Dictionary<InventoryItem, Boolean>();
+        /// <summary> A pool of instantiated items to pull from first. </summary>
+        private ObjectPool<InventoryItem> _itemPool;
 
         /// <summary> A reference to the currently open inventory. </summary>
         private EntityInventory _currentInventory;
@@ -47,28 +44,21 @@ namespace Khepri.UI.Windows
         /// <inheritdoc/>
         public override void _Ready()
         {
+            _itemPool = new ObjectPool<InventoryItem>(this, _inventoryItemPrefab);
+
             GetViewport().SizeChanged += OnSizeChanged;
             VisibilityChanged += OnVisibilityChanged;
             OnSizeChanged();
-
-            // Build the pool.
-            for (Int32 i = 0; i < _poolSize - _itemPool.Count; i++)
-            {
-                InventoryItem item = BuildItem();
-                _itemPool.Add(item, false);
-            }
         }
 
 
         /// <summary> Update the window when the size changes. </summary>
         private void OnSizeChanged()
         {
-            foreach (KeyValuePair<InventoryItem, Boolean> item in _itemPool)
+            InventoryItem[] activeItems = _itemPool.GetActiveObjects();
+            foreach (InventoryItem item in activeItems)
             {
-                if (item.Value) // If the item is currently in use.
-                {
-                    item.Key.GlobalPosition = CalculatePosition(item.Key.CellPosition);
-                }
+                item.GlobalPosition = CalculatePosition(item.CellPosition);
             }
         }
 
@@ -86,26 +76,8 @@ namespace Khepri.UI.Windows
             // If the window has been hidden, clean up.
             if (!Visible)
             {
-                foreach (KeyValuePair<InventoryItem, Boolean> item in _itemPool)
-                {
-                    if (item.Value)
-                    {
-                        FreeItem(item.Key);
-                    }
-                }
+                _itemPool.FreeAll();
             }
-        }
-
-
-        /// <summary> Create a new item for the pool. </summary>
-        /// <returns> The created item node. </returns>
-        private InventoryItem BuildItem()
-        {
-            InventoryItem item = _inventoryItemPrefab.Instantiate<InventoryItem>();
-            AddChild(item);
-            item.GlobalPosition = new Vector2(-100f, -100f);
-            item.Visible = false;
-            return item;
         }
 
 
@@ -152,32 +124,9 @@ namespace Khepri.UI.Windows
         /// <returns> The initialise item. </returns>
         private InventoryItem CreateItem(ItemData data, Vector2I position, EntityInventory inventory)
         {
-            InventoryItem result = null;
-
-            // Attempt to find a free item in the pool.
-            foreach (KeyValuePair<InventoryItem, Boolean> item in _itemPool)
-            {
-                if (!item.Value)    // If the item is free.
-                {
-                    result = item.Key;
-                    break;
-                }
-            }
-
-            // If an item was not found, expand the pool.
-            if (result == null)
-            {
-                result = BuildItem();
-                _poolSize++;
-            }
-
-            _itemPool[result] = true;
-            result.Initialise(data, position, inventory, this);
-            result.GlobalPosition = CalculatePosition(position);
-            result.Visible = true;
-            result.Modulate = Colors.White;
-
-            return result;
+            InventoryItem item = _itemPool.CreateObject();
+            item.Initialise(data, position, inventory, this);
+            return item;
         }
 
 
@@ -201,14 +150,9 @@ namespace Khepri.UI.Windows
         }
 
 
-        /// <summary> Free an item and return it to the pool. </summary>
-        /// <param name="item"> The item to return. </param>
-        public void FreeItem(InventoryItem item)
-        {
-            _itemPool[item] = false;
-            item.GlobalPosition = new Vector2(-100f, -100f);
-            item.Visible = false;
-        }
+        /// <summary> Dispose of an item, returning it back to the item pool. </summary>
+        /// <param name="item"> The item to dispose. </param>
+        public void RemoveItem(InventoryItem item) => _itemPool.FreeItem(item);
 
 
         /// <summary> Get a given inventory item at a given position. </summary>
@@ -222,7 +166,7 @@ namespace Khepri.UI.Windows
                 return null;
             }
 
-            return _itemPool.Where(x => x.Value && x.Key.Data == item).Select(x => x.Key).FirstOrDefault() ?? null;
+            return _itemPool.GetActiveObjects().Where(x => x.Data == item).FirstOrDefault() ?? null;
         }
 
 
