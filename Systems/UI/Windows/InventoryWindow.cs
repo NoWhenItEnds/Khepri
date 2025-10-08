@@ -1,6 +1,6 @@
 using Godot;
-using Khepri.Entities.Components;
 using Khepri.Entities.Items;
+using Khepri.Resources.Items;
 using Khepri.Types;
 using Khepri.UI.Windows.Components;
 using System;
@@ -26,10 +26,11 @@ namespace Khepri.UI.Windows
         [Export] public Int32 CellSize { get; private set; } = 32;
 
         /// <summary> A pool of instantiated items to pull from first. </summary>
-        private ObjectPool<InventoryItem> _itemPool;
+        public ObjectPool<InventoryItem, ItemResource> ItemPool { get; private set; }
 
         /// <summary> A reference to the currently open inventory. </summary>
-        private EntityInventory _currentInventory;
+        public EntityInventory CurrentInventory { get; private set; }
+
 
         /// <summary> The number of cells in the inventory. </summary>
         private Vector2I _gridSize = Vector2I.One;
@@ -44,7 +45,7 @@ namespace Khepri.UI.Windows
         /// <inheritdoc/>
         public override void _Ready()
         {
-            _itemPool = new ObjectPool<InventoryItem>(this, _inventoryItemPrefab);
+            ItemPool = new ObjectPool<InventoryItem, ItemResource>(this, _inventoryItemPrefab);
 
             GetViewport().SizeChanged += OnSizeChanged;
             VisibilityChanged += OnVisibilityChanged;
@@ -55,7 +56,7 @@ namespace Khepri.UI.Windows
         /// <summary> Update the window when the size changes. </summary>
         private void OnSizeChanged()
         {
-            InventoryItem[] activeItems = _itemPool.GetActiveObjects();
+            InventoryItem[] activeItems = ItemPool.GetActiveObjects();
             foreach (InventoryItem item in activeItems)
             {
                 item.GlobalPosition = CalculatePosition(item.CellPosition);
@@ -76,7 +77,7 @@ namespace Khepri.UI.Windows
             // If the window has been hidden, clean up.
             if (!Visible)
             {
-                _itemPool.FreeAll();
+                ItemPool.FreeAll();
             }
         }
 
@@ -85,7 +86,7 @@ namespace Khepri.UI.Windows
         /// <param name="inventory"> The entity's inventory. </param>
         public void Initialise(EntityInventory inventory)
         {
-            _currentInventory = inventory;
+            CurrentInventory = inventory;
             _currentSelection = Vector2I.Zero;
 
             // Set inventory size.
@@ -97,20 +98,20 @@ namespace Khepri.UI.Windows
             _inventoryGrid.OffsetRight = _gridSize.Y * halfSize;
 
             // Get the unique items.
-            Dictionary<ItemData, Vector2I> items = new Dictionary<ItemData, Vector2I>();
+            Dictionary<ItemResource, Vector2I> items = new Dictionary<ItemResource, Vector2I>();
             for (Int32 x = 0; x < inventory.InventorySize.X; x++)
             {
                 for (Int32 y = 0; y < inventory.InventorySize.Y; y++)
                 {
-                    ItemData? data = inventory.GetItem(x, y);
-                    if (data != null)
+                    ItemResource? item = inventory.GetItem(x, y);
+                    if (item != null)
                     {
-                        items.TryAdd(data, new Vector2I(x, y));
+                        items.TryAdd(item, new Vector2I(x, y));
                     }
                 }
             }
 
-            foreach (KeyValuePair<ItemData, Vector2I> item in items)
+            foreach (KeyValuePair<ItemResource, Vector2I> item in items)
             {
                 CreateItem(item.Key, item.Value, inventory);
             }
@@ -118,14 +119,14 @@ namespace Khepri.UI.Windows
 
 
         /// <summary> Initialise a new item by pulling from the pool. </summary>
-        /// <param name="data"> The data to initialise the item with. </param>
+        /// <param name="resource"> The data to initialise the item with. </param>
         /// <param name="position"> The cell position to create the object at. This is the object's top-left corner. </param>
         /// <param name="inventory"> A reference to the inventory this item is a part of. </param>
-        /// <returns> The initialise item. </returns>
-        private InventoryItem CreateItem(ItemData data, Vector2I position, EntityInventory inventory)
+        /// <returns> The initialised item. </returns>
+        private InventoryItem CreateItem(ItemResource resource, Vector2I position, EntityInventory inventory)
         {
-            InventoryItem item = _itemPool.CreateObject();
-            item.Initialise(data, position, inventory, this);
+            InventoryItem item = ItemPool.GetAvailableObject();
+            item.Initialise(this, resource, position);
             return item;
         }
 
@@ -152,7 +153,7 @@ namespace Khepri.UI.Windows
 
         /// <summary> Dispose of an item, returning it back to the item pool. </summary>
         /// <param name="item"> The item to dispose. </param>
-        public void RemoveItem(InventoryItem item) => _itemPool.FreeItem(item);
+        public void RemoveItem(InventoryItem item) => ItemPool.FreeObject(item);
 
 
         /// <summary> Get a given inventory item at a given position. </summary>
@@ -160,13 +161,13 @@ namespace Khepri.UI.Windows
         /// <returns> The returned inventory item. Null means that there wasn't one at this position. </returns>
         private InventoryItem? GetInventoryItem(Vector2I position)
         {
-            ItemData? item = _currentInventory.GetItem(position);
+            ItemResource? item = CurrentInventory.GetItem(position);
             if (item == null)
             {
                 return null;
             }
 
-            return _itemPool.GetActiveObjects().Where(x => x.Data == item).FirstOrDefault() ?? null;
+            return ItemPool.GetActiveObjects().Where(x => x.Resource == item).FirstOrDefault() ?? null;
         }
 
 
@@ -234,7 +235,7 @@ namespace Khepri.UI.Windows
                             InventoryItem? item = GetInventoryItem(_currentSelection);
                             if (item != null)
                             {
-                                Vector2I itemSize = item.Data.GetSize();  // We only need to apply the size if we're going 'forwards', not 'backwards' as the position for a large object will be the top-left.
+                                Vector2I itemSize = item.Resource.GetSize();  // We only need to apply the size if we're going 'forwards', not 'backwards' as the position for a large object will be the top-left.
                                 _currentSelection += direction * new Vector2I(direction.X > 0 ? itemSize.X : 1, direction.Y > 0 ? itemSize.Y : 1);
                             }
                             else
@@ -266,7 +267,7 @@ namespace Khepri.UI.Windows
                 Vector2 start = _inventoryGrid.Position + (_currentSelection * CellSize);
 
                 Vector2 size = Vector2.One * CellSize;
-                ItemData? currentItem = _currentInventory.GetItem(_currentSelection);
+                ItemResource? currentItem = CurrentInventory.GetItem(_currentSelection);
                 if (currentItem != null)
                 {
                     size = currentItem.GetSize() * CellSize;

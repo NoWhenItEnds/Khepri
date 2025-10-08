@@ -96,8 +96,8 @@ namespace Khepri.UI.Debug.Units
                     case Unit unit:
                         sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, unit.Name, pos.X, pos.Y, pos.Z, minutes));
                         break;
-                    case Item item:
-                        sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, item.Data.Name, pos.X, pos.Y, pos.Z, minutes));
+                    case ItemNode item:
+                        sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, item.Resource.Kind, pos.X, pos.Y, pos.Z, minutes));
                         break;
                 }
 

@@ -64,16 +64,15 @@ namespace Khepri.Entities.Devices
 
 
         /// <inheritdoc/>
-        public override Boolean Examine(Unit activatingEntity)
+        public override void Examine(Unit activatingEntity)
         {
             throw new NotImplementedException();
         }
 
 
         /// <inheritdoc/>
-        public override Boolean Use(Unit activatingEntity)
+        public override void Use(Unit activatingEntity)
         {
-            Boolean isSuccessful = false;
             if (activatingEntity == _playerController.PlayerUnit)
             {
                 _uiController.ShowTelescope(this);
@@ -83,14 +82,6 @@ namespace Khepri.Entities.Devices
             {
                 // TODO - Let AI fiddle with telescope. Set to homeworld?
             }
-            return isSuccessful;
-        }
-
-
-        /// <inheritdoc/>
-        public override Boolean Grab(Unit activatingEntity)
-        {
-            throw new NotImplementedException();
         }
     }
 }

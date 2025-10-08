@@ -60,14 +60,10 @@ namespace Khepri.Entities.Devices
 
 
         /// <inheritdoc/>
-        public abstract Boolean Examine(Unit activatingEntity);
+        public abstract void Examine(Unit activatingEntity);
 
 
         /// <inheritdoc/>
-        public abstract Boolean Use(Unit activatingEntity);
-
-
-        /// <inheritdoc/>
-        public abstract Boolean Grab(Unit activatingEntity);
+        public abstract void Use(Unit activatingEntity);
     }
 }

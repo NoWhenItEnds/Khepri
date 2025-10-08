@@ -1,34 +1,19 @@
-[gd_scene load_steps=3 format=3 uid="uid://bdf5vytv0sgwu"]
+[gd_scene load_steps=2 format=3 uid="uid://bdf5vytv0sgwu"]
 
 [ext_resource type="Script" uid="uid://p7bblgxddtm0" path="res://Systems/UI/HUD/Interaction/InteractionItem.cs" id="1_beekh"]
-[ext_resource type="SpriteFrames" uid="uid://cgrn35r1bjnnm" path="res://Content/Resources/SpriteFrames/Controllers/SpriteFrames_Controllers_Keyboard_White.tres" id="2_4gegn"]
 
-[node name="Interaction Item" type="NinePatchRect" node_paths=PackedStringArray("_sprite", "_label")]
+[node name="Interaction Item" type="NinePatchRect" node_paths=PackedStringArray("_label")]
 custom_minimum_size = Vector2(0, 32)
 script = ExtResource("1_beekh")
-_sprite = NodePath("HBoxContainer/Control/AnimatedSprite2D")
-_label = NodePath("HBoxContainer/Interaction Text")
+_label = NodePath("Interaction Text")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="Interaction Text" type="RichTextLabel" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="Control" type="Control" parent="HBoxContainer"]
-custom_minimum_size = Vector2(32, 0)
-layout_mode = 2
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="HBoxContainer/Control"]
-position = Vector2(16, 16)
-scale = Vector2(2, 2)
-sprite_frames = ExtResource("2_4gegn")
-animation = &"None"
-
-[node name="Interaction Text" type="RichTextLabel" parent="HBoxContainer"]
-layout_mode = 2
 size_flags_horizontal = 3
 bbcode_enabled = true
 text = "PLACEHOLDER"

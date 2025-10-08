@@ -2,7 +2,7 @@ using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Actors.Components;
 using Khepri.Entities.Actors.Components.States;
-using Khepri.Entities.Components;
+using Khepri.Entities.Items;
 using Khepri.Models.Input;
 using System;
 using System.Collections.Generic;
@@ -37,8 +37,13 @@ namespace Khepri.Entities.Actors
         /// <summary> The state machine controlling the unit. </summary>
         [Export] public UnitStateMachine StateMachine { get; private set; }
 
+
+        /// <summary> The grid size of the unit's inventory. </summary>
+        [ExportGroup("Settings")]
+        [Export] private Vector2I _inventorySize = new Vector2I(10, 10);
+
         /// <summary> A reference to the unit's inventory component. </summary>
-        [Export] public EntityInventory Inventory { get; private set; }
+        public EntityInventory Inventory { get; private set; }
 
 
         /// <summary> The animation sheets to use for the unit's animations. </summary>
@@ -66,6 +71,7 @@ namespace Khepri.Entities.Actors
         public override void _Ready()
         {
             _worldController = WorldController.Instance;
+            Inventory = new EntityInventory(_inventorySize);
 
             // Setup the sprite animations.
             foreach (var frames in _spriteFrames)
@@ -114,21 +120,14 @@ namespace Khepri.Entities.Actors
 
 
         /// <inheritdoc/>
-        public Boolean Examine(Unit activatingEntity)
+        public void Examine(Unit activatingEntity)
         {
             throw new NotImplementedException();
         }
 
 
         /// <inheritdoc/>
-        public Boolean Use(Unit activatingEntity)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        /// <inheritdoc/>
-        public Boolean Grab(Unit activatingEntity)
+        public void Use(Unit activatingEntity)
         {
             throw new NotImplementedException();
         }

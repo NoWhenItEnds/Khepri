@@ -21,24 +21,16 @@ namespace Khepri.Entities.Devices
 
 
         /// <inheritdoc/>
-        public override Boolean Examine(Unit activatingEntity)
+        public override void Examine(Unit activatingEntity)
         {
             throw new NotImplementedException();
         }
 
 
         /// <inheritdoc/>
-        public override Boolean Use(Unit activatingEntity)
+        public override void Use(Unit activatingEntity)
         {
-            Item newItem = _itemController.CreateItem("apple", ItemType.FOOD, GlobalPosition);
-            return true;
-        }
-
-
-        /// <inheritdoc/>
-        public override Boolean Grab(Unit activatingEntity)
-        {
-            throw new NotImplementedException();
+            ItemNode newItem = _itemController.CreateItem("apple", GlobalPosition);
         }
     }
 }

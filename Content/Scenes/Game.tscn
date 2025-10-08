@@ -1,8 +1,9 @@
-[gd_scene load_steps=41 format=3 uid="uid://ko6nvcupfcf4"]
+[gd_scene load_steps=42 format=3 uid="uid://ko6nvcupfcf4"]
 
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="Script" uid="uid://cgujt8yhxbsew" path="res://Systems/Controllers/WorldController.cs" id="1_8fov1"]
 [ext_resource type="PackedScene" uid="uid://rc2326u6agtf" path="res://Content/Prefabs/Entities/Actors/Unit.tscn" id="2_5p3x2"]
+[ext_resource type="Script" uid="uid://cp43wylajjm3x" path="res://Systems/Resources/ResourceController.cs" id="2_nskmx"]
 [ext_resource type="Script" uid="uid://d1dxnpil1ufxm" path="res://Systems/Models/GOAP/AgentController.cs" id="3_md4fn"]
 [ext_resource type="PackedScene" uid="uid://dm4tu3i0sn5s4" path="res://Content/Tiles/MountKosciuszko/MK_Terrain.tscn" id="4_5p3x2"]
 [ext_resource type="PackedScene" uid="uid://dbsl418re8pu4" path="res://Content/Tiles/MountKosciuszko/MK_Wall.tscn" id="5_sa7mi"]
@@ -12,7 +13,7 @@
 [ext_resource type="Shader" uid="uid://ctyba6bkndpm1" path="res://Content/Shaders/Shader_MainCameraMask.gdshader" id="9_gh1u3"]
 [ext_resource type="Script" uid="uid://cyaymrk4jwk3o" path="res://Systems/UI/HUD/Astrolabe.cs" id="11_k5j0c"]
 [ext_resource type="PackedScene" uid="uid://crta0fka14n85" path="res://Content/Prefabs/Entities/Item.tscn" id="11_kupp0"]
-[ext_resource type="Script" uid="uid://6b0qgj67orut" path="res://Systems/Controllers/ItemController.cs" id="11_uxds2"]
+[ext_resource type="Script" uid="uid://6b0qgj67orut" path="res://Systems/Entities/Items/ItemController.cs" id="11_uxds2"]
 [ext_resource type="Texture2D" uid="uid://bf4jcda6yqjao" path="res://Content/Textures/UI/HUD/Astrolabe/Astrolabe_Ring.png" id="12_k5j0c"]
 [ext_resource type="PackedScene" uid="uid://dy6hxh2vbsm0s" path="res://Content/Prefabs/Entities/Devices/Telescope.tscn" id="13_gl22v"]
 [ext_resource type="Script" uid="uid://c3lsvokkeus1u" path="res://Systems/Controllers/UIController.cs" id="13_oaat0"]
@@ -73,6 +74,9 @@ albedo_texture = SubResource("ViewportTexture_gh1u3")
 
 [node name="World Controller" type="Node" parent="Controllers"]
 script = ExtResource("1_8fov1")
+
+[node name="Resource Controller" type="Node" parent="Controllers"]
+script = ExtResource("2_nskmx")
 
 [node name="Player Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("PlayerUnit")]
 script = ExtResource("1_5p3x2")
@@ -814,6 +818,7 @@ _starDeclination = NodePath("VBoxContainer/Star Declination")
 _starfieldShader = ExtResource("28_5lwn5")
 
 [node name="Starfield" type="ColorRect" parent="UI/Windows/Telescope"]
+visible = false
 material = ExtResource("28_5lwn5")
 layout_mode = 1
 anchors_preset = 15

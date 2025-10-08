@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="FoodResource" load_steps=4 format=3 uid="uid://cep0e4e4k7c3w"]
+
+[ext_resource type="Script" uid="uid://b4xss154foxdd" path="res://Systems/Resources/Items/FoodResource.cs" id="1_lglo3"]
+[ext_resource type="SpriteFrames" uid="uid://bbleqbfqjwf3v" path="res://Content/Resources/SpriteFrames/Items/SpriteFrames_Items_Inventory.tres" id="1_yekgs"]
+[ext_resource type="SpriteFrames" uid="uid://x4r46q3wagnx" path="res://Content/Resources/SpriteFrames/Items/SpriteFrames_Items_Nodes.tres" id="2_ynmdw"]
+
+[resource]
+script = ExtResource("1_lglo3")
+HealthRecovery = 20.0
+Portions = 1
+Kind = "apple"
+WorldSprites = ExtResource("2_ynmdw")
+InventorySprites = ExtResource("1_yekgs")
+InventoryCells = Array[Array]([[0, 0], [1, 0], [0, 1], [1, 1]])
+metadata/_custom_type_script = "uid://b4xss154foxdd"

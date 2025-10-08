@@ -1,4 +1,5 @@
 using Godot;
+using Khepri.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,15 +7,16 @@ using System.Linq;
 namespace Khepri.Types
 {
     /// <summary> A caching system for pulling objects from a pool of initialised objects on command. </summary>
-    /// <typeparam name="T"> The kind of node in the pool. </typeparam>
-    public class ObjectPool<T> where T : Node
+    /// <typeparam name="TNode"> The kind of node in the pool. </typeparam>
+    /// <typeparam name="TResource"> The kind of date the node represents. </typeparam>
+    public class ObjectPool<TNode, TResource> where TNode : Node, IPoolable<TResource> where TResource : EntityResource
     {
-        /// <summary> How many item nodes the item pool should contain. </summary>
-        private Int32 _poolSize = 100;
+        /// <summary> How many item nodes the item pool should initially contain. </summary>
+        private Int32 _initialPoolSize = 100;
 
 
         /// <summary> A pool that holds objects that are in the game world. A boolean shows if an object is currently in use. </summary>
-        private Dictionary<T, Boolean> _objectPool = new Dictionary<T, Boolean>();
+        private Dictionary<TNode, Boolean> _objectPool = new Dictionary<TNode, Boolean>();
 
 
         /// <summary> The node to use as the spawned nodes' parent. </summary>
@@ -29,22 +31,20 @@ namespace Khepri.Types
             PARENT_NODE = parentNode;
             PREFAB = objectPrefab;
 
-            // First look for any existing items.
-            var existingNodes = parentNode.GetChildren();
-            foreach (Node node in existingNodes)
+            // Add any existing objects.
+            var children = PARENT_NODE.GetChildren();
+            foreach (Node child in children)
             {
-                if (node is T obj)
+                if (child is TNode node)
                 {
-                    _objectPool.Add(obj, true);
+                    _objectPool.Add(node, true);
                 }
             }
 
             // Build the pool.
-            Int32 initialLength = existingNodes.Count;
-            for (Int32 i = 0; i < _poolSize - initialLength; i++)
+            for (Int32 i = 0; i < _initialPoolSize; i++)
             {
-                T obj = BuildItem();
-                _objectPool.Add(obj, false);
+                BuildItem();
             }
         }
 
@@ -52,15 +52,16 @@ namespace Khepri.Types
         /// <summary> Create a new object for the pool. </summary>
         /// <returns> The created node. </returns>
         /// <exception cref="ArgumentException"> If the given prefab cannot be created as type T. </exception>
-        private T BuildItem()
+        private TNode BuildItem()
         {
-            T obj = PREFAB.InstantiateOrNull<T>();
+            TNode obj = PREFAB.InstantiateOrNull<TNode>();
             if (obj == null)
             {
-                throw new ArgumentException($"The given prefab cannot be instantiated into type {typeof(T)}.");
+                throw new ArgumentException($"The given prefab cannot be instantiated into type {typeof(TNode)}.");
             }
 
             PARENT_NODE.AddChild(obj);
+            _objectPool.Add(obj, false);
 
             // Depending upon the base type, getting it out of the way may be difficult.
             switch (obj)
@@ -85,12 +86,12 @@ namespace Khepri.Types
 
         /// <summary> Get a new object by pulling from the pool. </summary>
         /// <returns> The now active object. </returns>
-        public T CreateObject()
+        public TNode GetAvailableObject()
         {
-            T result = null;
+            TNode result = null;
 
             // Attempt to find a free object in the pool.
-            foreach (KeyValuePair<T, Boolean> obj in _objectPool)
+            foreach (KeyValuePair<TNode, Boolean> obj in _objectPool)
             {
                 if (!obj.Value)    // If the obj is free.
                 {
@@ -103,7 +104,6 @@ namespace Khepri.Types
             if (result == null)
             {
                 result = BuildItem();
-                _poolSize++;
             }
 
             _objectPool[result] = true;
@@ -129,17 +129,17 @@ namespace Khepri.Types
         /// <summary> Free all the currently in use items. </summary>
         public void FreeAll()
         {
-            T[] activeObjects = GetActiveObjects();
-            foreach (T obj in activeObjects)
+            TNode[] activeObjects = GetActiveObjects();
+            foreach (TNode obj in activeObjects)
             {
-                FreeItem(obj);
+                FreeObject(obj);
             }
         }
 
 
         /// <summary> Free an object and return it to the pool. </summary>
         /// <param name="obj"> The object to return. </param>
-        public void FreeItem(T obj)
+        public void FreeObject(TNode obj)
         {
             _objectPool[obj] = false;
 
@@ -164,9 +164,29 @@ namespace Khepri.Types
 
         /// <summary> Get an array of all the currently active objects. </summary>
         /// <returns> All the objects that are currently in use. </returns>
-        public T[] GetActiveObjects()
+        public TNode[] GetActiveObjects()
         {
             return _objectPool.Where(x => x.Value).Select(x => x.Key).ToArray();
         }
+    }
+
+
+    /// <summary> Represents an item as stored in a pool. </summary>
+    public interface IPoolable<T> where T : EntityResource
+    {
+        /// <summary> The data component representing the entity's data. </summary>
+        public T Resource { get; protected set; }
+
+
+        /// <summary> Initialise the object by setting its internal resource. </summary>
+        /// <param name="resource"> The resource the object represents. </param>
+        public void Initialise(T resource)
+        {
+            Resource = resource;
+        }
+
+
+        /// <summary> Free the object back to the object pool. </summary>
+        public void FreeObject();
     }
 }
