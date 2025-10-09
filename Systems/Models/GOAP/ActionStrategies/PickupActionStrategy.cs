@@ -12,7 +12,7 @@ namespace Khepri.Models.GOAP.ActionStrategies
     public partial class PickupActionStrategy : IActionStrategy
     {
         /// <inheritdoc/>
-        public Boolean IsValid => _unit.UsableEntities.Where(x => x is ItemNode item && item.Resource.Kind == _itemKind).Count() > 0;
+        public Boolean IsValid => _unit.UsableEntities.Where(x => x is ItemNode item && item.Resource.Id == _itemId).Count() > 0;
 
         /// <inheritdoc/>
         public Boolean IsComplete { get; private set; } = false;
@@ -21,17 +21,17 @@ namespace Khepri.Models.GOAP.ActionStrategies
         /// <summary> A reference to the unit being manipulated. </summary>
         private readonly Unit _unit;
 
-        /// <summary> The desired item's name or kind. </summary>
-        private readonly String _itemKind;
+        /// <summary> The desired item's unique name. </summary>
+        private readonly String _itemId;
 
 
         /// <summary> Attempt to pickup an item. </summary>
         /// <param name="unit"> A reference to the unit being manipulated. </param>
-        /// <param name="itemKind"> The desired item's name or kind. </param>
-        public PickupActionStrategy(Unit unit, String itemKind)
+        /// <param name="itemId"> The desired item's unique name. </param>
+        public PickupActionStrategy(Unit unit, String itemId)
         {
             _unit = unit;
-            _itemKind = itemKind;
+            _itemId = itemId;
         }
 
 
@@ -41,7 +41,7 @@ namespace Khepri.Models.GOAP.ActionStrategies
             IEnumerable<ItemNode> items = _unit.UsableEntities.Where(x => x is ItemNode).Cast<ItemNode>();
             if (items.Count() > 0)      // If the unit is close enough to usable items.
             {
-                ItemNode? item = items.FirstOrDefault(x => x.Resource.Kind == _itemKind);
+                ItemNode? item = items.FirstOrDefault(x => x.Resource.Id == _itemId);
 
                 if (item != null)  // If the item was actually found.
                 {

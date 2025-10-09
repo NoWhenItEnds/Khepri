@@ -145,9 +145,9 @@ namespace Khepri.Entities.Items
 
 
         /// <summary> Attempt to get all the items with a particular kind / name from the inventory. </summary>
-        /// <param name="kind"> The item's unique key / name. </param>
+        /// <param name="itemId"> The item's unique key / name. </param>
         /// <returns> An array of found item data. </returns>
-        public ItemResource[] GetItem(String kind)
+        public ItemResource[] GetItem(String itemId)
         {
             HashSet<ItemResource> uniqueItems = new HashSet<ItemResource>();
 
@@ -156,7 +156,7 @@ namespace Khepri.Entities.Items
                 for (Int32 x = 0; x < _storedItems.GetLength(0); x++)
                 {
                     ItemResource? currentItem = GetItem(x, y);
-                    if (currentItem != null && currentItem.Kind == kind)
+                    if (currentItem != null && currentItem.Id == itemId)
                     {
                         uniqueItems.Add(currentItem);
                     }

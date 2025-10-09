@@ -9,11 +9,8 @@ namespace Khepri.Resources.Items
     /// <summary> The data component of an item entity. </summary>
     public abstract partial class ItemResource : EntityResource
     {
-        /// <summary> The item's identifying kind. </summary>
-        [ExportGroup("General")]
-        [Export] public String Kind { get; private set; }
-
         /// <summary> An array of descriptions for the given item. </summary>
+        [ExportGroup("General")]
         [Export] public String[] Descriptions { get; private set; }
 
         /// <summary> The category of item. </summary>

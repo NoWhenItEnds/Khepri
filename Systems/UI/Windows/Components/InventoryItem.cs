@@ -73,7 +73,7 @@ namespace Khepri.UI.Windows.Components
             SetSprite(resource);
             Modulate = Colors.White;
             TextureClickMask = BuildClickMask(resource);
-            Name = resource.Kind;
+            Name = resource.Id;
         }
 
 

@@ -114,11 +114,11 @@ namespace Khepri.Entities.Actors.Components
 
 
         /// <summary> Attempts to get a kind of item from the unit's memory. </summary>
-        /// <param name="itemKind"> The item's unique name or key. </param>
+        /// <param name="itemId"> The item's unique name or key. </param>
         /// <returns> An array of all instances of the item the unit is aware of. </returns>
-        public KnownEntity[] TryGetItem(String itemKind)
+        public KnownEntity[] TryGetItem(String itemId)
         {
-            return _knownEntities.Where(x => x.Entity is ItemNode item && item.Resource.Kind == itemKind).ToArray();
+            return _knownEntities.Where(x => x.Entity is ItemNode item && item.Resource.Id == itemId).ToArray();
         }
 
 

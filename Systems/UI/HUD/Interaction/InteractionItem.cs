@@ -51,7 +51,7 @@ namespace Khepri.UI.HUD.Interaction
 
             if (Entity is ItemNode item)
             {
-                _label.Text = String.Format(ITEM_LABEL_FORMAT, item.Resource.Kind.Capitalize(), colour.ToHtml());
+                _label.Text = String.Format(ITEM_LABEL_FORMAT, item.Resource.Id.Capitalize(), colour.ToHtml());
             }
             else if (Entity is Device device)
             {
