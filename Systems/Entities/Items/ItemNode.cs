@@ -29,8 +29,8 @@ namespace Khepri.Entities.Items
         public Vector3 WorldPosition => GlobalPosition;
 
 
-        /// <summary> A reference to the object pool this object is a part of. </summary>
-        private ObjectPool<ItemNode, ItemResource> _objectPool;
+        /// <summary> A reference to the item controller. </summary>
+        private ItemController _itemController;
 
 
         /// <inheritdoc/>
@@ -39,7 +39,7 @@ namespace Khepri.Entities.Items
             _interactionArea.BodyEntered += OnBodyEntered;
             _interactionArea.BodyExited += OnBodyExited;
 
-            _objectPool = ItemController.Instance.ItemPool;
+            _itemController = ItemController.Instance;
         }
 
 
@@ -105,6 +105,6 @@ namespace Khepri.Entities.Items
 
 
         /// <inheritdoc/>
-        public void FreeObject() => _objectPool.FreeObject(this);
+        public void FreeObject() => _itemController.ItemPool.FreeObject(this);
     }
 }
