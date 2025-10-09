@@ -8,8 +8,8 @@
 script = ExtResource("1_lglo3")
 HealthRecovery = 20.0
 Portions = 1
-Kind = "apple"
 WorldSprites = ExtResource("2_ynmdw")
 InventorySprites = ExtResource("1_yekgs")
 InventoryCells = Array[Array]([[0, 0], [1, 0], [0, 1], [1, 1]])
+Id = "apple"
 metadata/_custom_type_script = "uid://b4xss154foxdd"
