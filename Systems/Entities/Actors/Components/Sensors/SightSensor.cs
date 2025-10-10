@@ -1,5 +1,4 @@
 using Godot;
-using Khepri.Entities.Interfaces;
 using System;
 using System.Collections.Generic;
 
@@ -70,7 +69,6 @@ namespace Khepri.Entities.Actors.Components.Sensors
                 Vector3 targetPosition = ToLocal(current.CollisionShape.GlobalPosition);
                 _lineOfSightRayCast.TargetPosition = targetPosition;
                 _lineOfSightRayCast.ForceRaycastUpdate();
-
 
                 if (_lineOfSightRayCast.IsColliding())
                 {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Khepri.Entities.Items;
 using Khepri.Models.Input;
 
 namespace Khepri.Entities.Actors.Components.States
@@ -76,9 +77,20 @@ namespace Khepri.Entities.Actors.Components.States
                         break;
                 }
             }
+            else if (input is ExamineInput examineInput)    // TODO - State change?
+            {
+                examineInput.Entity.Examine(_unit);
+            }
             else if (input is UseInput useInput)
             {
                 useInput.Entity.Use(_unit);
+            }
+            else if (input is GrabInput grabInput)
+            {
+                if (grabInput.Entity is ItemNode item)
+                {
+                    item.Grab(_unit);
+                }
             }
 
             CurrentState.HandleInput(input);

@@ -1,9 +1,6 @@
 using Godot;
 using Khepri.Entities.Actors;
-using Khepri.Entities.Actors.Components;
-using Khepri.Entities.Interfaces;
-using Khepri.Entities.Items;
-using Khepri.Entities.Items;
+using Khepri.Resources.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,33 +51,33 @@ namespace Khepri.Models.GOAP
 
         /// <summary> Adds a belief about a specific of item stored in the unit's sensors. </summary>
         /// <param name="key"> The name of belief. </param>
-        /// <param name="itemData"> The unique instance of the item. </param>
-        public void AddKnownItemBelief(String key, ItemData itemData)
+        /// <param name="resource"> The unique instance of the item. </param>
+        public void AddKnownItemBelief(String key, ItemResource resource)
         {
             _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => _unit.Sensors.TryGetItem(itemData.UId) != null)
+                .WithCondition(() => _unit.Sensors.TryGetItem(resource) != null)
                 .Build());
         }
 
 
         /// <summary> Adds a belief about a kind of item stored in the unit's inventory. </summary>
         /// <param name="key"> The name of belief. </param>
-        /// <param name="itemKey"> The unique identifying name or key of the item. </param>
-        public void AddInventoryBelief(String key, String itemKey)
+        /// <param name="kind"> The unique identifying name or key of the item. </param>
+        public void AddInventoryBelief(String key, String kind)
         {
             _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => _unit.Inventory.HasItem(itemKey) > 0)
+                .WithCondition(() => _unit.Inventory.HasItem(kind) > 0)
                 .Build());
         }
 
 
         /// <summary> Adds a belief about a specific item stored in the unit's inventory. </summary>
         /// <param name="key"> The name of belief. </param>
-        /// <param name="itemData"> The unique instance of the item. </param>
-        public void AddInventoryBelief(String key, ItemData itemData)
+        /// <param name="resource"> The unique instance of the item. </param>
+        public void AddInventoryBelief(String key, ItemResource resource)
         {
             _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => _unit.Inventory.HasItem(itemData.UId))
+                .WithCondition(() => _unit.Inventory.HasItem(resource))
                 .Build());
         }
 
@@ -101,14 +98,14 @@ namespace Khepri.Models.GOAP
 
         /// <summary> Adds a belief about whether the agent is currently within interaction range of a specific item. </summary>
         /// <param name="key"> The name of belief. </param>
-        /// <param name="itemData"> The unique instance of the item. </param>
+        /// <param name="resource"> The unique instance of the item. </param>
         /// <param name="distance"> The acceptable distance or range from the location. </param>
-        public void AddItemLocationBelief(String key, ItemData itemData, Single distance)
+        public void AddItemLocationBelief(String key, ItemResource resource, Single distance)
         {
             // TODO - Is this the best way? Probably not.
             _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => _unit.Sensors.TryGetItem(itemData.UId) != null)
-                .WithCondition(() => InRangeOf(_unit.Sensors.TryGetItem(itemData.UId).LastKnownPosition, distance))
+                .WithCondition(() => _unit.Sensors.TryGetItem(resource) != null)
+                .WithCondition(() => InRangeOf(_unit.Sensors.TryGetItem(resource).LastKnownPosition, distance))
                 .Build());
         }
 

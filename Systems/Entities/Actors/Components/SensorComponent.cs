@@ -1,7 +1,7 @@
 using Godot;
 using Khepri.Controllers;
-using Khepri.Entities.Interfaces;
 using Khepri.Entities.Items;
+using Khepri.Resources.Items;
 using Khepri.Types.Extensions;
 using System;
 using System.Collections.Generic;
@@ -114,20 +114,20 @@ namespace Khepri.Entities.Actors.Components
 
 
         /// <summary> Attempts to get a kind of item from the unit's memory. </summary>
-        /// <param name="itemName"> The item's unique name or key. </param>
+        /// <param name="itemId"> The item's unique name or key. </param>
         /// <returns> An array of all instances of the item the unit is aware of. </returns>
-        public KnownEntity[] TryGetItem(String itemName)
+        public KnownEntity[] TryGetItem(String itemId)
         {
-            return _knownEntities.Where(x => x.Entity is Item item && item.Data.Name == itemName).ToArray();
+            return _knownEntities.Where(x => x.Entity is ItemNode item && item.Resource.Id == itemId).ToArray();
         }
 
 
-        /// <summary> Attempts to get a specific item using its unique id. </summary>
-        /// <param name="uid"> The item's unique identifier. </param>
+        /// <summary> Attempts to get a specific item using its resource instance. </summary>
+        /// <param name="resource"> The item's internal data. </param>
         /// <returns> A reference to the tracked entity. A null means that one wasn't found. </returns>
-        public KnownEntity? TryGetItem(Guid uid)
+        public KnownEntity? TryGetItem(ItemResource resource)
         {
-            return _knownEntities.Where(x => x.Entity is Item item && item.Data.UId == uid).FirstOrDefault();
+            return _knownEntities.Where(x => x.Entity is ItemNode item && item.Resource == resource).FirstOrDefault();
         }
 
 

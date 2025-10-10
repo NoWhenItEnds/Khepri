@@ -1,8 +1,8 @@
-using Khepri.Entities.Interfaces;
+using Khepri.Entities;
 
 namespace Khepri.Models.Input
 {
-    /// <summary> An input representing an attempt to use and entity. </summary>
+    /// <summary> An input representing an attempt to use an entity. </summary>
     public record UseInput : IInput
     {
         /// <summary> The entity the action is trying to use. </summary>

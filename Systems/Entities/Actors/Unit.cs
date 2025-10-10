@@ -2,8 +2,7 @@ using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Actors.Components;
 using Khepri.Entities.Actors.Components.States;
-using Khepri.Entities.Components;
-using Khepri.Entities.Interfaces;
+using Khepri.Entities.Items;
 using Khepri.Models.Input;
 using System;
 using System.Collections.Generic;
@@ -11,7 +10,7 @@ using System.Collections.Generic;
 namespace Khepri.Entities.Actors
 {
     /// <summary> An active entity controlled by something. </summary>
-    public partial class Unit : CharacterBody3D, IEntity
+    public partial class Unit : CharacterBody3D, IEntity, IControllable
     {
         /// <inheritdoc/>
         [ExportGroup("Nodes")]
@@ -38,8 +37,13 @@ namespace Khepri.Entities.Actors
         /// <summary> The state machine controlling the unit. </summary>
         [Export] public UnitStateMachine StateMachine { get; private set; }
 
+
+        /// <summary> The grid size of the unit's inventory. </summary>
+        [ExportGroup("Settings")]
+        [Export] private Vector2I _inventorySize = new Vector2I(10, 10);
+
         /// <summary> A reference to the unit's inventory component. </summary>
-        [Export] public EntityInventory Inventory { get; private set; }
+        public EntityInventory Inventory { get; private set; }
 
 
         /// <summary> The animation sheets to use for the unit's animations. </summary>
@@ -56,24 +60,18 @@ namespace Khepri.Entities.Actors
         /// <summary> The current direction the unit is facing. </summary>
         public Single Direction { get; private set; } = 0f;
 
-        /// <summary> A reference to the world controller. </summary>
-        private WorldController _worldController;
-
         /// <summary> A list of entities that the unit is close enough to interact with. </summary>
         public HashSet<IEntity> UsableEntities = new HashSet<IEntity>();
 
-
-        /// <inheritdoc/>
-        public void Use(IEntity activatingEntity)
-        {
-            throw new NotImplementedException();
-        }
+        /// <summary> A reference to the world controller. </summary>
+        private WorldController _worldController;
 
 
         /// <inheritdoc/>
         public override void _Ready()
         {
             _worldController = WorldController.Instance;
+            Inventory = new EntityInventory(_inventorySize);
 
             // Setup the sprite animations.
             foreach (var frames in _spriteFrames)
@@ -106,8 +104,7 @@ namespace Khepri.Entities.Actors
         }
 
 
-        /// <summary> Handle the input sent to the unit by it's controller. </summary>
-        /// <param name="input"> The input data class to interpret. </param>
+        /// <inheritdoc/>
         public void HandleInput(IInput input) => StateMachine.HandleInput(input);
 
 
@@ -123,18 +120,16 @@ namespace Khepri.Entities.Actors
 
 
         /// <inheritdoc/>
-        public override Int32 GetHashCode() => HashCode.Combine(UId);
-
-
-        /// <inheritdoc/>
-        public override Boolean Equals(Object obj)
+        public void Examine(Unit activatingEntity)
         {
-            Unit? other = obj as Unit;
-            return other != null ? UId.Equals(other.UId) : false;
+            throw new NotImplementedException();
         }
 
 
         /// <inheritdoc/>
-        public bool Equals(IEntity other) => UId.Equals(other.UId);
+        public void Use(Unit activatingEntity)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

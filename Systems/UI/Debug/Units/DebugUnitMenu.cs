@@ -2,6 +2,7 @@ using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Actors;
 using Khepri.Entities.Actors.Components;
+using Khepri.Entities.Devices;
 using Khepri.Entities.Items;
 using Khepri.Models.GOAP;
 using System;
@@ -43,7 +44,7 @@ namespace Khepri.UI.Debug.Units
         private const String BELIEF_FORMAT = "[color={1}]- {0}[/color]";
 
         /// <summary> The format to use to show sensor information. </summary>
-        private const String SENSOR_FORMAT = "{0} <{1:F1}, {2:F1}, {3:F1}> {4:F1}m";
+        private const String SENSOR_FORMAT = "[b]{0}[/b] <{1:F1}, {2:F1}, {3:F1}> {4:F1}m";
 
 
         /// <inheritdoc/>
@@ -96,8 +97,11 @@ namespace Khepri.UI.Debug.Units
                     case Unit unit:
                         sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, unit.Name, pos.X, pos.Y, pos.Z, minutes));
                         break;
-                    case Item item:
-                        sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, item.Data.Name, pos.X, pos.Y, pos.Z, minutes));
+                    case ItemNode item:
+                        sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, item.Resource.Id, pos.X, pos.Y, pos.Z, minutes));
+                        break;
+                    case Device device:
+                        sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, device.Name, pos.X, pos.Y, pos.Z, minutes));
                         break;
                 }
 

@@ -1,6 +1,9 @@
+using System;
 using Godot;
+using Khepri.Entities.Devices;
 using Khepri.Nodes.Singletons;
 using Khepri.UI.HUD;
+using Khepri.UI.HUD.Interaction;
 using Khepri.UI.Windows;
 
 namespace Khepri.Controllers
@@ -16,10 +19,20 @@ namespace Khepri.Controllers
         /// <summary> A reference to the player status bars in the HUD. </summary>
         [Export] private StatusBars _statusBars;
 
+        /// <summary> A reference to the menu that displays interactable elements. </summary>
+        [Export] private InteractionMenu _interactionMenu;
+
 
         /// <summary> A reference to the inventory window element. </summary>
         [ExportSubgroup("Windows")]
         [Export] private InventoryWindow _inventoryWindow;
+
+        /// <summary> A window used to show the telescope's view. </summary>
+        [Export] private TelescopeWindow _telescopeWindow;
+
+
+        /// <summary> Whether a UI window is open. When this is true, the player shouldn't be able to control their character. </summary>
+        public Boolean IsWindowOpen { get; private set; } = false;
 
 
         /// <summary> A reference to the player controller. </summary>
@@ -42,13 +55,37 @@ namespace Khepri.Controllers
             switch (window)
             {
                 case WindowType.INVENTORY:
+                    ToggleHUD(false);
                     _inventoryWindow.Visible = true;
                     _inventoryWindow.Initialise(_playerController.PlayerUnit.Inventory);
                     break;
                 default:
+                    ToggleHUD(true);
                     _inventoryWindow.Visible = false;
+                    _telescopeWindow.Visible = false;
                     break;
             }
+        }
+
+
+        /// <summary> Show the telescope window to represent the view of a telescope. </summary>
+        /// <param name="telescope"> A reference to the triggering telescope. </param>
+        public void ShowTelescope(Telescope telescope)
+        {
+            ToggleHUD(false);
+            _telescopeWindow.Visible = true;
+            _telescopeWindow.Initialise(telescope);
+        }
+
+
+        /// <summary> Toggles whether the HUD is currently active. </summary>
+        /// <param name="isActive"> The state to set HUD elements. </param>
+        private void ToggleHUD(Boolean isActive)
+        {
+            IsWindowOpen = !isActive;
+            _astrolabe.Visible = isActive;
+            _statusBars.Visible = isActive;
+            _interactionMenu.Visible = isActive;
         }
     }
 
@@ -58,6 +95,7 @@ namespace Khepri.Controllers
     {
         NONE,
         CHARACTER,
-        INVENTORY
+        INVENTORY,
+        TELESCOPE
     }
 }

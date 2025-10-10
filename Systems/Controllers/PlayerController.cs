@@ -1,8 +1,10 @@
 using Godot;
+using Khepri.Entities;
 using Khepri.Entities.Actors;
 using Khepri.Models.Input;
 using Khepri.Nodes;
 using Khepri.Nodes.Singletons;
+using Khepri.Types.Extensions;
 using System;
 using System.Linq;
 
@@ -15,6 +17,17 @@ namespace Khepri.Controllers
         [ExportGroup("Nodes")]
         [Export] public Unit PlayerUnit { get; private set; }
 
+        /// <summary> The current entity that the player is controlling. </summary>
+        private IControllable _currentControllable;
+
+
+        /// <summary> Whether the user is currently using a controller. </summary>
+        public Boolean IsUsingJoypad { get; private set; } = false;
+
+
+        /// <summary> The index of the current interactable. </summary>
+        private Int32 _currentInteractableIndex = 0;
+
 
         /// <summary> A reference to the window node. </summary>
         private Viewport _viewport;
@@ -26,13 +39,6 @@ namespace Khepri.Controllers
         private UIController _uiController;
 
 
-        /// <summary> Whether the ui is currently open. </summary>
-        private Boolean _isUIOpen = false;
-
-        /// <summary> Whether the user is currently using a controller. </summary>
-        private Boolean _isUsingJoypad = false;
-
-
         /// <inheritdoc/>
         public override void _Ready()
         {
@@ -41,6 +47,7 @@ namespace Khepri.Controllers
             _uiController = UIController.Instance;
 
             // Set up initial state.
+            _currentControllable = PlayerUnit;
             _worldCamera.SetTarget(PlayerUnit.CameraPosition);
             Input.MouseMode = Input.MouseModeEnum.ConfinedHidden;
         }
@@ -49,7 +56,7 @@ namespace Khepri.Controllers
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
-            if (!_isUIOpen)
+            if (!_uiController.IsWindowOpen || PlayerUnit != _currentControllable)  // TODO - This feels like a hack to check it like this to allow the player to control a window.
             {
                 Single moveHorizontal = Input.GetAxis("action_move_left", "action_move_right");
                 Single moveVertical = Input.GetAxis("action_move_up", "action_move_down");
@@ -62,11 +69,11 @@ namespace Khepri.Controllers
                 }
 
                 MoveInput moveInput = new MoveInput(moveDirection, movementType);
-                PlayerUnit.HandleInput(moveInput);
+                _currentControllable.HandleInput(moveInput);
 
                 // Handle camera.
                 Vector2 ratio = Vector2.Zero;
-                if (_isUsingJoypad)
+                if (IsUsingJoypad)
                 {
                     Single cameraHorizontal = Input.GetAxis("action_camera_left", "action_camera_right");
                     Single cameraVertical = Input.GetAxis("action_camera_up", "action_camera_down");
@@ -80,6 +87,9 @@ namespace Khepri.Controllers
                 }
                 _worldCamera.UpdateCameraPosition(ratio);
             }
+
+            // Ensure that the interaction index is within range.
+            _currentInteractableIndex = (Int32)MathExtensions.WrapValue(_currentInteractableIndex, PlayerUnit.UsableEntities.Count);
         }
 
 
@@ -90,16 +100,37 @@ namespace Khepri.Controllers
 
             if (@event.IsActionReleased("action_toggle_ui"))
             {
-                _isUIOpen = !_isUIOpen;
-                Input.MouseMode = _isUIOpen ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.ConfinedHidden;
-                _uiController.ShowWindow(_isUIOpen ? WindowType.INVENTORY : WindowType.NONE);
+                Input.MouseMode = !_uiController.IsWindowOpen ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.ConfinedHidden;
+                _uiController.ShowWindow(!_uiController.IsWindowOpen ? WindowType.INVENTORY : WindowType.NONE);
+                SetControllable(null);  // TODO - Is this the best place to reset the controller?
             }
 
-            if (!_isUIOpen)
+            if (!_uiController.IsWindowOpen)
             {
-                if (@event.IsActionReleased("action_use"))
+                IEntity? currentInteractable = GetCurrentInteractable();
+                if(currentInteractable != null)
                 {
-                    PlayerUnit.HandleInput(new UseInput(PlayerUnit.UsableEntities.First()));    // TODO - This should be pulled from ui element.
+                    if (@event.IsActionReleased("action_examine"))
+                    {
+                        PlayerUnit.HandleInput(new ExamineInput(currentInteractable));
+                    }
+                    else if (@event.IsActionReleased("action_use"))
+                    {
+                        PlayerUnit.HandleInput(new UseInput(currentInteractable));
+                    }
+                    else if (@event.IsActionReleased("action_grab"))
+                    {
+                        PlayerUnit.HandleInput(new GrabInput(currentInteractable));
+                    }
+                }
+
+                if (@event.IsActionReleased("action_ui_up"))
+                {
+                    _currentInteractableIndex = (Int32)MathExtensions.WrapValue(_currentInteractableIndex + 1, PlayerUnit.UsableEntities.Count);
+                }
+                else if (@event.IsActionReleased("action_ui_down"))
+                {
+                    _currentInteractableIndex = (Int32)MathExtensions.WrapValue(_currentInteractableIndex - 1, PlayerUnit.UsableEntities.Count);
                 }
             }
         }
@@ -112,13 +143,26 @@ namespace Khepri.Controllers
             switch (@event)
             {
                 case InputEventKey or InputEventMouse:
-                    _isUsingJoypad = false;
+                    IsUsingJoypad = false;
                     break;
                 case InputEventJoypadButton:
                 case InputEventJoypadMotion { AxisValue: < -0.1f or > 0.1f }:
-                    _isUsingJoypad = true;
+                    IsUsingJoypad = true;
                     break;
             }
         }
+
+
+        /// <summary> Set the current entity being controlled by the controller. </summary>
+        /// <param name="controllable"> The new entity to control. A null resets it back to the default unit. </param>
+        public void SetControllable(IControllable? controllable = null)
+        {
+            _currentControllable = controllable ?? PlayerUnit;
+        }
+
+
+        /// <summary> Get the currently selected entity the player is interacting with. </summary>
+        /// <returns> Either a reference to the selected entity, or a null if there isn't one. </returns>
+        public IEntity? GetCurrentInteractable() => PlayerUnit.UsableEntities.Count > 0 ? PlayerUnit.UsableEntities.ToArray()[_currentInteractableIndex] : null;
     }
 }

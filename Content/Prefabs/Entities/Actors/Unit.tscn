@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://rc2326u6agtf"]
+[gd_scene load_steps=10 format=3 uid="uid://rc2326u6agtf"]
 
 [ext_resource type="Script" uid="uid://djimvajqu34qh" path="res://Systems/Entities/Actors/Unit.cs" id="1_igitp"]
 [ext_resource type="Script" uid="uid://ddi4d3d10ao2u" path="res://Systems/Entities/Actors/Components/SpriteComponent.cs" id="2_oq4pe"]
@@ -7,7 +7,6 @@
 [ext_resource type="Script" uid="uid://c83wmu6k0wt68" path="res://Systems/Entities/Actors/Components/SensorComponent.cs" id="4_xo887"]
 [ext_resource type="Script" uid="uid://daoay8off8cqo" path="res://Systems/Entities/Actors/Components/NeedComponent.cs" id="7_10mci"]
 [ext_resource type="Script" uid="uid://c6jyxaub0fvjn" path="res://Systems/Entities/Actors/Components/States/UnitStateMachine.cs" id="7_oq4pe"]
-[ext_resource type="Script" uid="uid://cqq6rm16iba5k" path="res://Systems/Entities/Components/EntityInventory.cs" id="8_oq4pe"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xo887"]
 radius = 0.2
@@ -16,7 +15,7 @@ height = 0.45
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_jo3tn"]
 radius = 10.0
 
-[node name="Unit" type="CharacterBody3D" node_paths=PackedStringArray("CollisionShape", "NavigationAgent", "CameraPosition", "VisibilityNotifier", "Sprite", "Needs", "Sensors", "StateMachine", "Inventory")]
+[node name="Unit" type="CharacterBody3D" node_paths=PackedStringArray("CollisionShape", "NavigationAgent", "CameraPosition", "VisibilityNotifier", "Sprite", "Needs", "Sensors", "StateMachine")]
 axis_lock_angular_x = true
 axis_lock_angular_y = true
 axis_lock_angular_z = true
@@ -29,7 +28,6 @@ Sprite = NodePath("Sprite Component")
 Needs = NodePath("Need Component")
 Sensors = NodePath("Sensor Component")
 StateMachine = NodePath("State Component")
-Inventory = NodePath("Inventory")
 _spriteFrames = Dictionary[int, SpriteFrames]({})
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
@@ -109,6 +107,3 @@ script = ExtResource("7_10mci")
 [node name="State Component" type="Node" parent="." node_paths=PackedStringArray("_unit")]
 script = ExtResource("7_oq4pe")
 _unit = NodePath("..")
-
-[node name="Inventory" type="Node" parent="."]
-script = ExtResource("8_oq4pe")
