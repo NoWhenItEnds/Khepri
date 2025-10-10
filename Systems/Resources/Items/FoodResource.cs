@@ -8,10 +8,6 @@ namespace Khepri.Resources.Items
     [GlobalClass]
     public partial class FoodResource : ItemResource
     {
-        /// <inheritdoc/>
-        public override ItemType ItemType { get; } = ItemType.FOOD;
-
-
         /// <summary> The amount of a unit's health the item recovers. </summary>
         [ExportGroup("Statistics")]
         [Export] public Single HealthRecovery { get; private set; }

@@ -1,11 +1,13 @@
 using Godot;
 using Khepri.Entities.Actors;
+using Khepri.Resources.Devices;
+using Khepri.Types;
 using System;
 
 namespace Khepri.Entities.Devices
 {
     /// <summary> An entity that can be interacted with by a unit for a unique effect. </summary>
-    public abstract partial class Device : StaticBody3D, IEntity
+    public abstract partial class DeviceNode : StaticBody3D, IEntity, IPoolable<DeviceResource>
     {
         /// <inheritdoc/>
         [ExportGroup("Nodes")]
@@ -18,8 +20,9 @@ namespace Khepri.Entities.Devices
         [Export] private Area3D _interactionArea;
 
 
-        /// <summary> The data component representing the device's data. </summary>
-        public DeviceData Data { get; private set; }
+        /// <inheritdoc/>
+        [ExportGroup("Statistics")]
+        [Export] public DeviceResource Resource { get; set; }
 
 
         /// <inheritdoc/>
@@ -34,6 +37,10 @@ namespace Khepri.Entities.Devices
         {
             _interactionArea.BodyEntered += OnBodyEntered;
             _interactionArea.BodyExited += OnBodyExited;
+
+            // TODO - Move to device controller.
+            _sprite.SpriteFrames = Resource.WorldSprites;
+            _sprite.Play();
         }
 
 
@@ -65,5 +72,9 @@ namespace Khepri.Entities.Devices
 
         /// <inheritdoc/>
         public abstract void Use(Unit activatingEntity);
+
+
+        /// <inheritdoc/>
+        public void FreeObject() => throw new NotImplementedException();
     }
 }

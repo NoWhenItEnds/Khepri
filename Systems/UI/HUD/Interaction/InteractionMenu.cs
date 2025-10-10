@@ -1,6 +1,7 @@
 using Godot;
 using Khepri.Controllers;
 using Khepri.Entities;
+using Khepri.Entities.Devices;
 using Khepri.Entities.Items;
 using System;
 using System.Text;
@@ -45,6 +46,9 @@ namespace Khepri.UI.HUD.Interaction
                     {
                         case ItemNode item:
                             text = item.Resource.Id;
+                            break;
+                        case DeviceNode device:
+                            text = device.Resource.Id;
                             break;
                     }
 

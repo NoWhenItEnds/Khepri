@@ -100,7 +100,7 @@ namespace Khepri.UI.Debug.Units
                     case ItemNode item:
                         sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, item.Resource.Id, pos.X, pos.Y, pos.Z, minutes));
                         break;
-                    case Device device:
+                    case DeviceNode device:
                         sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, device.Name, pos.X, pos.Y, pos.Z, minutes));
                         break;
                 }

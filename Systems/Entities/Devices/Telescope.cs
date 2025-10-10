@@ -9,7 +9,7 @@ using System;
 namespace Khepri.Entities.Devices
 {
     /// <summary> A device a unit can look through to see the night sky. </summary>
-    public partial class Telescope : Device, IControllable
+    public partial class Telescope : DeviceNode, IControllable
     {
         /// <summary> A modifier to increase the sensitivity of the input. </summary>
         [ExportGroup("Settings")]

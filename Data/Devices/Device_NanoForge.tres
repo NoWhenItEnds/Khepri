@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="DeviceResource" load_steps=3 format=3 uid="uid://jret43wdghyu"]
+
+[ext_resource type="SpriteFrames" uid="uid://dx5orqkv03mqp" path="res://Content/Resources/SpriteFrames/Actors/HumanF/SpriteFrame_Actor_HumanF_Base.tres" id="1_n7j60"]
+[ext_resource type="Script" uid="uid://dpwyhwk1kfcv4" path="res://Systems/Resources/Devices/DeviceResource.cs" id="1_sjqa2"]
+
+[resource]
+script = ExtResource("1_sjqa2")
+WorldSprites = ExtResource("1_n7j60")
+Id = "nano_forge"
+metadata/_custom_type_script = "uid://dpwyhwk1kfcv4"

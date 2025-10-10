@@ -13,9 +13,6 @@ namespace Khepri.Resources.Items
         [ExportGroup("General")]
         [Export] public String[] Descriptions { get; private set; }
 
-        /// <summary> The category of item. </summary>
-        public abstract ItemType ItemType { get; }
-
 
         /// <summary> A reference to the sprite the item uses in the world. </summary>
         [ExportGroup("Sprites")]
@@ -45,18 +42,5 @@ namespace Khepri.Resources.Items
         /// <summary> The internal logic to use when the entity is used. </summary>
         /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
         public abstract void Use(Unit activatingEntity);
-    }
-
-
-    /// <summary> The category of item. </summary>
-    public enum ItemType
-    {
-        NONE,
-        FOOD,
-        WEAPON,
-        TOOL,
-        APPEAL,
-        EQUIPMENT,
-        ACCESSORY
     }
 }

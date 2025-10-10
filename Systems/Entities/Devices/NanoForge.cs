@@ -6,7 +6,7 @@ using System;
 namespace Khepri.Entities.Devices
 {
     /// <summary> A device that can spawn objects from nothing but energy. </summary>
-    public partial class NanoForge : Device
+    public partial class NanoForge : DeviceNode
     {
         /// <summary> A reference to the item controller for spawning items. </summary>
         private ItemController _itemController;
