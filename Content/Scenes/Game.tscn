@@ -1,4 +1,4 @@
-[gd_scene load_steps=42 format=3 uid="uid://ko6nvcupfcf4"]
+[gd_scene load_steps=41 format=3 uid="uid://ko6nvcupfcf4"]
 
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="Script" uid="uid://cgujt8yhxbsew" path="res://Systems/Controllers/WorldController.cs" id="1_8fov1"]
@@ -27,7 +27,6 @@
 [ext_resource type="Texture2D" uid="uid://cykmv0wmfypeq" path="res://Content/Textures/UI/Windows/Inventory/Inventory_Grid_Tile.png" id="20_pt5vb"]
 [ext_resource type="Script" uid="uid://0jc0v8s8grx2" path="res://Systems/UI/HUD/Interaction/InteractionMenu.cs" id="21_gl22v"]
 [ext_resource type="PackedScene" uid="uid://bu7yeu1aonvto" path="res://Content/Prefabs/UI/Windows/Components/InventoryItem.tscn" id="22_0itj2"]
-[ext_resource type="PackedScene" uid="uid://bdf5vytv0sgwu" path="res://Content/Prefabs/UI/HUD/Components/InteractionItem.tscn" id="22_q32et"]
 [ext_resource type="Script" uid="uid://d3kcgr1eohghu" path="res://Systems/UI/Debug/Units/DebugUnitWindow.cs" id="25_rvbhf"]
 [ext_resource type="PackedScene" uid="uid://cf52786ejxpwc" path="res://Content/Prefabs/UI/Debug/DebugUnitMenu.tscn" id="26_1mywo"]
 [ext_resource type="Script" uid="uid://ptu2siel5uff" path="res://Systems/UI/Windows/TelescopeWindow.cs" id="27_qemnd"]
@@ -719,7 +718,7 @@ pivot_offset = Vector2(2, 16)
 texture = ExtResource("17_kqbmc")
 stretch_mode = 2
 
-[node name="Interaction Menu" type="Control" parent="UI/HUD" node_paths=PackedStringArray("_container")]
+[node name="Interaction Menu" type="Control" parent="UI/HUD" node_paths=PackedStringArray("_label")]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -732,8 +731,7 @@ offset_right = 128.0
 grow_horizontal = 2
 grow_vertical = 0
 script = ExtResource("21_gl22v")
-_interactionItemPrefab = ExtResource("22_q32et")
-_container = NodePath("MarginContainer/ScrollContainer/VBoxContainer")
+_label = NodePath("MarginContainer/ScrollContainer/RichTextLabel")
 
 [node name="MarginContainer" type="MarginContainer" parent="UI/HUD/Interaction Menu"]
 layout_mode = 1
@@ -750,11 +748,13 @@ theme_override_constants/margin_bottom = 8
 [node name="ScrollContainer" type="ScrollContainer" parent="UI/HUD/Interaction Menu/MarginContainer"]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/HUD/Interaction Menu/MarginContainer/ScrollContainer"]
+[node name="RichTextLabel" type="RichTextLabel" parent="UI/HUD/Interaction Menu/MarginContainer/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-alignment = 2
+bbcode_enabled = true
+fit_content = true
+vertical_alignment = 2
 
 [node name="Windows" type="Control" parent="UI"]
 layout_mode = 1

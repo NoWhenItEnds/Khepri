@@ -4,6 +4,7 @@ using Khepri.Entities.Actors;
 using Khepri.Models.Input;
 using Khepri.Nodes;
 using Khepri.Nodes.Singletons;
+using Khepri.Types.Extensions;
 using System;
 using System.Linq;
 
@@ -20,12 +21,12 @@ namespace Khepri.Controllers
         private IControllable _currentControllable;
 
 
-        /// <summary> Emitted when the player's interaction selection changed. </summary>
-        public event Action<Int32> SelectionChanged;
-
-
         /// <summary> Whether the user is currently using a controller. </summary>
         public Boolean IsUsingJoypad { get; private set; } = false;
+
+
+        /// <summary> The index of the current interactable. </summary>
+        private Int32 _currentInteractableIndex = 0;
 
 
         /// <summary> A reference to the window node. </summary>
@@ -36,10 +37,6 @@ namespace Khepri.Controllers
 
         /// <summary> A reference to the game world's UI controller. </summary>
         private UIController _uiController;
-
-
-        /// <summary> The index of the currently selected item on the UI. </summary>
-        private Int32 _currentSelection = 0;
 
 
         /// <inheritdoc/>
@@ -90,6 +87,9 @@ namespace Khepri.Controllers
                 }
                 _worldCamera.UpdateCameraPosition(ratio);
             }
+
+            // Ensure that the interaction index is within range.
+            _currentInteractableIndex = (Int32)MathExtensions.WrapValue(_currentInteractableIndex, PlayerUnit.UsableEntities.Count);
         }
 
 
@@ -107,33 +107,30 @@ namespace Khepri.Controllers
 
             if (!_uiController.IsWindowOpen)
             {
-                if (PlayerUnit.UsableEntities.Count > 0)
+                IEntity? currentInteractable = GetCurrentInteractable();
+                if(currentInteractable != null)
                 {
                     if (@event.IsActionReleased("action_examine"))
                     {
-                        PlayerUnit.HandleInput(new ExamineInput(PlayerUnit.UsableEntities.ToArray()[_currentSelection]));
-                        _currentSelection = Math.Clamp(_currentSelection, 0, PlayerUnit.UsableEntities.Count - 1);
+                        PlayerUnit.HandleInput(new ExamineInput(currentInteractable));
                     }
                     else if (@event.IsActionReleased("action_use"))
                     {
-                        PlayerUnit.HandleInput(new UseInput(PlayerUnit.UsableEntities.ToArray()[_currentSelection]));
-                        _currentSelection = Math.Clamp(_currentSelection, 0, PlayerUnit.UsableEntities.Count - 1);
+                        PlayerUnit.HandleInput(new UseInput(currentInteractable));
                     }
                     else if (@event.IsActionReleased("action_grab"))
                     {
-                        PlayerUnit.HandleInput(new GrabInput(PlayerUnit.UsableEntities.ToArray()[_currentSelection]));
-                        _currentSelection = Math.Clamp(_currentSelection, 0, PlayerUnit.UsableEntities.Count - 1);
+                        PlayerUnit.HandleInput(new GrabInput(currentInteractable));
                     }
-                    else if (@event.IsActionReleased("action_ui_up"))
-                    {
-                        _currentSelection = Math.Clamp(_currentSelection + 1, 0, PlayerUnit.UsableEntities.Count - 1);
-                        SelectionChanged?.Invoke(_currentSelection);
-                    }
-                    else if (@event.IsActionReleased("action_ui_down"))
-                    {
-                        _currentSelection = Math.Clamp(_currentSelection - 1, 0, PlayerUnit.UsableEntities.Count - 1);
-                        SelectionChanged?.Invoke(_currentSelection);
-                    }
+                }
+
+                if (@event.IsActionReleased("action_ui_up"))
+                {
+                    _currentInteractableIndex = (Int32)MathExtensions.WrapValue(_currentInteractableIndex + 1, PlayerUnit.UsableEntities.Count);
+                }
+                else if (@event.IsActionReleased("action_ui_down"))
+                {
+                    _currentInteractableIndex = (Int32)MathExtensions.WrapValue(_currentInteractableIndex - 1, PlayerUnit.UsableEntities.Count);
                 }
             }
         }
@@ -162,5 +159,10 @@ namespace Khepri.Controllers
         {
             _currentControllable = controllable ?? PlayerUnit;
         }
+
+
+        /// <summary> Get the currently selected entity the player is interacting with. </summary>
+        /// <returns> Either a reference to the selected entity, or a null if there isn't one. </returns>
+        public IEntity? GetCurrentInteractable() => PlayerUnit.UsableEntities.Count > 0 ? PlayerUnit.UsableEntities.ToArray()[_currentInteractableIndex] : null;
     }
 }

@@ -1,83 +1,56 @@
 using Godot;
 using Khepri.Controllers;
 using Khepri.Entities;
+using Khepri.Entities.Items;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 
 namespace Khepri.UI.HUD.Interaction
 {
     /// <summary> A menu that displays interactable elements. </summary>
     public partial class InteractionMenu : Control
     {
-        /// <summary> The prefab to use when spawning interaction items. </summary>
-        [ExportGroup("Prefabs")]
-        [Export] private PackedScene _interactionItemPrefab;
-
-        /// <summary> A reference to the container the interaction items will be spawned inside. </summary>
+        /// <summary> The label used to represent the nearby objects. </summary>
         [ExportGroup("Nodes")]
-        [Export] private VBoxContainer _container;
+        [Export] private RichTextLabel _label;
 
 
         /// <summary> A reference to the player controller singleton. </summary>
         private PlayerController _playerController;
 
-        private List<InteractionItem> _spawnedItems = new List<InteractionItem>();
+
+        private const String LABEL_FORMAT = "[color={1}]{0}[/color]";
 
 
         /// <inheritdoc/>
         public override void _Ready()
         {
             _playerController = PlayerController.Instance;
-            _playerController.SelectionChanged += OnSelectionChanged;
         }
 
 
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
-            // Only check if the menu is currently active.
-            if (Visible)
+            StringBuilder builder = new StringBuilder();
+            IEntity? selectedEntity = _playerController.GetCurrentInteractable();
+            if (selectedEntity != null)
             {
-                IEntity[] usableEntities = _playerController.PlayerUnit.UsableEntities.ToArray();
 
-                // Clear any items that represent objects no longer in range.
-                InteractionItem[] danglingItems = _spawnedItems.Where(x => !usableEntities.Contains(x.Entity)).ToArray();
-                foreach (InteractionItem item in danglingItems)
+                foreach (IEntity entity in _playerController.PlayerUnit.UsableEntities)
                 {
-                    item.QueueFree();
-                    _spawnedItems.Remove(item);
-                }
-
-                // If there is a disconnect between the number of usable items and spawned items, we need to spawn one.
-                if (usableEntities.Length > _spawnedItems.Count)
-                {
-                    IEnumerable<IEntity> missingEntities = usableEntities.Except(_spawnedItems.Select(x => x.Entity));
-                    foreach (IEntity entity in missingEntities)
+                    String text = "Placeholder";
+                    switch (entity)
                     {
-                        InteractionItem item = BuildItem(entity);
-                        _spawnedItems.Add(item);
+                        case ItemNode item:
+                            text = item.Resource.Id;
+                            break;
                     }
+
+                    builder.AppendLine(String.Format(LABEL_FORMAT, text.Capitalize(), entity == selectedEntity ? Colors.Green.ToHtml() : Colors.Red.ToHtml()));
                 }
             }
-        }
-
-        private InteractionItem BuildItem(IEntity entity)
-        {
-            InteractionItem item = _interactionItemPrefab.Instantiate<InteractionItem>();
-            _container.AddChild(item);
-            item.Initialise(entity);
-            return item;
-        }
-
-
-        private void OnSelectionChanged(Int32 selectionIndex)
-        {
-            InteractionItem selectedItem = _spawnedItems[selectionIndex];
-            foreach (InteractionItem item in _spawnedItems)
-            {
-                item.SetSelected(item == selectedItem);
-            }
+            _label.Text = builder.ToString();
         }
     }
 }
