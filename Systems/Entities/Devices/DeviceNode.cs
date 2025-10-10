@@ -34,10 +34,6 @@ namespace Khepri.Entities.Devices
         {
             _interactionArea.BodyEntered += OnBodyEntered;
             _interactionArea.BodyExited += OnBodyExited;
-
-            // TODO - Move to device controller.
-            _sprite.SpriteFrames = Resource.WorldSprites;
-            _sprite.Play();
         }
 
 
@@ -60,6 +56,21 @@ namespace Khepri.Entities.Devices
             {
                 unit.RemoveUsableEntity(this);
             }
+        }
+
+
+        /// <summary> Initialise the node with new data values. </summary>
+        /// <param name="resource"> The data resource to associate with this node. </param>
+        /// <param name="position"> The position to create the object at. </param>
+        public void Initialise(DeviceResource resource, Vector3 position)
+        {
+            if (this is IPoolable<DeviceResource> poolable)
+            {
+                poolable.Initialise(resource);
+            }
+            GlobalPosition = position;
+            _sprite.SpriteFrames = Resource.WorldSprites;
+            _sprite.Play();
         }
 
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=41 format=3 uid="uid://ko6nvcupfcf4"]
+[gd_scene load_steps=42 format=3 uid="uid://ko6nvcupfcf4"]
 
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="Script" uid="uid://cgujt8yhxbsew" path="res://Systems/Controllers/WorldController.cs" id="1_8fov1"]
@@ -20,6 +20,7 @@
 [ext_resource type="Texture2D" uid="uid://dt68ek83vdc6r" path="res://Content/Textures/UI/HUD/Astrolabe/Astrolabe_Indicator.png" id="13_wrnex"]
 [ext_resource type="Texture2D" uid="uid://c01vvl8jnhv8b" path="res://Content/Textures/UI/HUD/StatusBar/StatusBar_Frame.png" id="14_a7rpa"]
 [ext_resource type="PackedScene" uid="uid://d3h3gyl2w4p6t" path="res://Content/Prefabs/Entities/Devices/NanoForge.tscn" id="14_i3r7d"]
+[ext_resource type="Script" uid="uid://dg16ijbnpyoac" path="res://Systems/Entities/Devices/DeviceController.cs" id="14_nskmx"]
 [ext_resource type="Script" uid="uid://bvp2kcvx54mn7" path="res://Systems/UI/HUD/StatusBars.cs" id="14_rj7tm"]
 [ext_resource type="Texture2D" uid="uid://jm8q7n0aefdj" path="res://Content/Textures/UI/HUD/StatusBar/StatusBar_Progress.png" id="15_rj7tm"]
 [ext_resource type="Texture2D" uid="uid://be0foew3edrpc" path="res://Content/Textures/UI/HUD/StatusBar/StatusBar_Slider.png" id="17_kqbmc"]
@@ -568,6 +569,7 @@ script = ExtResource("11_uxds2")
 _itemPrefab = ExtResource("11_kupp0")
 
 [node name="Devices" type="Node3D" parent="World"]
+script = ExtResource("14_nskmx")
 
 [node name="Telescope" parent="World/Devices" instance=ExtResource("13_gl22v")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1390452, 0, 2.37148)
