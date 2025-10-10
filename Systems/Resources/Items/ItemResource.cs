@@ -21,8 +21,8 @@ namespace Khepri.Resources.Items
         [ExportGroup("Sprites")]
         [Export] public SpriteFrames WorldSprites { get; private set; }
 
-        /// <summary> A reference to the sprites the item uses to lookup its inventory sprite. </summary>
-        [Export] public SpriteFrames InventorySprites { get; private set; }
+        /// <summary> A reference to the sprites the item uses in the inventory. </summary>
+        [Export] public Texture2D InventorySprite { get; private set; }
 
         /// <summary> The item's index on the sprite sheet. </summary>
         [Export] public Int32 SpriteIndex { get; private set; }
@@ -43,11 +43,6 @@ namespace Khepri.Resources.Items
         /// <summary> The internal logic to use when the entity is examined. </summary>
         /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
         public abstract void Examine(Unit activatingEntity);
-
-
-        /// <summary> The internal logic to use when the entity is picked up. </summary>
-        /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
-        //public abstract void Grab(Unit activatingEntity);
 
 
         /// <summary> The internal logic to use when the entity is used. </summary>

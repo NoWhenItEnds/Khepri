@@ -922,6 +922,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="Unit Window" type="Control" parent="UI/Debug" node_paths=PackedStringArray("_enemyController", "_enemyUnit")]
 layout_mode = 1
@@ -930,6 +931,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("25_rvbhf")
 _unitMenuPrefab = ExtResource("26_1mywo")
 _enemyController = NodePath("../../../Controllers/Agent Controller")

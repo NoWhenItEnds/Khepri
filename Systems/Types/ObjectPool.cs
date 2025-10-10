@@ -164,10 +164,12 @@ namespace Khepri.Types
 
         /// <summary> Get an array of all the currently active objects. </summary>
         /// <returns> All the objects that are currently in use. </returns>
-        public TNode[] GetActiveObjects()
-        {
-            return _objectPool.Where(x => x.Value).Select(x => x.Key).ToArray();
-        }
+        public TNode[] GetActiveObjects() => _objectPool.Where(x => x.Value).Select(x => x.Key).ToArray();
+
+
+        /// <summary> Get an array of all the pool's objects. </summary>
+        /// <returns> An array of all the objects in the pool. </returns>
+        public TNode[] GetAllObjects() => _objectPool.Select(x => x.Key).ToArray();
     }
 
 

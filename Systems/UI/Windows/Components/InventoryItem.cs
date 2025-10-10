@@ -11,20 +11,12 @@ namespace Khepri.UI.Windows.Components
     /// <summary> An inventory item in an inventory grid. </summary>
     public partial class InventoryItem : TextureButton, IPoolable<ItemResource>
     {
-        /// <summary> A reference to the item's sprite. </summary>
-        [ExportGroup("Nodes")]
-        [Export] private AnimatedSprite2D _sprite;
-
         /// <summary> The position of the item's top-left position. </summary>
         public Vector2I CellPosition { get; private set; }
-
 
         /// <inheritdoc/>
         public ItemResource Resource { get; set; }
 
-
-        /// <summary> A reference to the game world's viewport. </summary>
-        private Viewport _viewport;
 
         /// <summary> A reference to the window this item is parented to. </summary>
         private InventoryWindow _window;
@@ -32,32 +24,17 @@ namespace Khepri.UI.Windows.Components
         /// <summary> A reference to the inventory this item is a part of. </summary>
         private EntityInventory _inventory;
 
-        /// <summary> A reference to the object pool this object is a part of. </summary>
-        private ObjectPool<InventoryItem, ItemResource> _objectPool;
-
 
         /// <summary> If the item it currently being held. </summary>
         private Boolean _isGrabbed = false;
-
-        /// <summary> Whether the item is currently following the mouse. It will when it is clicked. </summary>
-        private Boolean _isFollowingMouse = false;
-
-
-        /// <inheritdoc/>
-        public override void _Ready()
-        {
-            ButtonDown += OnButtonDown;
-            ButtonUp += OnButtonUp;
-
-            _viewport = GetViewport();
-        }
 
 
         /// <summary> Create the inventory item by settings its internal variables. </summary>
         /// <param name="window"> A reference to the window this item is parented to. </param>
         /// <param name="resource"> The raw item data used to build the item. </param>
+        /// <param name="inventory"> The inventory the item is currently in. </param>
         /// <param name="cellPosition"> The position of the item's top-left position. </param>
-        public void Initialise(InventoryWindow window, ItemResource resource, Vector2I cellPosition)
+        public void Initialise(InventoryWindow window, ItemResource resource, EntityInventory inventory, Vector2I cellPosition)
         {
             if (this is IPoolable<ItemResource> poolable)
             {
@@ -66,25 +43,13 @@ namespace Khepri.UI.Windows.Components
 
             CellPosition = cellPosition;
             _window = window;
-            _inventory = window.CurrentInventory;
-            _objectPool = window.ItemPool;
+            _inventory = inventory;
 
             GlobalPosition = window.CalculatePosition(cellPosition);
             SetSprite(resource);
             Modulate = Colors.White;
-            TextureClickMask = BuildClickMask(resource);
+            //TextureClickMask = BuildClickMask(resource);
             Name = resource.Id;
-        }
-
-
-        /// <summary> Pick the item up. </summary>
-        private void OnButtonDown()
-        {
-            if (!_isGrabbed)
-            {
-                _isFollowingMouse = true;
-                GrabItem();
-            }
         }
 
 
@@ -94,17 +59,6 @@ namespace Khepri.UI.Windows.Components
             _isGrabbed = true;
             _inventory.RemoveItem(Resource);
             Modulate = new Color(1, 1, 1, 0.5f);    // Make it transparent to easily see the object being grabbed.
-        }
-
-
-        /// <summary> Drop the item in the desired spot. </summary>
-        private void OnButtonUp()
-        {
-            _isFollowingMouse = false;
-
-            Vector2 mousePosition = _viewport.GetMousePosition();
-            Vector2I cellPosition = _window.CalculatePosition(mousePosition);
-            PlaceItem(cellPosition);
         }
 
 
@@ -144,38 +98,26 @@ namespace Khepri.UI.Windows.Components
             _inventory.RemoveItem(Resource);
             Vector3 playerPosition = PlayerController.Instance.PlayerUnit.GlobalPosition;
             ItemController.Instance.CreateItem(Resource, playerPosition);
-            _window.RemoveItem(this);
+            FreeObject();
         }
 
 
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
-            if (_isFollowingMouse)
+            if (_isGrabbed) // Move the item to follow the current selection.
             {
-                Vector2 mousePosition = _viewport.GetMousePosition();
-                GlobalPosition = mousePosition;
+                GlobalPosition = _window.SelectionPosition;
             }
         }
 
 
         /// <summary> Set the item's sprite based upon the information in the data object. </summary>
         /// <param name="resource"> The raw data to build the item. </param>
-        /// <exception cref="ArgumentException"> If the data contains a type not mapped to the sprite sheet. </exception>
         private void SetSprite(ItemResource resource)
         {
-            String itemType = resource.ItemType.ToString().Capitalize();
-            String[] possibleTypes = _sprite.SpriteFrames.GetAnimationNames();
-            if (!possibleTypes.Contains(itemType))
-            {
-                throw new ArgumentException("The map of inventory item sprites doesn't contain a category for the given type!");
-            }
-
-            Int32 itemIndex = Mathf.Clamp(resource.SpriteIndex, 0, _sprite.SpriteFrames.GetFrameCount(itemType) - 1);
-
-            _sprite.Animation = itemType;
-            _sprite.Frame = itemIndex;
-            Size = resource.GetSize() * _window.CellSize;
+            TextureNormal = resource.InventorySprite;
+            Size = resource.GetSize() * InventoryWindow.CELL_SIZE;
         }
 
 
@@ -187,7 +129,7 @@ namespace Khepri.UI.Windows.Components
             Bitmap mask = new Bitmap();
             mask.Create((Vector2I)Size);
 
-            Int32 cellSize = _window.CellSize;
+            Int32 cellSize = InventoryWindow.CELL_SIZE;
             foreach (Vector2I point in resource.InventoryCells)
             {
                 for (Int32 x = point.X * cellSize; x < (point.X + 1) * cellSize; x++)
@@ -207,6 +149,6 @@ namespace Khepri.UI.Windows.Components
 
 
         /// <inheritdoc/>
-        public void FreeObject() => _objectPool.FreeObject(this);
+        public void FreeObject() => _window.ItemPool.FreeObject(this);
     }
 }
