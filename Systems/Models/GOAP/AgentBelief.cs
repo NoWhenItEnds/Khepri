@@ -1,6 +1,5 @@
 using Godot;
 using Khepri.Entities.Actors;
-using Khepri.Entities.Items;
 using Khepri.Resources.Items;
 using System;
 using System.Collections.Generic;

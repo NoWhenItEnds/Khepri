@@ -19,6 +19,7 @@ namespace Khepri.UI.HUD.Interaction
         private PlayerController _playerController;
 
 
+        /// <summary> The format to use for the interaction item labels. </summary>
         private const String LABEL_FORMAT = "[color={1}]{0}[/color]";
 
 

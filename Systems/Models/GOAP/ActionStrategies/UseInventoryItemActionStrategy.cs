@@ -1,6 +1,4 @@
 using Khepri.Entities.Actors;
-using Khepri.Entities.Items;
-using Khepri.Models.Input;
 using Khepri.Resources.Items;
 using Khepri.Types.Exceptions;
 using System;
@@ -8,7 +6,7 @@ using System;
 namespace Khepri.Models.GOAP.ActionStrategies
 {
     /// <summary> Use an item in a unit's inventory. </summary>
-    public partial class UseItemActionStrategy : IActionStrategy
+    public partial class UseInventoryItemActionStrategy : IActionStrategy
     {
         /// <inheritdoc/>
         public Boolean IsValid => _unit.Inventory.HasItem(_itemKind) > 0;
@@ -27,7 +25,7 @@ namespace Khepri.Models.GOAP.ActionStrategies
         /// <summary> Use an item in a unit's inventory. </summary>
         /// <param name="unit"> A reference to the unit being manipulated. </param>
         /// <param name="itemKind"> The desired item's name or kind. </param>
-        public UseItemActionStrategy(Unit unit, String itemKind)
+        public UseInventoryItemActionStrategy(Unit unit, String itemKind)
         {
             _unit = unit;
             _itemKind = itemKind;

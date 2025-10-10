@@ -48,7 +48,7 @@ namespace Khepri.Resources.Items
             activatingEntity.Needs.UpdateFatigue(FatigueRecovery);
             activatingEntity.Needs.UpdateEntertainment(EntertainmentRecovery);
 
-            Portions -= 1;
+            Portions -= 1;  // TODO - It should queue free.
         }
     }
 }

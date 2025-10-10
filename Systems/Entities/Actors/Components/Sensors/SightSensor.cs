@@ -70,7 +70,6 @@ namespace Khepri.Entities.Actors.Components.Sensors
                 _lineOfSightRayCast.TargetPosition = targetPosition;
                 _lineOfSightRayCast.ForceRaycastUpdate();
 
-
                 if (_lineOfSightRayCast.IsColliding())
                 {
                     KnownEntity? trackedObject = _sensors.TryGetEntity(current);

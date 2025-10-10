@@ -118,7 +118,7 @@ namespace Khepri.Models.GOAP
                 .Build());
 
             AvailableActions.Add(new AgentAction.Builder("EatApple")
-                .WithStrategy(new UseItemActionStrategy(_controlledEntity, "apple"))
+                .WithStrategy(new UseInventoryItemActionStrategy(_controlledEntity, "apple"))
                 .WithCost(5)    // This is how which items the agent prefers is encoded. Favorite items have a lower cost.
                 .AddPrecondition(AvailableBeliefs["HasApple"])
                 .AddOutcome(AvailableBeliefs["IsFed"])

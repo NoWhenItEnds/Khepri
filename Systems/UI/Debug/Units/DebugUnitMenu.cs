@@ -2,6 +2,7 @@ using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Actors;
 using Khepri.Entities.Actors.Components;
+using Khepri.Entities.Devices;
 using Khepri.Entities.Items;
 using Khepri.Models.GOAP;
 using System;
@@ -98,6 +99,9 @@ namespace Khepri.UI.Debug.Units
                         break;
                     case ItemNode item:
                         sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, item.Resource.Id, pos.X, pos.Y, pos.Z, minutes));
+                        break;
+                    case Device device:
+                        sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, device.Name, pos.X, pos.Y, pos.Z, minutes));
                         break;
                 }
 
