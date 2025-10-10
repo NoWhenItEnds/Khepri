@@ -1,7 +1,7 @@
 using System;
 using Khepri.Entities.Actors;
 
-namespace Khepri.Models.GOAP.ActionStrategies
+namespace Khepri.GOAP.ActionStrategies
 {
     /// <summary> Stand around. Look pretty. </summary>
     public class IdleActionStrategy : IActionStrategy

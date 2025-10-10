@@ -1,12 +1,12 @@
 using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Actors;
-using Khepri.Models.GOAP.ActionStrategies;
+using Khepri.GOAP.ActionStrategies;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Khepri.Models.GOAP
+namespace Khepri.GOAP
 {
     /// <summary> Uses a GOAP implementation to control an entity. The AI brain that controls a unit. </summary>
     public partial class AgentController : Node

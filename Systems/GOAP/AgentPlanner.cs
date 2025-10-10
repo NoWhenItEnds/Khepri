@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Khepri.Models.GOAP
+namespace Khepri.GOAP
 {
     /// <summary> Handles the logic of constructing a method to reach a desired goal. </summary>
     /// <remarks> https://www.youtube.com/watch?v=T_sBYgP7_2k </remarks>

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Khepri.Models.GOAP.ActionStrategies;
+using Khepri.GOAP.ActionStrategies;
 
-namespace Khepri.Models.GOAP
+namespace Khepri.GOAP
 {
     /// <summary> A potential action an entity can use to try to address a goal. </summary>
     public class AgentAction : IEquatable<AgentAction>

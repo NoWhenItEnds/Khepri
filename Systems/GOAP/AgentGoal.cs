@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Khepri.Models.GOAP
+namespace Khepri.GOAP
 {
     /// <summary> A goal that the agent desires and will use a chain of actions to complete. </summary>
     /// <remarks> Under the hood this is really just a series of desired states / beliefs. </remarks>

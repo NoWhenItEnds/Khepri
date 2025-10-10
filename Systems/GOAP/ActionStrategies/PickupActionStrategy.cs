@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Khepri.Models.GOAP.ActionStrategies
+namespace Khepri.GOAP.ActionStrategies
 {
     /// <summary> Attempt to pickup an item. </summary>
     public partial class PickupActionStrategy : IActionStrategy

@@ -4,7 +4,7 @@ using Khepri.Entities.Actors;
 using Khepri.Entities.Actors.Components;
 using Khepri.Entities.Devices;
 using Khepri.Entities.Items;
-using Khepri.Models.GOAP;
+using Khepri.GOAP;
 using System;
 using System.Collections.Generic;
 using System.Text;

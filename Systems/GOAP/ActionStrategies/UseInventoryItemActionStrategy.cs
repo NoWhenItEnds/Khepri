@@ -3,7 +3,7 @@ using Khepri.Resources.Items;
 using Khepri.Types.Exceptions;
 using System;
 
-namespace Khepri.Models.GOAP.ActionStrategies
+namespace Khepri.GOAP.ActionStrategies
 {
     /// <summary> Use an item in a unit's inventory. </summary>
     public partial class UseInventoryItemActionStrategy : IActionStrategy

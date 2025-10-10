@@ -4,7 +4,7 @@ using Godot;
 using Khepri.Entities.Actors;
 using Khepri.Models.Input;
 
-namespace Khepri.Models.GOAP.ActionStrategies
+namespace Khepri.GOAP.ActionStrategies
 {
     /// <summary> Wander randomly. Take in the scenery. </summary>
     public class WanderActionStrategy : IActionStrategy

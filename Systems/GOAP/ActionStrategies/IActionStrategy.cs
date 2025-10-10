@@ -1,6 +1,6 @@
 using System;
 
-namespace Khepri.Models.GOAP.ActionStrategies
+namespace Khepri.GOAP.ActionStrategies
 {
     /// <summary> The logic that is used to evaluate / carry out an action. </summary>
     public interface IActionStrategy

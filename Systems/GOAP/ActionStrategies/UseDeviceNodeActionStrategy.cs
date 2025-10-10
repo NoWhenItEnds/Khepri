@@ -1,8 +1,7 @@
-using Godot;
 using Khepri.Entities.Actors;
 using System;
 
-namespace Khepri.Models.GOAP.ActionStrategies
+namespace Khepri.GOAP.ActionStrategies
 {
     /// <summary> Use a device that is in the game world. </summary>
     public partial class UseDeviceNodeActionStrategy : IActionStrategy

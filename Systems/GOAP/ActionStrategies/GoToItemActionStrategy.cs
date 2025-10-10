@@ -5,7 +5,7 @@ using Khepri.Models.Input;
 using System;
 using System.Linq;
 
-namespace Khepri.Models.GOAP.ActionStrategies
+namespace Khepri.GOAP.ActionStrategies
 {
     /// <summary> Go to the know location of an item. </summary>
     public partial class GoToItemActionStrategy : IActionStrategy

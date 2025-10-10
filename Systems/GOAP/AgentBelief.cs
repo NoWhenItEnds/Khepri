@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Khepri.Models.GOAP
+namespace Khepri.GOAP
 {
     /// <summary> Construct beliefs on an industrial scale. </summary>
     public class BeliefFactory
