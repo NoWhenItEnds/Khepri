@@ -1,3 +1,4 @@
+#nullable disable warnings
 using Godot;
 
 namespace Khepri.Nodes.Singletons

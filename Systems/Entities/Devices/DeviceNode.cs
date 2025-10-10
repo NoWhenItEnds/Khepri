@@ -26,9 +26,6 @@ namespace Khepri.Entities.Devices
 
 
         /// <inheritdoc/>
-        public Guid UId { get; } = Guid.NewGuid();
-
-        /// <inheritdoc/>
         public Vector3 WorldPosition => GlobalPosition;
 
 

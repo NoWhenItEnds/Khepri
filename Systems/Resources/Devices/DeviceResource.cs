@@ -11,6 +11,9 @@ namespace Khepri.Resources.Devices
         [ExportGroup("General")]
         [Export] public String[] Descriptions { get; private set; }
 
+        /// <summary> The prefab used to spawn this device. </summary>
+        [Export] public PackedScene Prefab { get; private set; }
+
 
         /// <summary> A reference to the sprites the device uses in the world. </summary>
         [ExportGroup("Sprites")]

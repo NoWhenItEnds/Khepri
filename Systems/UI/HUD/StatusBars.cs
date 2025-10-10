@@ -74,7 +74,14 @@ namespace Khepri.UI.HUD
                 }
             }
 
-            return _needsContainer.GetChild(0) as TextureProgressBar;
+            if (_needsContainer.GetChild(0) is TextureProgressBar child)
+            {
+                return child;
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException("Unable to find a texture progress bar in the needs container.");
+            }
         }
 
 

@@ -52,9 +52,6 @@ namespace Khepri.Entities.Actors
 
 
         /// <inheritdoc/>
-        public Guid UId { get; } = Guid.NewGuid();
-
-        /// <inheritdoc/>
         public Vector3 WorldPosition => GlobalPosition;
 
         /// <summary> The current direction the unit is facing. </summary>

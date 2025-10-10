@@ -68,9 +68,9 @@ namespace Khepri.Models
 
 
         /// <inheritdoc/>
-        public int CompareTo(StarData other)
+        public int CompareTo(StarData? other)
         {
-            return RightAscension.CompareTo(other.RightAscension);
+            return RightAscension.CompareTo(other?.RightAscension);
         }
 
 

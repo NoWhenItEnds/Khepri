@@ -88,7 +88,7 @@ namespace Khepri.Types
         /// <returns> The now active object. </returns>
         public TNode GetAvailableObject()
         {
-            TNode result = null;
+            TNode? result = null;
 
             // Attempt to find a free object in the pool.
             foreach (KeyValuePair<TNode, Boolean> obj in _objectPool)

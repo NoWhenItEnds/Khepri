@@ -91,7 +91,7 @@ namespace Khepri.GOAP
             // TODO - Is this the best way? Probably not.
             _beliefs.Add(key, new AgentBelief.Builder(key)
                 .WithCondition(() => _unit.Sensors.TryGetItem(itemKey).Length > 0)
-                .WithCondition(() => InRangeOf(_unit.Sensors.TryGetItem(itemKey).FirstOrDefault().LastKnownPosition, distance))
+                .WithCondition(() => InRangeOf(_unit.Sensors.TryGetItem(itemKey).FirstOrDefault()?.LastKnownPosition, distance))
                 .Build());
         }
 
@@ -105,7 +105,7 @@ namespace Khepri.GOAP
             // TODO - Is this the best way? Probably not.
             _beliefs.Add(key, new AgentBelief.Builder(key)
                 .WithCondition(() => _unit.Sensors.TryGetItem(resource) != null)
-                .WithCondition(() => InRangeOf(_unit.Sensors.TryGetItem(resource).LastKnownPosition, distance))
+                .WithCondition(() => InRangeOf(_unit.Sensors.TryGetItem(resource)?.LastKnownPosition, distance))
                 .Build());
         }
 
@@ -126,7 +126,7 @@ namespace Khepri.GOAP
         /// <param name="target"> The target position. </param>
         /// <param name="range"> The acceptable range. </param>
         /// <returns> If the unit is within acceptable range of the target location. </returns>
-        private Boolean InRangeOf(Vector3 target, Single range) => _unit.GlobalPosition.DistanceTo(target) < range;
+        private Boolean InRangeOf(Vector3? target, Single range) => target != null ? _unit.GlobalPosition.DistanceTo(target.Value) < range : false;
     }
 
 
@@ -169,7 +169,7 @@ namespace Khepri.GOAP
 
 
         /// <inheritdoc/>
-        public override Boolean Equals(Object obj)
+        public override Boolean Equals(Object? obj)
         {
             AgentBelief? other = obj as AgentBelief;
             return other != null ? Name.Equals(other.Name) : false;
@@ -177,7 +177,7 @@ namespace Khepri.GOAP
 
 
         /// <inheritdoc/>
-        public bool Equals(AgentBelief other) => Name.Equals(other.Name);
+        public bool Equals(AgentBelief? other) => Name.Equals(other?.Name);
 
 
         /// <summary> A builder for creating and modifying beliefs. </summary>

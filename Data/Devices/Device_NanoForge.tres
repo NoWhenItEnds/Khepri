@@ -5,6 +5,7 @@
 
 [resource]
 script = ExtResource("1_sjqa2")
+ScriptPath = "uid://dj8hyy8422ox1"
 WorldSprites = ExtResource("1_n7j60")
 Id = "nano_forge"
 metadata/_custom_type_script = "uid://dpwyhwk1kfcv4"

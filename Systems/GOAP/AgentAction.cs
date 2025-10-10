@@ -68,7 +68,7 @@ namespace Khepri.GOAP
 
 
         /// <inheritdoc/>
-        public override Boolean Equals(Object obj)
+        public override Boolean Equals(Object? obj)
         {
             AgentAction? other = obj as AgentAction;
             return other != null ? Name.Equals(other.Name) : false;
@@ -76,7 +76,7 @@ namespace Khepri.GOAP
 
 
         /// <inheritdoc/>
-        public bool Equals(AgentAction other) => Name.Equals(other.Name);
+        public bool Equals(AgentAction? other) => Name.Equals(other?.Name);
 
 
         /// <summary> A helpful builder that allows for easy construction of agent actions. </summary>

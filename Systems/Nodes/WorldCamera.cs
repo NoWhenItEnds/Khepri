@@ -66,8 +66,10 @@ namespace Khepri.Nodes
             Single aspectRatio = (Single)viewportSize.X / (Single)viewportSize.Y;
             Single height = _mainCamera.Size;
             Single width = height * aspectRatio;
-            QuadMesh quad = _occlusionMesh.Mesh as QuadMesh;
-            quad.Size = new Vector2(width, height);
+            if(_occlusionMesh.Mesh is QuadMesh quad)
+            {
+                quad.Size = new Vector2(width, height);
+            }
         }
 
 

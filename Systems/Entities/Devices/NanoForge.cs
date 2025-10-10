@@ -1,4 +1,3 @@
-using Khepri.Controllers;
 using Khepri.Entities.Actors;
 using Khepri.Entities.Items;
 using System;
@@ -30,7 +29,7 @@ namespace Khepri.Entities.Devices
         /// <inheritdoc/>
         public override void Use(Unit activatingEntity)
         {
-            ItemNode newItem = _itemController.CreateItem("apple", GlobalPosition);
+            _itemController.CreateItem("apple", GlobalPosition);
         }
     }
 }

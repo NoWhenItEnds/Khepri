@@ -252,7 +252,7 @@ namespace Khepri.Entities.Actors.Components
 
 
         /// <inheritdoc/>
-        public override Boolean Equals(Object obj)
+        public override Boolean Equals(Object? obj)
         {
             KnownEntity? other = obj as KnownEntity;
             return other != null ? Entity.Equals(other.Entity) : false;
@@ -260,7 +260,7 @@ namespace Khepri.Entities.Actors.Components
 
 
         /// <inheritdoc/>
-        public Boolean Equals(KnownEntity other) => Entity.Equals(other.Entity);
+        public Boolean Equals(KnownEntity? other) => Entity.Equals(other?.Entity);
     }
 
 
@@ -294,7 +294,7 @@ namespace Khepri.Entities.Actors.Components
 
 
         /// <inheritdoc/>
-        public override Boolean Equals(Object obj)
+        public override Boolean Equals(Object? obj)
         {
             KnownPosition? other = obj as KnownPosition;
             return other != null ? Position.Equals(other.Position) : false;
@@ -302,6 +302,6 @@ namespace Khepri.Entities.Actors.Components
 
 
         /// <inheritdoc/>
-        public bool Equals(KnownPosition other) => Position.Equals(other.Position);
+        public bool Equals(KnownPosition? other) => Position.Equals(other?.Position);
     }
 }
