@@ -14,7 +14,7 @@ namespace Khepri.Entities.Items
         [Export] public CollisionShape3D CollisionShape { get; private set; }
 
         /// <summary> The sprite th use to represent the item. </summary>
-        [Export] private AnimatedSprite3D _sprite;
+        [Export] private Sprite3D _sprite;
 
         /// <summary> The radius to allow for interaction with the item. </summary>
         [Export] private Area3D _interactionArea;
@@ -61,6 +61,20 @@ namespace Khepri.Entities.Items
             {
                 unit.RemoveUsableEntity(this);
             }
+        }
+
+
+        /// <summary> Initialise the node with new data values. </summary>
+        /// <param name="resource"> The data resource to associate with this node. </param>
+        /// <param name="position"> The position to create the object at. </param>
+        public void Initialise(ItemResource resource, Vector3 position)
+        {
+            if (this is IPoolable<ItemResource> poolable)
+            {
+                poolable.Initialise(resource);
+            }
+            GlobalPosition = position;
+            _sprite.Texture = resource.WorldSprite;
         }
 
 

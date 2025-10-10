@@ -17,15 +17,12 @@ namespace Khepri.Resources.Items
         public abstract ItemType ItemType { get; }
 
 
-        /// <summary> A reference to the sprites the item uses to lookup its world sprite. </summary>
+        /// <summary> A reference to the sprite the item uses in the world. </summary>
         [ExportGroup("Sprites")]
-        [Export] public SpriteFrames WorldSprites { get; private set; }
+        [Export] public Texture2D WorldSprite { get; private set; }
 
-        /// <summary> A reference to the sprites the item uses in the inventory. </summary>
+        /// <summary> A reference to the sprite the item uses in the inventory. </summary>
         [Export] public Texture2D InventorySprite { get; private set; }
-
-        /// <summary> The item's index on the sprite sheet. </summary>
-        [Export] public Int32 SpriteIndex { get; private set; }
 
         /// <summary> The positions of the cells the item will take up in the inventory. </summary>
         [Export] public Array<Vector2I> InventoryCells { get; private set; }

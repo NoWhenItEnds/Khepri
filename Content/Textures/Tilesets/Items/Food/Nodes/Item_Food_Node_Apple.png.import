@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cy4b2atl02lu2"
-path="res://.godot/imported/Items_Food_Inventory.png-eb89fcdaf1ffecd96eb6ca632d80e4ec.ctex"
+uid="uid://bnc480lxnrf0o"
+path="res://.godot/imported/Item_Food_Node_Apple.png-0589e7f216a60a680339bdfd85f8f9b7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Content/Textures/Tilesets/Items/Items_Food_Inventory.png"
-dest_files=["res://.godot/imported/Items_Food_Inventory.png-eb89fcdaf1ffecd96eb6ca632d80e4ec.ctex"]
+source_file="res://Content/Textures/Tilesets/Items/Food/Nodes/Item_Food_Node_Apple.png"
+dest_files=["res://.godot/imported/Item_Food_Node_Apple.png-0589e7f216a60a680339bdfd85f8f9b7.ctex"]
 
 [params]
 

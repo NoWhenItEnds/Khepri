@@ -1,8 +1,6 @@
-[gd_scene load_steps=6 format=3 uid="uid://crta0fka14n85"]
+[gd_scene load_steps=4 format=3 uid="uid://crta0fka14n85"]
 
 [ext_resource type="Script" uid="uid://csemfp1o3paeq" path="res://Systems/Entities/Items/ItemNode.cs" id="1_0w5ry"]
-[ext_resource type="SpriteFrames" uid="uid://x4r46q3wagnx" path="res://Content/Resources/SpriteFrames/Items/SpriteFrames_Items_Nodes.tres" id="1_mt5oc"]
-[ext_resource type="Script" uid="uid://bghtlkqurxx24" path="res://Systems/Nodes/LayeredAnimatedSprite3D.cs" id="2_0w5ry"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_0w5ry"]
 height = 0.5
@@ -16,7 +14,7 @@ collision_layer = 2
 collision_mask = 2
 script = ExtResource("1_0w5ry")
 CollisionShape = NodePath("CollisionShape3D")
-_sprite = NodePath("AnimatedSprite3D")
+_sprite = NodePath("Sprite3D")
 _interactionArea = NodePath("Interaction Area")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
@@ -29,12 +27,9 @@ shape = SubResource("CylinderShape3D_0w5ry")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 shape = SubResource("CylinderShape3D_40fli")
 
-[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="."]
+[node name="Sprite3D" type="Sprite3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 pixel_size = 0.0313
 axis = 1
 shaded = true
 texture_filter = 0
-sprite_frames = ExtResource("1_mt5oc")
-animation = &"Food"
-script = ExtResource("2_0w5ry")
