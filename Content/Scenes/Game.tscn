@@ -537,6 +537,7 @@ _occlusionMesh = NodePath("MeshInstance3D")
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
 cull_mask = 1
 projection = 1
+current = true
 size = 12.0
 
 [node name="Occlusion SubViewport" type="SubViewport" parent="World/World Camera/Main Camera"]
@@ -801,7 +802,7 @@ grow_vertical = 2
 texture = ExtResource("20_pt5vb")
 stretch_mode = 1
 
-[node name="Telescope" type="Control" parent="UI/Windows" node_paths=PackedStringArray("_lookAzimuth", "_lookAltitude", "_lookRightAscension", "_lookDeclination", "_starId", "_starProperName", "_starRightAscension", "_starDeclination")]
+[node name="Telescope" type="Control" parent="UI/Windows" node_paths=PackedStringArray("_helperCamera", "_lookAzimuth", "_lookAltitude", "_lookRightAscension", "_lookDeclination", "_starId", "_starProperName", "_starRightAscension", "_starDeclination")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -809,6 +810,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("27_qemnd")
+_helperCamera = NodePath("Helper Camera")
 _lookAzimuth = NodePath("VBoxContainer/Look Azimuth")
 _lookAltitude = NodePath("VBoxContainer/Look Altitude")
 _lookRightAscension = NodePath("VBoxContainer/Look Right Ascension")
@@ -818,6 +820,8 @@ _starProperName = NodePath("VBoxContainer/Star Proper Name")
 _starRightAscension = NodePath("VBoxContainer/Star Right Ascension")
 _starDeclination = NodePath("VBoxContainer/Star Declination")
 _starfieldShader = ExtResource("28_5lwn5")
+
+[node name="Helper Camera" type="Camera3D" parent="UI/Windows/Telescope"]
 
 [node name="Starfield" type="ColorRect" parent="UI/Windows/Telescope"]
 visible = false

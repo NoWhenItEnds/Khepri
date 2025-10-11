@@ -83,11 +83,11 @@ namespace Khepri.Types.Extensions
 
 
         /// <summary> Convert spherical, horizontal coordinates to a position in world space. </summary>
-        /// <param name="altitude"> The object's altitude. Also known as theta. </param>
-        /// <param name="azimuth"> The object's azimuth. </param>
+        /// <param name="azimuth"> The object's azimuth. Its rotation on the X axis. </param>
+        /// <param name="altitude"> The object's altitude. Its rotation on the Y axis. Also known as theta. </param>
         /// <param name="radius"> The radius of the sphere to map the coordinates to. By default a unit sphere. </param>
         /// <returns> The location of the object in Godot-space. </returns>
-        public static Vector3 SphericalToCartesian(Single altitude, Single azimuth, Single radius = 1f)
+        public static Vector3 SphericalToCartesian(Single azimuth, Single altitude, Single radius = 1f)
         {
             Single sinTheta = Mathf.Sin(altitude);
             return new Vector3(sinTheta * Mathf.Sin(azimuth), Mathf.Cos(altitude), sinTheta * Mathf.Cos(azimuth)) * radius;

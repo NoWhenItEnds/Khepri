@@ -118,6 +118,6 @@ namespace Khepri.Entities.Items
 
 
         /// <inheritdoc/>
-        public void FreeObject() => _itemController.ItemPool.FreeObject(this);
+        public void FreeObject() => _itemController.StarPool.FreeObject(this);
     }
 }

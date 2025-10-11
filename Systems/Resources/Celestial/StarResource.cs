@@ -5,7 +5,7 @@ namespace Khepri.Resources.Celestial
 {
     /// <summary> The data component of a star entity. </summary>
     [GlobalClass]
-    public partial class StarResource : EntityResource
+    public partial class StarResource : EntityResource, IComparable<StarResource>
     {
         /// <summary> A common name for the star, such as "Barnard's Star" or "Sirius". These are taken from the International Astronomical Union (https://www.iau.org/public/themes/naming_stars/, specifically, the formatted version from https://github.com/mirandadam/iau-starnames). </summary>
         [ExportGroup("Statistics")]
@@ -42,5 +42,12 @@ namespace Khepri.Resources.Celestial
 
         /// <summary> The data component of a star entity. </summary>
         public StarResource() { }
+
+
+        /// <inheritdoc/>
+        public int CompareTo(StarResource? other)
+        {
+            return RightAscension.CompareTo(other?.RightAscension);
+        }
     }
 }

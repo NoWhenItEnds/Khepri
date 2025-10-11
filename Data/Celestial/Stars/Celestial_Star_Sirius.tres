@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="StarResource" load_steps=2 format=3 uid="uid://chwoxjtfso6y8"]
+
+[ext_resource type="Script" uid="uid://cqvnoj8mj5f50" path="res://Systems/Resources/Celestial/StarResource.cs" id="1_k8kqr"]
+
+[resource]
+script = ExtResource("1_k8kqr")
+ProperName = "Sirius"
+RightAscension = 6.752
+Declination = -16.716
+Distance = 2.637
+ProperMotionRightAscension = -546.01
+ProperMotionDeclination = -1223.08
+RadialVelocity = -9.4
+Magnitude = -1.44
+Id = "Gl 244A"
+metadata/_custom_type_script = "uid://cqvnoj8mj5f50"
