@@ -22,9 +22,6 @@ namespace Khepri.Entities.Devices
         /// <summary> The telescope's current azimuth. It's right to left value. Starts from N and rotates cloak-wise. </summary>
         public Single Azimuth { get; private set; } = 0f;
 
-        /// <summary> The star that is currently the closest to the telescope. </summary>
-        public StarData ClosestStar => _worldController.GetClosestStar(Azimuth, Altitude);
-
 
         /// <summary> A reference to the world location controller. </summary>
         private WorldController _worldController;

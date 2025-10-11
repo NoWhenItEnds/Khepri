@@ -1,11 +1,10 @@
 using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Devices;
-using Khepri.Models;
+using Khepri.Resources.Celestial;
 using Khepri.Types.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Khepri.UI.Windows
 {
@@ -53,7 +52,7 @@ namespace Khepri.UI.Windows
 
 
         /// <summary> The world's loaded star data, ordered first by declination, then right ascension. </summary>
-        private StarData[][] _stars = Array.Empty<StarData[]>();
+        private StarResource[][] _stars = Array.Empty<StarResource[]>();
 
         /// <summary> A reference to the telescope the player is currently using. </summary>
         private Telescope? _currentTelescope = null;
@@ -96,19 +95,20 @@ namespace Khepri.UI.Windows
                 _lookRightAscension.Text = String.Format(HORIZONTAL_FORMAT, "RGA", equatorial.X);
                 _lookDeclination.Text = String.Format(VERTICAL_FORMAT, "DEC", equatorial.Y);
 
-                StarData[] visibleStars = GetVisibleStars(equatorial);
-                StarData closestStar = GetClosestStar(visibleStars, equatorial);
+                StarResource[] visibleStars = GetVisibleStars(equatorial);
+                StarResource closestStar = GetClosestStar(visibleStars, equatorial);
 
-                _starId.Text = closestStar.GetId();
-                _starProperName.Text = closestStar.Proper;
+                _starId.Text = closestStar.Id;
+                _starProperName.Text = closestStar.ProperName;
                 _starRightAscension.Text = String.Format(HORIZONTAL_FORMAT, "RGA", Mathf.RadToDeg(closestStar.RightAscension));
                 _starDeclination.Text = String.Format(VERTICAL_FORMAT, "DEC", Mathf.RadToDeg(closestStar.Declination));
 
-                SetStarfieldShader(equatorial.Y);
+                //SetStarfieldShader(equatorial.Y);
             }
         }
 
 
+        /*
         private void SetStarfieldShader(Single declination)
         {
             StarData[] stars = _worldController.GetStars(declination);
@@ -127,19 +127,19 @@ namespace Khepri.UI.Windows
             _starfieldShader.SetShaderParameter("size", positions.Length);
             _starfieldShader.SetShaderParameter("positions", positions);
             _starfieldShader.SetShaderParameter("colours", colours);
-        }
+        }*/
 
 
         /// <summary> Get the star resources visible from a given azimuth and altitude. </summary>
         /// <param name="equatorial"> The observing telescope's rotation in relation to the celestial sphere. </param>
         /// <returns> All the stars that are currently on the screen. </returns>
-        private StarData[] GetVisibleStars(Vector2 equatorial)
+        private StarResource[] GetVisibleStars(Vector2 equatorial)
         {
-            StarData[] nearbyStars = _stars.FilterData(equatorial.Y);
+            StarResource[] nearbyStars = _stars.FilterData(equatorial.Y);
 
-            List<StarData> visibleStars = new List<StarData>();
+            List<StarResource> visibleStars = new List<StarResource>();
             Rect2 viewportRect = GetViewportRect();
-            foreach (StarData star in nearbyStars)
+            foreach (StarResource star in nearbyStars)
             {
                 Vector2 horizontal = MathExtensions.ConvertToHorizontal(star.RightAscension, star.Declination, _worldController.Latitude, _worldController.LocalSiderealTime);
                 Vector3 starPosition = MathExtensions.SphericalToCartesian(horizontal.X, horizontal.Y, 1000f);
@@ -158,14 +158,14 @@ namespace Khepri.UI.Windows
         /// <param name="stars"> The array of stars to check. </param>
         /// <param name="equatorial"> The observing telescope's rotation in relation to the celestial sphere. </param>
         /// <returns> The star closest to the given coordinate. </returns>
-        private StarData GetClosestStar(StarData[] stars, Vector2 equatorial)
+        private StarResource GetClosestStar(StarResource[] stars, Vector2 equatorial)
         {
             // Ensure that there are stars in the array.
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stars.Length);
 
-            StarData closestStar = stars[0];
+            StarResource closestStar = stars[0];
             Single previousDistance = equatorial.DistanceTo(new Vector2((Single)stars[0].RightAscension, (Single)stars[0].Declination));
-            foreach (StarData star in stars)
+            foreach (StarResource star in stars)
             {
                 Single currentDistance = equatorial.DistanceTo(new Vector2((Single)Mathf.RadToDeg(star.RightAscension), (Single)Mathf.RadToDeg(star.Declination)));
                 if (currentDistance < previousDistance)
