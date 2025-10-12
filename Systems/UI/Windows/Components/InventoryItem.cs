@@ -4,7 +4,6 @@ using Khepri.Entities.Items;
 using Khepri.Resources.Items;
 using Khepri.Types;
 using System;
-using System.Linq;
 
 namespace Khepri.UI.Windows.Components
 {

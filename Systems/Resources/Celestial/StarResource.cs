@@ -65,8 +65,74 @@ namespace Khepri.Resources.Celestial
         public StarResource() { }
 
 
+        public Color CalculateColour()
+        {
+            // Clamp B-V to valid range [-0.4, 2.0]
+            Single colourIndex = Math.Clamp(ColourIndex, -0.4f, 2f);
+
+            float r = 0f, g = 0f, b = 0f;
+            float t;
+
+            // Compute red component
+            if (colourIndex >= -0.40f && colourIndex < 0.00f)
+            {
+                t = (colourIndex + 0.40f) / (0.00f + 0.40f);
+                r = 0.61f + (0.11f * t) + (0.1f * t * t);
+            }
+            else if (colourIndex >= 0.00f && colourIndex < 0.40f)
+            {
+                t = (colourIndex - 0.00f) / (0.40f - 0.00f);
+                r = 0.83f + (0.17f * t);
+            }
+            else if (colourIndex >= 0.40f && colourIndex < 2.10f)
+            {
+                r = 1.00f;
+            }
+
+            // Compute green component
+            if (colourIndex >= -0.40f && colourIndex < 0.00f)
+            {
+                t = (colourIndex + 0.40f) / (0.00f + 0.40f);
+                g = 0.70f + (0.07f * t) + (0.1f * t * t);
+            }
+            else if (colourIndex >= 0.00f && colourIndex < 0.40f)
+            {
+                t = (colourIndex - 0.00f) / (0.40f - 0.00f);
+                g = 0.87f + (0.11f * t);
+            }
+            else if (colourIndex >= 0.40f && colourIndex < 1.60f)
+            {
+                t = (colourIndex - 0.40f) / (1.60f - 0.40f);
+                g = 0.98f - (0.16f * t);
+            }
+            else if (colourIndex >= 1.60f && colourIndex < 2.00f)
+            {
+                t = (colourIndex - 1.60f) / (2.00f - 1.60f);
+                g = 0.82f - (0.5f * t * t);
+            }
+
+            // Compute blue component
+            if (colourIndex >= -0.40f && colourIndex < 0.40f)
+            {
+                b = 1.00f;
+            }
+            else if (colourIndex >= 0.40f && colourIndex < 1.50f)
+            {
+                t = (colourIndex - 0.40f) / (1.50f - 0.40f);
+                b = 1.00f - (0.47f * t) + (0.1f * t * t);
+            }
+            else if (colourIndex >= 1.50f && colourIndex < 1.94f)
+            {
+                t = (colourIndex - 1.50f) / (1.94f - 1.50f);
+                b = 0.63f - (0.6f * t * t);
+            }
+
+            return new Color(r, g, b);
+        }
+
+
         /// <inheritdoc/>
-        public int CompareTo(StarResource? other)
+        public Int32 CompareTo(StarResource? other)
         {
             return RightAscension.CompareTo(other?.RightAscension);
         }

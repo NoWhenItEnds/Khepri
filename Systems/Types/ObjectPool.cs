@@ -11,10 +11,6 @@ namespace Khepri.Types
     /// <typeparam name="TResource"> The kind of date the node represents. </typeparam>
     public class ObjectPool<TNode, TResource> where TNode : Node, IPoolable<TResource> where TResource : EntityResource
     {
-        /// <summary> How many item nodes the item pool should initially contain. </summary>
-        private Int32 _initialPoolSize = 100;
-
-
         /// <summary> A pool that holds objects that are in the game world. A boolean shows if an object is currently in use. </summary>
         private Dictionary<TNode, Boolean> _objectPool = new Dictionary<TNode, Boolean>();
 
@@ -25,11 +21,19 @@ namespace Khepri.Types
         /// <summary> The prefab to spawn additional objects from. </summary>
         private readonly PackedScene PREFAB;
 
+        /// <summary> How many item nodes the item pool should initially contain. </summary>
+        private readonly Int32 INITIAL_SIZE = 100;
 
-        public ObjectPool(Node parentNode, PackedScene objectPrefab)
+
+        /// <summary> A caching system for pulling objects from a pool of initialised objects on command. </summary>
+        /// <param name="parentNode"> The node to use as the spawned nodes' parent. </param>
+        /// <param name="objectPrefab"> The prefab to spawn additional objects from. </param>
+        /// <param name="initialSize"> How many item nodes the item pool should initially contain. </param>
+        public ObjectPool(Node parentNode, PackedScene objectPrefab, Int32 initialSize = 100)
         {
             PARENT_NODE = parentNode;
             PREFAB = objectPrefab;
+            INITIAL_SIZE = initialSize;
 
             // Add any existing objects.
             var children = PARENT_NODE.GetChildren();
@@ -42,7 +46,7 @@ namespace Khepri.Types
             }
 
             // Build the pool.
-            for (Int32 i = 0; i < _initialPoolSize; i++)
+            for (Int32 i = 0; i < INITIAL_SIZE; i++)
             {
                 BuildItem();
             }

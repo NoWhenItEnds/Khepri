@@ -34,7 +34,7 @@ namespace Khepri.UI.Debug.Units
         public override void _PhysicsProcess(Double delta)
         {
             // TODO - Pull all the units from the central unit factory when it's created.
-            if (_enemyUnit.VisibilityNotifier.IsOnScreen())
+            if (_showDebug && _enemyUnit.VisibilityNotifier.IsOnScreen())
             {
                 if (!_activeMenus.ContainsKey(_enemyUnit))
                 {
