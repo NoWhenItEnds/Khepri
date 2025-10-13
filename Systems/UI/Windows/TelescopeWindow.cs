@@ -23,6 +23,7 @@ namespace Khepri.UI.Windows
         /// <summary> The container to spawn star nodes within. </summary>
         [Export] private Control _starContainer;
 
+
         /// <summary> The telescope's local azimuth. </summary>
         [ExportSubgroup("Labels")]
         [Export] private RichTextLabel _lookAzimuth;
@@ -51,12 +52,14 @@ namespace Khepri.UI.Windows
 
         /// <summary> How many degrees each pfile of star in the array represents. </summary>
         [ExportGroup("Settings")]
-        [Export] private Single _starSegmentSize = 2f;
+        [Export] private Single _starSegmentSize = 5f;
 
 
+        /// <summary> A shader to to use for the starfield. </summary>
         [ExportGroup("Resources")]
         [Export] private ShaderMaterial _starfieldShader;
 
+        /// <summary> The prefab to use for spawning star objects. </summary>
         [Export] private PackedScene _starPrefab;
 
 
@@ -103,6 +106,12 @@ namespace Khepri.UI.Windows
         {
             if (Visible && _currentTelescope != null)
             {
+                Single fovRad = Mathf.DegToRad(_helperCamera.Fov);
+                Vector2 size = GetViewport().GetVisibleRect().Size;
+                Single ratio = size.X / size.Y;
+                Single height = (Single)Math.Tan(fovRad / 2f);
+                _starContainer1.Scale = new Vector2(height * ratio, height);
+
                 Vector2 equatorial = MathExtensions.ConvertToEquatorial(_currentTelescope.Azimuth, _currentTelescope.Altitude, _worldController.Latitude, _worldController.LocalSiderealTime);
                 _lookAzimuth.Text = String.Format(HORIZONTAL_FORMAT, "AZI", _currentTelescope.Azimuth);
                 _lookAltitude.Text = String.Format(VERTICAL_FORMAT, "ALT", _currentTelescope.Altitude);
@@ -157,7 +166,7 @@ namespace Khepri.UI.Windows
             StarResource[] nearbyStars = _stars.FilterData(equatorial.Y);
 
             List<TelescopeItem> visibleStars = new List<TelescopeItem>();
-            Rect2 viewportRect = GetViewportRect();
+            Rect2 viewportRect = _starContainer.GetRect();
             foreach (StarResource star in nearbyStars)
             {
                 Vector2 horizontal = MathExtensions.ConvertToHorizontal(Mathf.RadToDeg(star.RightAscension), Mathf.RadToDeg(star.Declination), _worldController.Latitude, _worldController.LocalSiderealTime);

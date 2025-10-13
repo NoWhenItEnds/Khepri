@@ -75,8 +75,6 @@ albedo_texture = SubResource("ViewportTexture_gh1u3")
 
 [node name="World Controller" type="Node" parent="Controllers"]
 script = ExtResource("1_8fov1")
-Latitude = 90.0
-Longitude = 0.0
 
 [node name="Resource Controller" type="Node" parent="Controllers"]
 script = ExtResource("2_nskmx")
@@ -805,7 +803,7 @@ grow_vertical = 2
 texture = ExtResource("20_pt5vb")
 stretch_mode = 1
 
-[node name="Telescope" type="Control" parent="UI/Windows" node_paths=PackedStringArray("_helperCamera", "_starContainer", "_lookAzimuth", "_lookAltitude", "_lookRightAscension", "_lookDeclination", "_starId", "_starProperName", "_starRightAscension", "_starDeclination")]
+[node name="Telescope" type="Control" parent="UI/Windows" node_paths=PackedStringArray("_helperCamera", "_starContainer", "_starContainer1", "_lookAzimuth", "_lookAltitude", "_lookRightAscension", "_lookDeclination", "_starId", "_starProperName", "_starRightAscension", "_starDeclination")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -815,6 +813,7 @@ grow_vertical = 2
 script = ExtResource("27_qemnd")
 _helperCamera = NodePath("Helper Camera")
 _starContainer = NodePath("Stars")
+_starContainer1 = NodePath("Background")
 _lookAzimuth = NodePath("VBoxContainer/Look Azimuth")
 _lookAltitude = NodePath("VBoxContainer/Look Altitude")
 _lookRightAscension = NodePath("VBoxContainer/Look Right Ascension")
@@ -827,16 +826,17 @@ _starfieldShader = ExtResource("28_5lwn5")
 _starPrefab = ExtResource("31_a8dtn")
 
 [node name="Helper Camera" type="Camera3D" parent="UI/Windows/Telescope"]
-fov = 10.0
+fov = 5.0
 
 [node name="Background" type="ColorRect" parent="UI/Windows/Telescope"]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 1)
+color = Color(0, 0.7529412, 0.5294118, 1)
 
 [node name="Stars" type="Control" parent="UI/Windows/Telescope"]
 layout_mode = 1

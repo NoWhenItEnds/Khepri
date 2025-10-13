@@ -1,4 +1,5 @@
 using Godot;
+using Khepri.Nodes.Extensions;
 using Khepri.Resources.Celestial;
 using Khepri.Types;
 

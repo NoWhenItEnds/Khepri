@@ -36,32 +36,33 @@ namespace Khepri.Types.Extensions
         /// <returns> The coordinates of a celestial object relative to the observer in degrees. X = azimuth, Y = altitude. </returns>
         public static Vector2 ConvertToHorizontal(Double rightAscension, Double declination, Double latitude, Double localSiderealTime)
         {
-            // Compute hour angle in degrees, normalized to 0-360.
-            Double haDeg = (localSiderealTime - rightAscension + 360.0) % 360.0;
+            // Compute hour angle in degrees, normalised to [-180, +180].
+            Double haDeg = localSiderealTime - rightAscension;
+            haDeg = ((haDeg + 180.0) % 360.0) - 180.0;
 
             Double haRad = Mathf.DegToRad(haDeg);
             Double decRad = Mathf.DegToRad(declination);
             Double latRad = Mathf.DegToRad(latitude);
 
             Double sinAlt = Math.Sin(decRad) * Math.Sin(latRad) + Math.Cos(decRad) * Math.Cos(latRad) * Math.Cos(haRad);
+            sinAlt = Math.Max(-1.0, Math.Min(1.0, sinAlt)); // Clamp to [-1, 1] to handle floating-point precision issues.
 
-            // Altitude in radians and degrees
             Double altRad = Math.Asin(sinAlt);
             Double altDeg = Mathf.RadToDeg(altRad);
 
-            // Avoid division by zero if altitude is exactly ±90 degrees (zenith/nadir).
-            if (Math.Abs(altDeg) >= 90.0 - 1e-10)
+            // Use sqrt for cosAlt to ensure it's non-negative.
+            Double cosAlt = Math.Sqrt(1.0 - sinAlt * sinAlt);
+
+            // At zenith or nadir, azimuth is undefined; set to 0 by convention.
+            Double azDeg = 0.0;
+
+            if (cosAlt >= 1e-6) // Greater than epsilon.
             {
-                return new Vector2(0f, (Single)altDeg);
+                Double sinAz = -Math.Cos(decRad) * Math.Sin(haRad) / cosAlt;
+                Double cosAz = (Math.Sin(decRad) * Math.Cos(latRad) - Math.Cos(decRad) * Math.Cos(haRad) * Math.Sin(latRad)) / cosAlt;
+                azDeg = Mathf.RadToDeg(Math.Atan2(sinAz, cosAz));
+                if (azDeg < 0.0) azDeg += 360.0;    // Normalise azimuth to 0-360.
             }
-
-            Double cosAlt = Math.Cos(altRad);
-            Double sinAz = -Math.Sin(haRad) * Math.Cos(decRad) / cosAlt;
-            Double cosAz = (Math.Sin(decRad) - Math.Sin(altRad) * Math.Sin(latRad)) / (cosAlt * Math.Cos(latRad));
-            Double azDeg = Mathf.RadToDeg(Math.Atan2(sinAz, cosAz));
-
-            // Normalize azimuth to 0-360
-            if (azDeg < 0) azDeg += 360.0;
 
             return new Vector2((Single)azDeg, (Single)altDeg);
         }
@@ -90,7 +91,11 @@ namespace Khepri.Types.Extensions
         public static Vector3 SphericalToCartesian(Single azimuth, Single altitude, Single radius = 1f)
         {
             Single sinTheta = Mathf.Sin(altitude);
-            return new Vector3(sinTheta * Mathf.Sin(azimuth), Mathf.Cos(altitude), sinTheta * Mathf.Cos(azimuth)) * radius;
+            return new Vector3(
+                sinTheta * Mathf.Sin(azimuth),
+                Mathf.Cos(altitude),
+                sinTheta * Mathf.Cos(azimuth)
+            ) * radius;
         }
     }
 }
