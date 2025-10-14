@@ -1,7 +1,6 @@
 using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Actors;
-using Khepri.Models;
 using Khepri.Models.Input;
 using Khepri.Types.Extensions;
 using System;
@@ -13,7 +12,7 @@ namespace Khepri.Entities.Devices
     {
         /// <summary> A modifier to increase the sensitivity of the input. </summary>
         [ExportGroup("Settings")]
-        [Export] private Single _inputSensitivity = 0.5f;
+        [Export] private Single _inputSensitivity = 0.1f;
 
 
         /// <summary> The telescope's current altitude. It's up and down value. </summary>
@@ -50,7 +49,7 @@ namespace Khepri.Entities.Devices
             if (input is MoveInput moveInput)
             {
                 Altitude = Math.Clamp(Altitude + (moveInput.Direction.Z * -1f) * _inputSensitivity, 0f, 90f);
-                Azimuth += moveInput.Direction.X * _inputSensitivity;
+                Azimuth += (moveInput.Direction.X * -1f) * _inputSensitivity;
                 Azimuth = (Single)MathExtensions.WrapValue(Azimuth, 360);
             }
             else if (input is UseInput useInput)

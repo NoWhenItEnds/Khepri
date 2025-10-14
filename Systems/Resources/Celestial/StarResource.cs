@@ -65,6 +65,32 @@ namespace Khepri.Resources.Celestial
         public StarResource() { }
 
 
+        /// <summary> Get the most appropriate identifier to represent the object. </summary>
+        /// <returns> An identifier that represents the star in a star catalogue. </returns>
+        public String GetIdentifier()
+        {
+            String result = "UNKNOWN";
+            if (HRId != -1)
+            {
+                result = $"HR {HRId}";
+            }
+            else if (HipId != -1)
+            {
+                result = $"HIP {HipId}";
+            }
+            else if (HDId != -1)
+            {
+                result = $"HD {HipId}";
+            }
+            else if (!String.IsNullOrEmpty(GLId))
+            {
+                result = GLId;
+            }
+
+            return result;
+        }
+
+
         public Color CalculateColour()
         {
             // Clamp B-V to valid range [-0.4, 2.0]

@@ -78,10 +78,13 @@ namespace Khepri.UI.Windows
 
 
         /// <summary> The format to use for azimuth and right ascension labels. </summary>
-        private const String HORIZONTAL_FORMAT = "[color=red]{0}: {1:000.000}°";
+        private const String HORIZONTAL_FORMAT = "[color=#bf0001]{0}: {1:000.000}°";
 
         /// <summary> The format to use for altitude and declination labels. </summary>
-        private const String VERTICAL_FORMAT = "[color=red]{0}: {1:+00.000;-00.000}°";
+        private const String VERTICAL_FORMAT = "[color=#bf0001]{0}: {1:+00.000;-00.000}°";
+
+        /// <summary> How to format simple text on the label. </summary>
+        private const String TEXT_FORMAT = "[color=#bf0001]{0}";
 
 
         /// <inheritdoc/>
@@ -106,12 +109,6 @@ namespace Khepri.UI.Windows
         {
             if (Visible && _currentTelescope != null)
             {
-                Single fovRad = Mathf.DegToRad(_helperCamera.Fov);
-                Vector2 size = GetViewport().GetVisibleRect().Size;
-                Single ratio = size.X / size.Y;
-                Single height = (Single)Math.Tan(fovRad / 2f);
-                _starContainer1.Scale = new Vector2(height * ratio, height);
-
                 Vector2 equatorial = MathExtensions.ConvertToEquatorial(_currentTelescope.Azimuth, _currentTelescope.Altitude, _worldController.Latitude, _worldController.LocalSiderealTime);
                 _lookAzimuth.Text = String.Format(HORIZONTAL_FORMAT, "AZI", _currentTelescope.Azimuth);
                 _lookAltitude.Text = String.Format(VERTICAL_FORMAT, "ALT", _currentTelescope.Altitude);
@@ -125,13 +122,11 @@ namespace Khepri.UI.Windows
                 if(visibleStars.Length > 0)
                 {
                     TelescopeItem closestStar = GetClosestStar(visibleStars, equatorial);
-                    _starId.Text = closestStar.Resource.Id;
-                    _starProperName.Text = closestStar.Resource.ProperName;
+                    _starId.Text = String.Format(TEXT_FORMAT, closestStar.Resource.GetIdentifier());
+                    _starProperName.Text = String.Format(TEXT_FORMAT, closestStar.Resource.ProperName);
                     _starRightAscension.Text = String.Format(HORIZONTAL_FORMAT, "RGA", Mathf.RadToDeg(closestStar.Resource.RightAscension));
                     _starDeclination.Text = String.Format(VERTICAL_FORMAT, "DEC", Mathf.RadToDeg(closestStar.Resource.Declination));
                 }
-
-                QueueRedraw();
             }
         }
 
@@ -182,17 +177,6 @@ namespace Khepri.UI.Windows
 
             return visibleStars.ToArray();
         }
-
-
-        public override void _Draw()
-        {
-            if(_currentTelescope != null)
-            {
-                Vector2 screenPosition = _helperCamera.GetScreenPosition(_currentTelescope.Azimuth, _currentTelescope.Altitude);
-                DrawCircle(screenPosition, 12f, Colors.Red);
-            }
-        }
-
 
 
         /// <summary> Gets the star closest to the given coordinates. </summary>
