@@ -119,7 +119,8 @@ namespace Khepri.UI.Windows
                 _helperCamera.SetRotationHorizontal(_currentTelescope.Azimuth, _currentTelescope.Altitude);
                 TelescopeItem[] visibleStars = GetVisibleStars(equatorial);
 
-                if(visibleStars.Length > 0)
+                SetStarfieldShader(visibleStars);
+                if (visibleStars.Length > 0)
                 {
                     TelescopeItem closestStar = GetClosestStar(visibleStars, equatorial);
                     _starId.Text = String.Format(TEXT_FORMAT, closestStar.Resource.GetIdentifier());
@@ -131,26 +132,13 @@ namespace Khepri.UI.Windows
         }
 
 
-        /*
-        private void SetStarfieldShader(Single declination)
+        private void SetStarfieldShader(TelescopeItem[] visibleStars)
         {
-            StarData[] stars = _worldController.GetStars(declination);
-
-            Random random = new Random();
-            Vector3[] positions = stars
-                .Select(s => MathExtensions.ConvertToHorizontal(s.RightAscension, s.Declination, _worldController.Latitude, _worldController.LocalSiderealTime))
-                .Select(h => MathExtensions.SphericalToCartesian(h.Y, h.X)).ToArray();
-
-            Color[] colours = new Color[positions.Length];
-            for (Int32 i = 0; i < colours.Length; i++)
-            {
-                colours[i] = new Color(random.NextSingle(), random.NextSingle(), random.NextSingle());
-            }
-
-            _starfieldShader.SetShaderParameter("size", positions.Length);
+            Vector2[] positions = visibleStars.Select(x => x.TestPosition).ToArray();
+            _starfieldShader.SetShaderParameter("size", visibleStars.Length);
             _starfieldShader.SetShaderParameter("positions", positions);
-            _starfieldShader.SetShaderParameter("colours", colours);
-        }*/
+            _starfieldShader.SetShaderParameter("colours", visibleStars.Select(x => x.Resource.CalculateColour()).ToArray());
+        }
 
 
         /// <summary> Get the star resources visible from a given azimuth and altitude. </summary>

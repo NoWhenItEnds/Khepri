@@ -826,7 +826,7 @@ _starfieldShader = ExtResource("28_5lwn5")
 _starPrefab = ExtResource("31_a8dtn")
 
 [node name="Helper Camera" type="Camera3D" parent="UI/Windows/Telescope"]
-fov = 5.0
+fov = 10.0
 
 [node name="Background" type="ColorRect" parent="UI/Windows/Telescope"]
 layout_mode = 1
@@ -838,6 +838,7 @@ grow_vertical = 2
 color = Color(0, 0, 0.34117648, 1)
 
 [node name="Stars" type="Control" parent="UI/Windows/Telescope"]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -845,7 +846,18 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="Background2" type="ColorRect" parent="UI/Windows/Telescope"]
+material = ExtResource("28_5lwn5")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0)
+
 [node name="Vignette" type="ColorRect" parent="UI/Windows/Telescope"]
+visible = false
 material = ExtResource("28_dt3xa")
 layout_mode = 1
 anchors_preset = 15

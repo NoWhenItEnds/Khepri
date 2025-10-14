@@ -20,6 +20,8 @@ namespace Khepri.UI.Windows.Components
         /// <summary> A reference to the window this item is parented to. </summary>
         private TelescopeWindow _window;
 
+        public Vector2 TestPosition;
+
 
         /// <summary> Create the telescope item by settings its internal variables. </summary>
         /// <param name="window"> A reference to the window this item is parented to. </param>
@@ -29,6 +31,7 @@ namespace Khepri.UI.Windows.Components
         {
             _window = window;
             GlobalPosition = position;
+            TestPosition = position;
             if (this is IPoolable<StarResource> poolable)
             {
                 poolable.Initialise(resource);
