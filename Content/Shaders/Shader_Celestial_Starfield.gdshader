@@ -1,8 +1,8 @@
 shader_type canvas_item;
 
 uniform int size;
-uniform vec2 positions[2000];
-uniform vec4 colours[2000];
+uniform vec3 positions[2095];
+uniform vec4 colours[2095];
 
 varying vec2 pixel_pos;
 
@@ -12,8 +12,9 @@ void vertex() {
 
 void fragment() {
     for (int i = 0; i < size; i++) {
-		vec2 position = positions[i]; 
-		if(distance(position, pixel_pos) < 5.0) {
+		vec2 position = positions[i].xy; 
+		float magnitude = positions[i].z;
+		if(distance(position, pixel_pos) < magnitude) {
 			COLOR = colours[i];
 		}
     }

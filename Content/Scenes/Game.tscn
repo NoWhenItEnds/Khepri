@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=3 uid="uid://ko6nvcupfcf4"]
+[gd_scene load_steps=43 format=3 uid="uid://ko6nvcupfcf4"]
 
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="Script" uid="uid://cgujt8yhxbsew" path="res://Systems/Controllers/WorldController.cs" id="1_8fov1"]
@@ -33,7 +33,6 @@
 [ext_resource type="Script" uid="uid://ptu2siel5uff" path="res://Systems/UI/Windows/TelescopeWindow.cs" id="27_qemnd"]
 [ext_resource type="Material" uid="uid://b3aob0eitxdfa" path="res://Content/Materials/Celestial/Material_Celestial_Starfield.tres" id="28_5lwn5"]
 [ext_resource type="Material" uid="uid://cxosp5fguv4vd" path="res://Content/Materials/Material_Telescope_Vignette.tres" id="28_dt3xa"]
-[ext_resource type="PackedScene" uid="uid://dufo5fpe1568h" path="res://Content/Prefabs/UI/Windows/Components/TelescopeItem.tscn" id="31_a8dtn"]
 [ext_resource type="Material" uid="uid://c1uwl4bmhj4bd" path="res://Content/Materials/Material_Telescope_Crosshair.tres" id="33_4buj1"]
 
 [sub_resource type="Environment" id="Environment_gh1u3"]
@@ -804,7 +803,7 @@ grow_vertical = 2
 texture = ExtResource("20_pt5vb")
 stretch_mode = 1
 
-[node name="Telescope" type="Control" parent="UI/Windows" node_paths=PackedStringArray("_helperCamera", "_starContainer", "_lookAzimuth", "_lookAltitude", "_lookRightAscension", "_lookDeclination", "_starId", "_starProperName", "_starRightAscension", "_starDeclination")]
+[node name="Telescope" type="Control" parent="UI/Windows" node_paths=PackedStringArray("_helperCamera", "_lookAzimuth", "_lookAltitude", "_lookRightAscension", "_lookDeclination", "_starId", "_starProperName", "_starRightAscension", "_starDeclination")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -813,7 +812,6 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("27_qemnd")
 _helperCamera = NodePath("Helper Camera")
-_starContainer = NodePath("Stars")
 _lookAzimuth = NodePath("VBoxContainer/Look Azimuth")
 _lookAltitude = NodePath("VBoxContainer/Look Altitude")
 _lookRightAscension = NodePath("VBoxContainer/Look Right Ascension")
@@ -823,10 +821,9 @@ _starProperName = NodePath("VBoxContainer/Star Proper Name")
 _starRightAscension = NodePath("VBoxContainer/Star Right Ascension")
 _starDeclination = NodePath("VBoxContainer/Star Declination")
 _starfieldShader = ExtResource("28_5lwn5")
-_starPrefab = ExtResource("31_a8dtn")
 
 [node name="Helper Camera" type="Camera3D" parent="UI/Windows/Telescope"]
-fov = 10.0
+fov = 15.0
 
 [node name="Background" type="ColorRect" parent="UI/Windows/Telescope"]
 layout_mode = 1
@@ -835,18 +832,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0.34117648, 1)
+color = Color(0, 0, 0, 1)
 
-[node name="Stars" type="Control" parent="UI/Windows/Telescope"]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Background2" type="ColorRect" parent="UI/Windows/Telescope"]
+[node name="Starfield" type="ColorRect" parent="UI/Windows/Telescope"]
 material = ExtResource("28_5lwn5")
 layout_mode = 1
 anchors_preset = 15
@@ -857,7 +845,6 @@ grow_vertical = 2
 color = Color(1, 1, 1, 0)
 
 [node name="Vignette" type="ColorRect" parent="UI/Windows/Telescope"]
-visible = false
 material = ExtResource("28_dt3xa")
 layout_mode = 1
 anchors_preset = 15

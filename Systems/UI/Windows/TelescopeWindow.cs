@@ -3,9 +3,7 @@ using Khepri.Controllers;
 using Khepri.Entities.Devices;
 using Khepri.Nodes.Extensions;
 using Khepri.Resources.Celestial;
-using Khepri.Types;
 using Khepri.Types.Extensions;
-using Khepri.UI.Windows.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,9 +17,6 @@ namespace Khepri.UI.Windows
         [ExportGroup("Nodes")]
         [ExportSubgroup("Helpers")]
         [Export] private Camera3D _helperCamera;
-
-        /// <summary> The container to spawn star nodes within. </summary>
-        [Export] private Control _starContainer;
 
 
         /// <summary> The telescope's local azimuth. </summary>
@@ -52,19 +47,12 @@ namespace Khepri.UI.Windows
 
         /// <summary> How many degrees each pfile of star in the array represents. </summary>
         [ExportGroup("Settings")]
-        [Export] private Single _starSegmentSize = 5f;
+        [Export] private Single _starSegmentSize = 10f;
 
 
         /// <summary> A shader to to use for the starfield. </summary>
         [ExportGroup("Resources")]
         [Export] private ShaderMaterial _starfieldShader;
-
-        /// <summary> The prefab to use for spawning star objects. </summary>
-        [Export] private PackedScene _starPrefab;
-
-
-        /// <summary> A pool of objects to use for rendering stars. </summary>
-        public ObjectPool<TelescopeItem, StarResource> StarPool { get; private set; }
 
 
         /// <summary> The world's loaded star data, ordered first by declination, then right ascension. </summary>
@@ -90,7 +78,6 @@ namespace Khepri.UI.Windows
         /// <inheritdoc/>
         public override void _Ready()
         {
-            StarPool = new ObjectPool<TelescopeItem, StarResource>(_starContainer, _starPrefab, 2000);
             _worldController = WorldController.Instance;
             _stars = StarDataExtensions.Load2DArrayFromFile(_starSegmentSize);
         }
@@ -115,55 +102,56 @@ namespace Khepri.UI.Windows
                 _lookRightAscension.Text = String.Format(HORIZONTAL_FORMAT, "RGA", equatorial.X);
                 _lookDeclination.Text = String.Format(VERTICAL_FORMAT, "DEC", equatorial.Y);
 
-                StarPool.FreeAll();
                 _helperCamera.SetRotationHorizontal(_currentTelescope.Azimuth, _currentTelescope.Altitude);
-                TelescopeItem[] visibleStars = GetVisibleStars(equatorial);
+                (StarResource[] Stars, Vector3[] Positions) visibleStars = GetVisibleStars(equatorial);
 
-                SetStarfieldShader(visibleStars);
-                if (visibleStars.Length > 0)
+                SetStarfieldShader(visibleStars.Positions, visibleStars.Stars.Select(x => x.CalculateColour()).ToArray());
+                if (visibleStars.Stars.Length > 0)
                 {
-                    TelescopeItem closestStar = GetClosestStar(visibleStars, equatorial);
-                    _starId.Text = String.Format(TEXT_FORMAT, closestStar.Resource.GetIdentifier());
-                    _starProperName.Text = String.Format(TEXT_FORMAT, closestStar.Resource.ProperName);
-                    _starRightAscension.Text = String.Format(HORIZONTAL_FORMAT, "RGA", Mathf.RadToDeg(closestStar.Resource.RightAscension));
-                    _starDeclination.Text = String.Format(VERTICAL_FORMAT, "DEC", Mathf.RadToDeg(closestStar.Resource.Declination));
+                    StarResource closestStar = GetClosestStar(visibleStars.Stars, equatorial);
+                    _starId.Text = String.Format(TEXT_FORMAT, closestStar.GetIdentifier());
+                    _starProperName.Text = String.Format(TEXT_FORMAT, closestStar.ProperName);
+                    _starRightAscension.Text = String.Format(HORIZONTAL_FORMAT, "RGA", Mathf.RadToDeg(closestStar.RightAscension));
+                    _starDeclination.Text = String.Format(VERTICAL_FORMAT, "DEC", Mathf.RadToDeg(closestStar.Declination));
                 }
             }
         }
 
 
-        private void SetStarfieldShader(TelescopeItem[] visibleStars)
+        /// <summary> Set the values of the starfield shader. </summary>
+        /// <param name="positions"> An array of star positions, and magnitudes. </param>
+        /// <param name="colours"> A matching array of star colours. </param>
+        private void SetStarfieldShader(Vector3[] positions, Color[] colours)
         {
-            Vector2[] positions = visibleStars.Select(x => x.TestPosition).ToArray();
-            _starfieldShader.SetShaderParameter("size", visibleStars.Length);
+            _starfieldShader.SetShaderParameter("size", positions.Length);
             _starfieldShader.SetShaderParameter("positions", positions);
-            _starfieldShader.SetShaderParameter("colours", visibleStars.Select(x => x.Resource.CalculateColour()).ToArray());
+            _starfieldShader.SetShaderParameter("colours", colours);
         }
 
 
         /// <summary> Get the star resources visible from a given azimuth and altitude. </summary>
         /// <param name="equatorial"> The observing telescope's rotation in relation to the celestial sphere. </param>
-        /// <returns> All the stars that are currently on the screen. </returns>
-        private TelescopeItem[] GetVisibleStars(Vector2 equatorial)
+        /// <returns> All the stars that are currently on the screen, and their positions within screen space. </returns>
+        private (StarResource[] Stars, Vector3[] Positions) GetVisibleStars(Vector2 equatorial)
         {
             StarResource[] nearbyStars = _stars.FilterData(equatorial.Y);
 
-            List<TelescopeItem> visibleStars = new List<TelescopeItem>();
-            Rect2 viewportRect = _starContainer.GetRect();
+            List<StarResource> visibleStars = new List<StarResource>();
+            List<Vector3> positions = new List<Vector3>();
+            Rect2 viewportRect = GetViewportRect();
             foreach (StarResource star in nearbyStars)
             {
                 Vector2 horizontal = MathExtensions.ConvertToHorizontal(Mathf.RadToDeg(star.RightAscension), Mathf.RadToDeg(star.Declination), _worldController.Latitude, _worldController.LocalSiderealTime);
-
                 Vector2 screenPosition = _helperCamera.GetScreenPosition(horizontal.X, horizontal.Y);
+
                 if (viewportRect.HasPoint(screenPosition))
                 {
-                    TelescopeItem item = StarPool.GetAvailableObject();
-                    item.Initialise(this, star, screenPosition);
-                    visibleStars.Add(item);
+                    visibleStars.Add(star);
+                    positions.Add(new Vector3(screenPosition.X, screenPosition.Y, star.Magnitude));
                 }
             }
 
-            return visibleStars.ToArray();
+            return (visibleStars.ToArray(), positions.ToArray());
         }
 
 
@@ -171,16 +159,16 @@ namespace Khepri.UI.Windows
         /// <param name="stars"> The array of stars to check. </param>
         /// <param name="equatorial"> The observing telescope's rotation in relation to the celestial sphere. </param>
         /// <returns> The star closest to the given coordinate. </returns>
-        private TelescopeItem GetClosestStar(TelescopeItem[] stars, Vector2 equatorial)
+        private StarResource GetClosestStar(StarResource[] stars, Vector2 equatorial)
         {
             // Ensure that there are stars in the array.
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stars.Length);
 
-            TelescopeItem closestStar = stars[0];
-            Single previousDistance = equatorial.DistanceTo(new Vector2((Single)stars[0].Resource.RightAscension, (Single)stars[0].Resource.Declination));
-            foreach (TelescopeItem star in stars)
+            StarResource closestStar = stars[0];
+            Single previousDistance = equatorial.DistanceTo(new Vector2((Single)stars[0].RightAscension, (Single)stars[0].Declination));
+            foreach (StarResource star in stars)
             {
-                Single currentDistance = equatorial.DistanceTo(new Vector2((Single)Mathf.RadToDeg(star.Resource.RightAscension), (Single)Mathf.RadToDeg(star.Resource.Declination)));
+                Single currentDistance = equatorial.DistanceTo(new Vector2((Single)Mathf.RadToDeg(star.RightAscension), (Single)Mathf.RadToDeg(star.Declination)));
                 if (currentDistance < previousDistance)
                 {
                     previousDistance = currentDistance;
