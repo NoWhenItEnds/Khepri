@@ -66,7 +66,7 @@ namespace Khepri.Entities.Actors.Components.Sensors
         {
             foreach (IEntity current in _nearbyEntities)
             {
-                Vector3 targetPosition = ToLocal(current.CollisionShape.GlobalPosition);
+                Vector3 targetPosition = ToLocal(current.GetCollisionShape().GlobalPosition);
                 _lineOfSightRayCast.TargetPosition = targetPosition;
                 _lineOfSightRayCast.ForceRaycastUpdate();
 

@@ -2,13 +2,13 @@
 
 [ext_resource type="Script" uid="uid://b4xss154foxdd" path="res://Systems/Resources/Items/FoodResource.cs" id="1_lglo3"]
 [ext_resource type="Texture2D" uid="uid://cthd2jn8xvpul" path="res://Content/Textures/Tilesets/Items/Food/Inventory/Item_Food_Inventory_Apple.png" id="1_yekgs"]
-[ext_resource type="SpriteFrames" uid="uid://x4r46q3wagnx" path="res://Content/Resources/SpriteFrames/Items/SpriteFrames_Items_Nodes.tres" id="2_ynmdw"]
+[ext_resource type="Texture2D" uid="uid://bnc480lxnrf0o" path="res://Content/Textures/Tilesets/Items/Food/Nodes/Item_Food_Node_Apple.png" id="2_yekgs"]
 
 [resource]
 script = ExtResource("1_lglo3")
 HealthRecovery = 20.0
 Portions = 2
-WorldSprites = ExtResource("2_ynmdw")
+WorldSprite = ExtResource("2_yekgs")
 InventorySprite = ExtResource("1_yekgs")
 InventoryCells = Array[Vector2i]([Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1)])
 Id = "apple"

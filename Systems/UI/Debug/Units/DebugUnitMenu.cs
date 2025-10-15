@@ -4,7 +4,9 @@ using Khepri.Entities.Actors;
 using Khepri.Entities.Actors.Components;
 using Khepri.Entities.Devices;
 using Khepri.Entities.Items;
-using Khepri.Models.GOAP;
+using Khepri.GOAP;
+using Khepri.Resources.Actors;
+using Khepri.Resources.Items;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -28,7 +30,7 @@ namespace Khepri.UI.Debug.Units
         private AgentController _controller;
 
         /// <summary> The unit this menu represents. </summary>
-        private Unit _unit;
+        private Being _being;
 
         /// <summary> An internal reference to the game's viewport. </summary>
         private Viewport _viewport;
@@ -56,11 +58,11 @@ namespace Khepri.UI.Debug.Units
 
 
         /// <summary> Construct the menu. </summary>
-        /// <param name="unit"> The unit this menu represents. </param>
-        public void Initialise(AgentController controller, Unit unit)
+        /// <param name="being"> The being this menu represents. </param>
+        public void Initialise(AgentController controller, Being being)
         {
             _controller = controller;
-            _unit = unit;
+            _being = being;
         }
 
 
@@ -68,11 +70,11 @@ namespace Khepri.UI.Debug.Units
         public override void _PhysicsProcess(Double delta)
         {
             // Follow the unit around.
-            Vector2 screenPosition = _viewport.GetCamera3D().UnprojectPosition(_unit.GlobalPosition);
+            Vector2 screenPosition = _viewport.GetCamera3D().UnprojectPosition(_being.GlobalPosition);
             GlobalPosition = screenPosition;
 
             // Update information.
-            NeedComponent needs = _unit.Needs;
+            BeingNeedsResource needs = _being.GetResource<BeingResource>().Needs;
             _needsLabel.Text = String.Format(NEEDS_FORMAT, needs.CurrentHealth, needs.CurrentHunger, needs.CurrentFatigue, needs.CurrentEntertainment, needs.CurrentStamina);
 
             // Update Beliefs.
@@ -88,19 +90,19 @@ namespace Khepri.UI.Debug.Units
             DateTimeOffset currentTime = _worldController.CurrentTime;
             StringBuilder sensorBuilder = new StringBuilder();
             sensorBuilder.Append("[font_size=10]");
-            foreach (KnownEntity entity in _unit.Sensors.GetEntities())
+            foreach (KnownEntity entity in _being.Sensors.GetEntities())
             {
                 Vector3 pos = entity.LastKnownPosition;
                 Double minutes = (currentTime - entity.LastSeenTimestamp).TotalMinutes;
                 switch (entity.Entity)
                 {
-                    case Unit unit:
+                    case Being unit:
                         sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, unit.Name, pos.X, pos.Y, pos.Z, minutes));
                         break;
                     case ItemNode item:
-                        sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, item.Resource.Id, pos.X, pos.Y, pos.Z, minutes));
+                        sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, item.GetResource<ItemResource>().Id, pos.X, pos.Y, pos.Z, minutes));
                         break;
-                    case Device device:
+                    case DeviceNode device:
                         sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, device.Name, pos.X, pos.Y, pos.Z, minutes));
                         break;
                 }

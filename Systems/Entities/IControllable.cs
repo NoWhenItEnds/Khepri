@@ -1,10 +1,6 @@
-using Godot;
-using Khepri.Models.Input;
-using System;
-
 namespace Khepri.Entities
 {
-    /// <summary> Represents an entity that is controllable by an agent. </summary>
+    /// <summary> Tags the entity as one that can be directly controlled. </summary>
     public interface IControllable
     {
         /// <summary> Handle the input sent to the entity by it's controller. </summary>

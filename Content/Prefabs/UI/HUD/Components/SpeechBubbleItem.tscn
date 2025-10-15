@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://dg53cc06rwfo5"]
+
+[ext_resource type="Script" uid="uid://cffb1sgrynh05" path="res://Systems/UI/HUD/SpeechBubbles/SpeechBubbleItem.cs" id="1_xdrx6"]
+
+[node name="SpeechBubbleItem" type="PanelContainer" node_paths=PackedStringArray("_label")]
+offset_right = 1.0
+offset_bottom = 22.0
+mouse_filter = 2
+script = ExtResource("1_xdrx6")
+_label = NodePath("RichTextLabel")
+_moveSpeed = 20.0
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+layout_mode = 2
+mouse_filter = 2
+bbcode_enabled = true
+text = "PLACEHOLDER "
+fit_content = true

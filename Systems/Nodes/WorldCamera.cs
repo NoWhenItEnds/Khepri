@@ -47,6 +47,10 @@ namespace Khepri.Nodes
         }
 
 
+        /// <summary> Get a reference to the main camera node. </summary>
+        public Camera3D GetCamera() => _mainCamera;
+
+
         /// <summary> Set's the orthographic camera's size. </summary>
         /// <param name="size"> The distance the camera is zoomed. Higher values means that it is more zoomed out.</param>
         public void SetCameraSize(Single size = 12f)
@@ -66,8 +70,10 @@ namespace Khepri.Nodes
             Single aspectRatio = (Single)viewportSize.X / (Single)viewportSize.Y;
             Single height = _mainCamera.Size;
             Single width = height * aspectRatio;
-            QuadMesh quad = _occlusionMesh.Mesh as QuadMesh;
-            quad.Size = new Vector2(width, height);
+            if(_occlusionMesh.Mesh is QuadMesh quad)
+            {
+                quad.Size = new Vector2(width, height);
+            }
         }
 
 

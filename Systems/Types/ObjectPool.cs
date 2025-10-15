@@ -7,16 +7,11 @@ using System.Linq;
 namespace Khepri.Types
 {
     /// <summary> A caching system for pulling objects from a pool of initialised objects on command. </summary>
-    /// <typeparam name="TNode"> The kind of node in the pool. </typeparam>
-    /// <typeparam name="TResource"> The kind of date the node represents. </typeparam>
-    public class ObjectPool<TNode, TResource> where TNode : Node, IPoolable<TResource> where TResource : EntityResource
+    /// <typeparam name="T"> The kind of node in the pool. </typeparam>
+    public class ObjectPool<T> where T : Node, IPoolable
     {
-        /// <summary> How many item nodes the item pool should initially contain. </summary>
-        private Int32 _initialPoolSize = 100;
-
-
         /// <summary> A pool that holds objects that are in the game world. A boolean shows if an object is currently in use. </summary>
-        private Dictionary<TNode, Boolean> _objectPool = new Dictionary<TNode, Boolean>();
+        private Dictionary<T, Boolean> _objectPool = new Dictionary<T, Boolean>();
 
 
         /// <summary> The node to use as the spawned nodes' parent. </summary>
@@ -25,24 +20,32 @@ namespace Khepri.Types
         /// <summary> The prefab to spawn additional objects from. </summary>
         private readonly PackedScene PREFAB;
 
+        /// <summary> How many item nodes the item pool should initially contain. </summary>
+        private readonly Int32 INITIAL_SIZE = 100;
 
-        public ObjectPool(Node parentNode, PackedScene objectPrefab)
+
+        /// <summary> A caching system for pulling objects from a pool of initialised objects on command. </summary>
+        /// <param name="parentNode"> The node to use as the spawned nodes' parent. </param>
+        /// <param name="objectPrefab"> The prefab to spawn additional objects from. </param>
+        /// <param name="initialSize"> How many item nodes the item pool should initially contain. </param>
+        public ObjectPool(Node parentNode, PackedScene objectPrefab, Int32 initialSize = 100)
         {
             PARENT_NODE = parentNode;
             PREFAB = objectPrefab;
+            INITIAL_SIZE = initialSize;
 
             // Add any existing objects.
             var children = PARENT_NODE.GetChildren();
             foreach (Node child in children)
             {
-                if (child is TNode node)
+                if (child is T node)
                 {
                     _objectPool.Add(node, true);
                 }
             }
 
             // Build the pool.
-            for (Int32 i = 0; i < _initialPoolSize; i++)
+            for (Int32 i = 0; i < INITIAL_SIZE; i++)
             {
                 BuildItem();
             }
@@ -52,12 +55,12 @@ namespace Khepri.Types
         /// <summary> Create a new object for the pool. </summary>
         /// <returns> The created node. </returns>
         /// <exception cref="ArgumentException"> If the given prefab cannot be created as type T. </exception>
-        private TNode BuildItem()
+        private T BuildItem()
         {
-            TNode obj = PREFAB.InstantiateOrNull<TNode>();
+            T obj = PREFAB.InstantiateOrNull<T>();
             if (obj == null)
             {
-                throw new ArgumentException($"The given prefab cannot be instantiated into type {typeof(TNode)}.");
+                throw new ArgumentException($"The given prefab cannot be instantiated into type {typeof(T)}.");
             }
 
             PARENT_NODE.AddChild(obj);
@@ -86,12 +89,12 @@ namespace Khepri.Types
 
         /// <summary> Get a new object by pulling from the pool. </summary>
         /// <returns> The now active object. </returns>
-        public TNode GetAvailableObject()
+        public T GetAvailableObject()
         {
-            TNode result = null;
+            T? result = null;
 
             // Attempt to find a free object in the pool.
-            foreach (KeyValuePair<TNode, Boolean> obj in _objectPool)
+            foreach (KeyValuePair<T, Boolean> obj in _objectPool)
             {
                 if (!obj.Value)    // If the obj is free.
                 {
@@ -129,8 +132,8 @@ namespace Khepri.Types
         /// <summary> Free all the currently in use items. </summary>
         public void FreeAll()
         {
-            TNode[] activeObjects = GetActiveObjects();
-            foreach (TNode obj in activeObjects)
+            T[] activeObjects = GetActiveObjects();
+            foreach (T obj in activeObjects)
             {
                 FreeObject(obj);
             }
@@ -139,7 +142,7 @@ namespace Khepri.Types
 
         /// <summary> Free an object and return it to the pool. </summary>
         /// <param name="obj"> The object to return. </param>
-        public void FreeObject(TNode obj)
+        public void FreeObject(T obj)
         {
             _objectPool[obj] = false;
 
@@ -164,28 +167,23 @@ namespace Khepri.Types
 
         /// <summary> Get an array of all the currently active objects. </summary>
         /// <returns> All the objects that are currently in use. </returns>
-        public TNode[] GetActiveObjects() => _objectPool.Where(x => x.Value).Select(x => x.Key).ToArray();
+        public T[] GetActiveObjects() => _objectPool.Where(x => x.Value).Select(x => x.Key).ToArray();
 
 
         /// <summary> Get an array of all the pool's objects. </summary>
         /// <returns> An array of all the objects in the pool. </returns>
-        public TNode[] GetAllObjects() => _objectPool.Select(x => x.Key).ToArray();
+        public T[] GetAllObjects() => _objectPool.Select(x => x.Key).ToArray();
     }
 
 
     /// <summary> Represents an item as stored in a pool. </summary>
-    public interface IPoolable<T> where T : EntityResource
+    public interface IPoolable
     {
-        /// <summary> The data component representing the entity's data. </summary>
-        public T Resource { get; protected set; }
-
-
-        /// <summary> Initialise the object by setting its internal resource. </summary>
-        /// <param name="resource"> The resource the object represents. </param>
-        public void Initialise(T resource)
-        {
-            Resource = resource;
-        }
+        /// <summary> Gets the data resource associated with the entity cast to the given type. </summary>
+        /// <typeparam name="T"> The type of resource desired. </typeparam>
+        /// <returns> The internal resource cast to the given type. </returns>
+        /// <exception cref="InvalidCastException"></exception>
+        public T GetResource<T>() where T : EntityResource;
 
 
         /// <summary> Free the object back to the object pool. </summary>

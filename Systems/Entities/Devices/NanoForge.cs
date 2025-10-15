@@ -1,4 +1,3 @@
-using Khepri.Controllers;
 using Khepri.Entities.Actors;
 using Khepri.Entities.Items;
 using System;
@@ -6,7 +5,7 @@ using System;
 namespace Khepri.Entities.Devices
 {
     /// <summary> A device that can spawn objects from nothing but energy. </summary>
-    public partial class NanoForge : Device
+    public partial class NanoForge : DeviceNode
     {
         /// <summary> A reference to the item controller for spawning items. </summary>
         private ItemController _itemController;
@@ -21,16 +20,16 @@ namespace Khepri.Entities.Devices
 
 
         /// <inheritdoc/>
-        public override void Examine(Unit activatingEntity)
+        public override void Examine(Being activatingEntity)
         {
             throw new NotImplementedException();
         }
 
 
         /// <inheritdoc/>
-        public override void Use(Unit activatingEntity)
+        public override void Use(Being activatingEntity)
         {
-            ItemNode newItem = _itemController.CreateItem("apple", GlobalPosition);
+            _itemController.CreateItem("apple", GlobalPosition);
         }
     }
 }

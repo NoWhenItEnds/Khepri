@@ -1,19 +1,18 @@
 using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Actors;
-using Khepri.Models;
-using Khepri.Models.Input;
+using Khepri.Resources.Devices;
 using Khepri.Types.Extensions;
 using System;
 
 namespace Khepri.Entities.Devices
 {
     /// <summary> A device a unit can look through to see the night sky. </summary>
-    public partial class Telescope : Device, IControllable
+    public partial class Telescope : DeviceNode, IControllable
     {
         /// <summary> A modifier to increase the sensitivity of the input. </summary>
         [ExportGroup("Settings")]
-        [Export] private Single _inputSensitivity = 0.5f;
+        [Export] private Single _inputSensitivity = 0.1f;
 
 
         /// <summary> The telescope's current altitude. It's up and down value. </summary>
@@ -21,9 +20,6 @@ namespace Khepri.Entities.Devices
 
         /// <summary> The telescope's current azimuth. It's right to left value. Starts from N and rotates cloak-wise. </summary>
         public Single Azimuth { get; private set; } = 0f;
-
-        /// <summary> The star that is currently the closest to the telescope. </summary>
-        public StarData ClosestStar => _worldController.GetClosestStar(Azimuth, Altitude);
 
 
         /// <summary> A reference to the world location controller. </summary>
@@ -53,7 +49,7 @@ namespace Khepri.Entities.Devices
             if (input is MoveInput moveInput)
             {
                 Altitude = Math.Clamp(Altitude + (moveInput.Direction.Z * -1f) * _inputSensitivity, 0f, 90f);
-                Azimuth += moveInput.Direction.X * _inputSensitivity;
+                Azimuth += (moveInput.Direction.X * -1f) * _inputSensitivity;
                 Azimuth = (Single)MathExtensions.WrapValue(Azimuth, 360);
             }
             else if (input is UseInput useInput)
@@ -64,16 +60,16 @@ namespace Khepri.Entities.Devices
 
 
         /// <inheritdoc/>
-        public override void Examine(Unit activatingEntity)
+        public override void Examine(Being activatingEntity)
         {
             throw new NotImplementedException();
         }
 
 
         /// <inheritdoc/>
-        public override void Use(Unit activatingEntity)
+        public override void Use(Being activatingEntity)
         {
-            if (activatingEntity == _playerController.PlayerUnit)
+            if (activatingEntity == _playerController.PlayerBeing)
             {
                 _uiController.ShowTelescope(this);
                 _playerController.SetControllable(this);

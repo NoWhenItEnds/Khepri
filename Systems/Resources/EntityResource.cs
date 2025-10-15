@@ -8,7 +8,7 @@ namespace Khepri.Resources
     {
         /// <summary> The resource's identifying kind. </summary>
         [ExportGroup("General")]
-        [Export] public String Id { get; private set; }
+        [Export] public String Id { get; set; }
 
 
         /// <summary> The data component of a game entity. </summary>

@@ -4,6 +4,7 @@ using Khepri.Entities.Devices;
 using Khepri.Nodes.Singletons;
 using Khepri.UI.HUD;
 using Khepri.UI.HUD.Interaction;
+using Khepri.UI.HUD.SpeechBubbles;
 using Khepri.UI.Windows;
 
 namespace Khepri.Controllers
@@ -11,9 +12,12 @@ namespace Khepri.Controllers
     /// <summary> The main controller for the game world's UI. </summary>
     public partial class UIController : SingletonControl<UIController>
     {
-        /// <summary> A reference to the astrolabe in the HUD. </summary>
+        /// <summary> A reference to the element responsible for spawning speech bubble popups. </summary>
         [ExportGroup("Nodes")]
         [ExportSubgroup("HUD")]
+        [Export] private SpeechBubbleHUD _speechBubbles;
+
+        /// <summary> A reference to the astrolabe in the HUD. </summary>
         [Export] private Astrolabe _astrolabe;
 
         /// <summary> A reference to the player status bars in the HUD. </summary>
@@ -57,7 +61,7 @@ namespace Khepri.Controllers
                 case WindowType.INVENTORY:
                     ToggleHUD(false);
                     _inventoryWindow.Visible = true;
-                    _inventoryWindow.Initialise(_playerController.PlayerUnit.Inventory);
+                    _inventoryWindow.Initialise(_playerController.PlayerBeing.Inventory);
                     break;
                 default:
                     ToggleHUD(true);
@@ -87,6 +91,12 @@ namespace Khepri.Controllers
             _statusBars.Visible = isActive;
             _interactionMenu.Visible = isActive;
         }
+
+
+        /// <summary> Spawns a speech bubble on the HUD containing text. </summary>
+        /// <param name="text"> The BBCode formatted text to display. </param>
+        /// <param name="speakingNode"> A reference to the node that has 'spoken'. </param>
+        public void SpawnSpeechBubble(String text, Node3D speakingNode) => _speechBubbles.SpawnText(text, speakingNode);
     }
 
 

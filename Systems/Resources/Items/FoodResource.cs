@@ -1,6 +1,7 @@
 using System;
 using Godot;
 using Khepri.Entities.Actors;
+using Khepri.Resources.Actors;
 
 namespace Khepri.Resources.Items
 {
@@ -8,10 +9,6 @@ namespace Khepri.Resources.Items
     [GlobalClass]
     public partial class FoodResource : ItemResource
     {
-        /// <inheritdoc/>
-        public override ItemType ItemType { get; } = ItemType.FOOD;
-
-
         /// <summary> The amount of a unit's health the item recovers. </summary>
         [ExportGroup("Statistics")]
         [Export] public Single HealthRecovery { get; private set; }
@@ -34,19 +31,20 @@ namespace Khepri.Resources.Items
 
 
         /// <inheritdoc/>
-        public override void Examine(Unit activatingEntity)
+        public override void Examine(Being activatingEntity)
         {
             throw new NotImplementedException();
         }
 
 
         /// <inheritdoc/>
-        public override void Use(Unit activatingEntity)
+        public override void Use(Being activatingEntity)
         {
-            activatingEntity.Needs.UpdateHealth(HealthRecovery);
-            activatingEntity.Needs.UpdateHunger(HungerRecovery);
-            activatingEntity.Needs.UpdateFatigue(FatigueRecovery);
-            activatingEntity.Needs.UpdateEntertainment(EntertainmentRecovery);
+            BeingNeedsResource needs = activatingEntity.GetResource<BeingResource>().Needs;
+            needs.UpdateHealth(HealthRecovery);
+            needs.UpdateHunger(HungerRecovery);
+            needs.UpdateFatigue(FatigueRecovery);
+            needs.UpdateEntertainment(EntertainmentRecovery);
 
             Portions -= 1;  // TODO - It should queue free.
         }

@@ -1,7 +1,10 @@
 using Godot;
 using Khepri.Controllers;
 using Khepri.Entities;
+using Khepri.Entities.Devices;
 using Khepri.Entities.Items;
+using Khepri.Resources.Devices;
+using Khepri.Resources.Items;
 using System;
 using System.Text;
 
@@ -38,13 +41,16 @@ namespace Khepri.UI.HUD.Interaction
             if (selectedEntity != null)
             {
 
-                foreach (IEntity entity in _playerController.PlayerUnit.UsableEntities)
+                foreach (IEntity entity in _playerController.PlayerBeing.UsableEntities)
                 {
                     String text = "Placeholder";
                     switch (entity)
                     {
                         case ItemNode item:
-                            text = item.Resource.Id;
+                            text = item.GetResource<ItemResource>().Id;
+                            break;
+                        case DeviceNode device:
+                            text = device.GetResource<DeviceResource>().Id;
                             break;
                     }
 

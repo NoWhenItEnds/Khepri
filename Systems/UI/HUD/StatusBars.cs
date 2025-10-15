@@ -1,5 +1,6 @@
 using Godot;
 using Khepri.Controllers;
+using Khepri.Resources.Actors;
 using Khepri.Types.Extensions;
 using System;
 using System.Linq;
@@ -46,11 +47,12 @@ namespace Khepri.UI.HUD
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
-            _staminaBar.Value = _playerController.PlayerUnit.Needs.CurrentStamina;
-            _healthBar.Value = _playerController.PlayerUnit.Needs.CurrentHealth;
-            _hungerBar.Value = _playerController.PlayerUnit.Needs.CurrentHunger;
-            _fatigueBar.Value = _playerController.PlayerUnit.Needs.CurrentFatigue;
-            _entertainmentBar.Value = _playerController.PlayerUnit.Needs.CurrentEntertainment;
+            BeingNeedsResource needs = _playerController.PlayerBeing.GetResource<BeingResource>().Needs;
+            _staminaBar.Value = needs.CurrentStamina;
+            _healthBar.Value = needs.CurrentHealth;
+            _hungerBar.Value = needs.CurrentHunger;
+            _fatigueBar.Value = needs.CurrentFatigue;
+            _entertainmentBar.Value = needs.CurrentEntertainment;
 
             TextureProgressBar highestNeed = OrderNeedsBars();
             Single sliderPosition = (Single)Mathf.Lerp(0f, 255f, highestNeed.Value / 100f) - 2f;    // Small offset to bring it inline.
@@ -74,7 +76,14 @@ namespace Khepri.UI.HUD
                 }
             }
 
-            return _needsContainer.GetChild(0) as TextureProgressBar;
+            if (_needsContainer.GetChild(0) is TextureProgressBar child)
+            {
+                return child;
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException("Unable to find a texture progress bar in the needs container.");
+            }
         }
 
 
