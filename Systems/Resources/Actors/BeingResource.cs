@@ -1,0 +1,21 @@
+using Godot;
+using Khepri.Entities;
+using System;
+
+namespace Khepri.Resources.Actors
+{
+    /// <summary> The data component for a living creature within the game world. </summary>
+    [GlobalClass]
+    public partial class BeingResource : ActorResource
+    {
+        /// <summary> The data component for a living creature within the game world. </summary>
+        public BeingResource() { }
+
+
+        /// <inheritdoc/>
+        public void HandleInput(IInput input)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

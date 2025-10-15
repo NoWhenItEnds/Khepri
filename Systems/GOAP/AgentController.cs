@@ -13,7 +13,7 @@ namespace Khepri.GOAP
     {
         /// <summary> The entity this controller is responsible for controlling. </summary>
         [ExportGroup("Nodes")]
-        [Export] private Unit _controlledEntity;
+        [Export] private Being _controlledEntity;
 
 
         /// <summary> The current goal the agent is trying to accomplish. </summary>

@@ -14,7 +14,7 @@ namespace Khepri.GOAP.ActionStrategies
 
 
         /// <summary> A reference to the unit being manipulated. </summary>
-        private readonly Unit _unit;
+        private readonly Being _unit;
 
         /// <summary> The device's name or kind. </summary>
         private readonly String _deviceKind;
@@ -23,7 +23,7 @@ namespace Khepri.GOAP.ActionStrategies
         /// <summary> Use an item in a unit's inventory. </summary>
         /// <param name="unit"> A reference to the unit being manipulated. </param>
         /// <param name="deviceKind"> The desired device's name or kind. </param>
-        public UseDeviceNodeActionStrategy(Unit unit, String deviceKind)
+        public UseDeviceNodeActionStrategy(Being unit, String deviceKind)
         {
             _unit = unit;
             _deviceKind = deviceKind;

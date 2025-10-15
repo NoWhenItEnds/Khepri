@@ -11,7 +11,7 @@ namespace Khepri.GOAP
     public class BeliefFactory
     {
         /// <summary> A reference to the unit who the beliefs are associated with. </summary>
-        private readonly Unit _unit;
+        private readonly Being _unit;
 
         /// <summary> The array of current beliefs. </summary>
         private readonly Dictionary<String, AgentBelief> _beliefs;
@@ -20,7 +20,7 @@ namespace Khepri.GOAP
         /// <summary> Construct beliefs on an industrial scale. </summary>
         /// <param name="unit"> A reference to the decision-making agent. </param>
         /// <param name="beliefs"> The array of current beliefs. </param>
-        public BeliefFactory(Unit unit, Dictionary<String, AgentBelief> beliefs)
+        public BeliefFactory(Being unit, Dictionary<String, AgentBelief> beliefs)
         {
             _unit = unit;
             _beliefs = beliefs;

@@ -3,18 +3,19 @@ using Khepri.Controllers;
 using Khepri.Entities.Actors.Components;
 using Khepri.Entities.Actors.Components.States;
 using Khepri.Entities.Items;
-using Khepri.Models.Input;
+using Khepri.Resources;
+using Khepri.Resources.Actors;
 using System;
 using System.Collections.Generic;
 
 namespace Khepri.Entities.Actors
 {
     /// <summary> An active entity controlled by something. </summary>
-    public partial class Unit : CharacterBody3D, IEntity, IControllable
+    public partial class Being : CharacterBody3D, IEntity
     {
         /// <inheritdoc/>
         [ExportGroup("Nodes")]
-        [Export] public CollisionShape3D CollisionShape { get; private set; }
+        [Export] private CollisionShape3D _collisionShape;
 
         /// <summary> A reference to the unit's navigation agent. </summary>
         [Export] public NavigationAgent3D NavigationAgent { get; private set; }
@@ -49,6 +50,9 @@ namespace Khepri.Entities.Actors
         /// <summary> The animation sheets to use for the unit's animations. </summary>
         [ExportGroup("Resources")]
         [Export] private Godot.Collections.Dictionary<UnitSpriteLayer, SpriteFrames> _spriteFrames;
+
+        /// <summary> The being's data component. </summary>
+        [Export] private BeingResource _resource;
 
 
         /// <inheritdoc/>
@@ -102,6 +106,28 @@ namespace Khepri.Entities.Actors
 
 
         /// <inheritdoc/>
+        public Vector3 GetWorldPosition() => GlobalPosition;
+
+
+        /// <inheritdoc/>
+        public CollisionShape3D GetCollisionShape() => _collisionShape;
+
+
+        /// <inheritdoc/>
+        public T GetResource<T>() where T : EntityResource
+        {
+            if (_resource is T resource)
+            {
+                return resource;
+            }
+            else
+            {
+                throw new InvalidCastException($"Unable to cast the resource to {typeof(T)}.");
+            }
+        }
+
+
+        /// <inheritdoc/>
         public void HandleInput(IInput input) => StateMachine.HandleInput(input);
 
 
@@ -117,14 +143,14 @@ namespace Khepri.Entities.Actors
 
 
         /// <inheritdoc/>
-        public void Examine(Unit activatingEntity)
+        public void Examine(Being activatingEntity)
         {
             throw new NotImplementedException();
         }
 
 
         /// <inheritdoc/>
-        public void Use(Unit activatingEntity)
+        public void Use(Being activatingEntity)
         {
             throw new NotImplementedException();
         }

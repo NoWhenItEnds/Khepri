@@ -14,7 +14,7 @@ namespace Khepri.GOAP.ActionStrategies
 
 
         /// <summary> A reference to the unit being manipulated. </summary>
-        private readonly Unit _unit;
+        private readonly Being _unit;
 
         /// <summary> How long the action has remaining before it's complete. </summary>
         private Single _duration;
@@ -26,7 +26,7 @@ namespace Khepri.GOAP.ActionStrategies
         /// <summary> Stand around. Look pretty. </summary>
         /// <param name="unit"> A reference to the unit being manipulated. </param>
         /// <param name="duration"> How long the action has remaining before it's complete. </param>
-        public IdleActionStrategy(Unit unit, Single duration)
+        public IdleActionStrategy(Being unit, Single duration)
         {
             _unit = unit;   // TODO - This should play an idle animation.
             _duration = duration;

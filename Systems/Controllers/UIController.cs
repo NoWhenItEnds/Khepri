@@ -57,7 +57,7 @@ namespace Khepri.Controllers
                 case WindowType.INVENTORY:
                     ToggleHUD(false);
                     _inventoryWindow.Visible = true;
-                    _inventoryWindow.Initialise(_playerController.PlayerUnit.Inventory);
+                    _inventoryWindow.Initialise(_playerController.PlayerBeing.Inventory);
                     break;
                 default:
                     ToggleHUD(true);

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Khepri.Entities.Items;
-using Khepri.Models.Input;
 
 namespace Khepri.Entities.Actors.Components.States
 {
@@ -22,7 +21,7 @@ namespace Khepri.Entities.Actors.Components.States
     {
         /// <summary> A reference to the unit controlled by the state. </summary>
         [ExportGroup("Nodes")]
-        [Export] private Unit _unit;
+        [Export] private Being _unit;
 
         /// <summary> The current state of the state machine. </summary>
         public UnitState CurrentState { get; private set; }
@@ -65,13 +64,13 @@ namespace Khepri.Entities.Actors.Components.States
             {
                 switch (moveInput.MovementType)
                 {
-                    case MoveType.WALKING:
+                    case MoveInput.MoveType.WALKING:
                         TransitionState(StateEvent.WALK);
                         break;
-                    case MoveType.SPRINTING:
+                    case MoveInput.MoveType.SPRINTING:
                         TransitionState(StateEvent.SPRINT);
                         break;
-                    case MoveType.IDLE:
+                    case MoveInput.MoveType.IDLE:
                     default:
                         TransitionState(StateEvent.IDLE);
                         break;

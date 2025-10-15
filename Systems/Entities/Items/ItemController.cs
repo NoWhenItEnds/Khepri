@@ -16,7 +16,7 @@ namespace Khepri.Entities.Items
 
 
         /// <summary> A pool of instantiated items to pull from first. </summary>
-        public ObjectPool<ItemNode, ItemResource> StarPool { get; private set; }
+        public ObjectPool<ItemNode> ItemPool { get; private set; }
 
 
         /// <summary> A reference to the resource controller. </summary>
@@ -27,7 +27,7 @@ namespace Khepri.Entities.Items
         public override void _Ready()
         {
             _resourceController = ResourceController.Instance;
-            StarPool = new ObjectPool<ItemNode, ItemResource>(this, _itemPrefab);
+            ItemPool = new ObjectPool<ItemNode>(this, _itemPrefab);
         }
 
 
@@ -52,7 +52,7 @@ namespace Khepri.Entities.Items
         /// <returns> The initialised item. </returns>
         public ItemNode CreateItem(ItemResource resource, Vector3 position)
         {
-            ItemNode item = StarPool.GetAvailableObject();
+            ItemNode item = ItemPool.GetAvailableObject();
             item.Initialise(resource, position);
             return item;
         }

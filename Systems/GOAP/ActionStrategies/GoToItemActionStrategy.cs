@@ -1,7 +1,7 @@
 using Godot;
+using Khepri.Entities;
 using Khepri.Entities.Actors;
 using Khepri.Entities.Actors.Components;
-using Khepri.Models.Input;
 using System;
 using System.Linq;
 
@@ -18,7 +18,7 @@ namespace Khepri.GOAP.ActionStrategies
 
 
         /// <summary> A reference to the unit being manipulated. </summary>
-        private readonly Unit _unit;
+        private readonly Being _unit;
 
         /// <summary> The desired item's name or kind. </summary>
         private readonly String _itemKind;
@@ -27,7 +27,7 @@ namespace Khepri.GOAP.ActionStrategies
         /// <summary> Go to the know location of an item. </summary>
         /// <param name="unit"> A reference to the unit being manipulated. </param>
         /// <param name="itemKind"> The desired item's name or kind. </param>
-        public GoToItemActionStrategy(Unit unit, String itemKind)
+        public GoToItemActionStrategy(Being unit, String itemKind)
         {
             _unit = unit;
             _itemKind = itemKind;
@@ -62,7 +62,7 @@ namespace Khepri.GOAP.ActionStrategies
             {
                 Vector3 nextPosition = _unit.NavigationAgent.GetNextPathPosition();
                 Vector3 direction = _unit.GlobalPosition.DirectionTo(nextPosition).Normalized();
-                _unit.HandleInput(new MoveInput(direction, MoveType.WALKING));
+                _unit.HandleInput(new MoveInput(direction, MoveInput.MoveType.WALKING));
             }
         }
 
@@ -70,7 +70,7 @@ namespace Khepri.GOAP.ActionStrategies
         /// <inheritdoc/>
         public void Stop()
         {
-            _unit.HandleInput(new MoveInput(Vector3.Zero, MoveType.IDLE));
+            _unit.HandleInput(new MoveInput(Vector3.Zero, MoveInput.MoveType.IDLE));
         }
     }
 }

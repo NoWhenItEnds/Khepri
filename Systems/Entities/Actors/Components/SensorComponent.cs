@@ -14,7 +14,7 @@ namespace Khepri.Entities.Actors.Components
     {
         /// <summary> A reference to the brain's unit. </summary>
         [ExportGroup("Nodes")]
-        [Export] private Unit _unit;
+        [Export] private Being _unit;
 
         /// <summary> Represents the unit's rendered line of sight. </summary>
         /// <remarks> This should only be used by a unit controlled by the player. </remarks>
@@ -48,7 +48,7 @@ namespace Khepri.Entities.Actors.Components
             _worldController = WorldController.Instance;
 
             // Only render the lights if the unit is controlled by the player
-            ToggleLights(PlayerController.Instance.PlayerUnit == _unit);
+            ToggleLights(PlayerController.Instance.PlayerBeing == _unit);
         }
 
 
@@ -67,7 +67,7 @@ namespace Khepri.Entities.Actors.Components
             {
                 foreach (KnownEntity entity in _knownEntities)
                 {
-                    DebugDraw3D.DrawAabb(entity.Entity.CollisionShape.GetAabb(),
+                    DebugDraw3D.DrawAabb(entity.Entity.GetCollisionShape().GetAabb(),
                         entity.IsVisible ? Colors.DarkViolet : Colors.MediumPurple);
                 }
             }
@@ -118,7 +118,7 @@ namespace Khepri.Entities.Actors.Components
         /// <returns> An array of all instances of the item the unit is aware of. </returns>
         public KnownEntity[] TryGetItem(String itemId)
         {
-            return _knownEntities.Where(x => x.Entity is ItemNode item && item.Resource.Id == itemId).ToArray();
+            return _knownEntities.Where(x => x.Entity is ItemNode item && item.GetResource<ItemResource>().Id == itemId).ToArray();
         }
 
 
@@ -127,7 +127,7 @@ namespace Khepri.Entities.Actors.Components
         /// <returns> A reference to the tracked entity. A null means that one wasn't found. </returns>
         public KnownEntity? TryGetItem(ItemResource resource)
         {
-            return _knownEntities.Where(x => x.Entity is ItemNode item && item.Resource == resource).FirstOrDefault();
+            return _knownEntities.Where(x => x.Entity is ItemNode item && item.GetResource<ItemResource>() == resource).FirstOrDefault();
         }
 
 
@@ -226,7 +226,7 @@ namespace Khepri.Entities.Actors.Components
             _worldController = WorldController.Instance;
 
             Entity = entity;
-            LastKnownPosition = entity.WorldPosition;
+            LastKnownPosition = entity.GetWorldPosition();
             LastSeenTimestamp = _worldController.CurrentTime;
         }
 
@@ -244,7 +244,7 @@ namespace Khepri.Entities.Actors.Components
         public void UpdateLastKnownPosition(Vector3? position = null)
         {
             LastSeenTimestamp = _worldController.CurrentTime;
-            LastKnownPosition = position == null ? Entity.CollisionShape.GlobalPosition : position.Value;
+            LastKnownPosition = position == null ? Entity.GetCollisionShape().GlobalPosition : position.Value;
         }
 
         /// <inheritdoc/>

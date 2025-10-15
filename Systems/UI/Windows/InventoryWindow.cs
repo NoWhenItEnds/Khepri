@@ -22,7 +22,7 @@ namespace Khepri.UI.Windows
 
 
         /// <summary> A pool of instantiated items to pull from first. </summary>
-        public ObjectPool<InventoryItem, ItemResource> ItemPool { get; private set; }
+        public ObjectPool<InventoryItem> ItemPool { get; private set; }
 
         /// <summary> Get the current selection's position on the screen. </summary>
         public Vector2 SelectionPosition => CalculatePosition(_currentSelection);
@@ -51,7 +51,7 @@ namespace Khepri.UI.Windows
         /// <inheritdoc/>
         public override void _Ready()
         {
-            ItemPool = new ObjectPool<InventoryItem, ItemResource>(this, _inventoryItemPrefab);
+            ItemPool = new ObjectPool<InventoryItem>(this, _inventoryItemPrefab);
             foreach (InventoryItem item in ItemPool.GetAllObjects())
             {
                 item.ButtonDown += PickupItem;
@@ -175,7 +175,7 @@ namespace Khepri.UI.Windows
                 return null;
             }
 
-            return ItemPool.GetActiveObjects().Where(x => x.Resource == item).FirstOrDefault() ?? null;
+            return ItemPool.GetActiveObjects().Where(x => x.GetResource<ItemResource>() == item).FirstOrDefault() ?? null;
         }
 
 
@@ -213,7 +213,7 @@ namespace Khepri.UI.Windows
                         InventoryItem? item = GetInventoryItem(_currentSelection);
                         if (item != null)
                         {
-                            Vector2I itemSize = item.Resource.GetSize();  // We only need to apply the size if we're going 'forwards', not 'backwards' as the position for a large object will be the top-left.
+                            Vector2I itemSize = item.GetResource<ItemResource>().GetSize();  // We only need to apply the size if we're going 'forwards', not 'backwards' as the position for a large object will be the top-left.
                             _currentSelection += direction * new Vector2I(direction.X > 0 ? itemSize.X : 1, direction.Y > 0 ? itemSize.Y : 1);
                         }
                         else

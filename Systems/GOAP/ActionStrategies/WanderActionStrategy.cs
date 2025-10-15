@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using Godot;
+using Khepri.Entities;
 using Khepri.Entities.Actors;
-using Khepri.Models.Input;
 
 namespace Khepri.GOAP.ActionStrategies
 {
@@ -19,7 +19,7 @@ namespace Khepri.GOAP.ActionStrategies
         private readonly Random _random = new Random();
 
         /// <summary> A reference to the unit being manipulated. </summary>
-        private readonly Unit _unit;
+        private readonly Being _unit;
 
         /// <summary> The radius to choose a point to wander towards. </summary>
         private readonly Single _radius;
@@ -28,7 +28,7 @@ namespace Khepri.GOAP.ActionStrategies
         /// <summary> Wander randomly. Take in the scenery. </summary>
         /// <param name="unit"> A reference to the unit being manipulated. </param>
         /// <param name="radius"> The radius to choose a point to wander towards. </param>
-        public WanderActionStrategy(Unit unit, Single radius)
+        public WanderActionStrategy(Being unit, Single radius)
         {
             _unit = unit;
             _radius = radius;
@@ -74,7 +74,7 @@ namespace Khepri.GOAP.ActionStrategies
             {
                 Vector3 nextPosition = _unit.NavigationAgent.GetNextPathPosition();
                 Vector3 direction = _unit.GlobalPosition.DirectionTo(nextPosition).Normalized();
-                _unit.HandleInput(new MoveInput(direction, MoveType.WALKING));
+                _unit.HandleInput(new MoveInput(direction, MoveInput.MoveType.WALKING));
             }
         }
 
@@ -82,7 +82,7 @@ namespace Khepri.GOAP.ActionStrategies
         /// <inheritdoc/>
         public void Stop()
         {
-            _unit.HandleInput(new MoveInput(Vector3.Zero, MoveType.IDLE));
+            _unit.HandleInput(new MoveInput(Vector3.Zero, MoveInput.MoveType.IDLE));
         }
     }
 }

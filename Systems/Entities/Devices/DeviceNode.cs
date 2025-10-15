@@ -1,5 +1,6 @@
 using Godot;
 using Khepri.Entities.Actors;
+using Khepri.Resources;
 using Khepri.Resources.Devices;
 using Khepri.Types;
 using System;
@@ -7,11 +8,11 @@ using System;
 namespace Khepri.Entities.Devices
 {
     /// <summary> An entity that can be interacted with by a unit for a unique effect. </summary>
-    public abstract partial class DeviceNode : StaticBody3D, IEntity, IPoolable<DeviceResource>
+    public abstract partial class DeviceNode : StaticBody3D, IEntity, IPoolable
     {
-        /// <inheritdoc/>
+        /// <summary> The device's bounding shape. </summary>
         [ExportGroup("Nodes")]
-        [Export] public CollisionShape3D CollisionShape { get; private set; }
+        [Export] private CollisionShape3D _collisionShape;
 
         /// <summary> The sprite th use to represent the item. </summary>
         [Export] private AnimatedSprite3D _sprite;
@@ -20,13 +21,9 @@ namespace Khepri.Entities.Devices
         [Export] private Area3D _interactionArea;
 
 
-        /// <inheritdoc/>
+        /// <summary> The data resource representing the device. </summary>
         [ExportGroup("Statistics")]
-        [Export] public DeviceResource Resource { get; set; }
-
-
-        /// <inheritdoc/>
-        public Vector3 WorldPosition => GlobalPosition;
+        [Export] private DeviceResource _resource;
 
 
         /// <inheritdoc/>
@@ -41,7 +38,7 @@ namespace Khepri.Entities.Devices
         /// <param name="body"> A reference to the unit. </param>
         private void OnBodyEntered(Node3D body)
         {
-            if (body is Unit unit)
+            if (body is Being unit)
             {
                 unit.AddUsableEntity(this);
             }
@@ -52,7 +49,7 @@ namespace Khepri.Entities.Devices
         /// <param name="body"> A reference to the unit. </param>
         private void OnBodyExited(Node3D body)
         {
-            if (body is Unit unit)
+            if (body is Being unit)
             {
                 unit.RemoveUsableEntity(this);
             }
@@ -64,25 +61,46 @@ namespace Khepri.Entities.Devices
         /// <param name="position"> The position to create the object at. </param>
         public void Initialise(DeviceResource resource, Vector3 position)
         {
-            if (this is IPoolable<DeviceResource> poolable)
-            {
-                poolable.Initialise(resource);
-            }
+            _resource = resource;
             GlobalPosition = position;
-            _sprite.SpriteFrames = Resource.WorldSprites;
+            _sprite.SpriteFrames = _resource.WorldSprites;
             _sprite.Play();
         }
 
 
         /// <inheritdoc/>
-        public abstract void Examine(Unit activatingEntity);
+        public Vector3 GetWorldPosition() => GlobalPosition;
 
 
         /// <inheritdoc/>
-        public abstract void Use(Unit activatingEntity);
+        public CollisionShape3D GetCollisionShape() => _collisionShape;
 
 
         /// <inheritdoc/>
-        public void FreeObject() => throw new NotImplementedException();
+        public T GetResource<T>() where T : EntityResource
+        {
+            if (_resource is T resource)
+            {
+                return resource;
+            }
+            else
+            {
+                throw new InvalidCastException($"Unable to cast the resource to {typeof(T)}.");
+            }
+        }
+
+
+        /// <summary> The internal logic to use when the entity is examined. </summary>
+        /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
+        public abstract void Examine(Being activatingEntity);
+
+
+        /// <summary> The internal logic to use when the entity is used. </summary>
+        /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
+        public abstract void Use(Being activatingEntity);
+
+
+        /// <inheritdoc/>
+        public void FreeObject() => throw new NotImplementedException();    // TODO - Implements.
     }
 }

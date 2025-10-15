@@ -36,11 +36,11 @@ namespace Khepri.Resources.Items
 
         /// <summary> The internal logic to use when the entity is examined. </summary>
         /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
-        public abstract void Examine(Unit activatingEntity);
+        public abstract void Examine(Being activatingEntity);
 
 
         /// <summary> The internal logic to use when the entity is used. </summary>
         /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
-        public abstract void Use(Unit activatingEntity);
+        public abstract void Use(Being activatingEntity);
     }
 }

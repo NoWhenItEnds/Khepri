@@ -16,7 +16,7 @@ namespace Khepri.GOAP.ActionStrategies
 
 
         /// <summary> A reference to the unit being manipulated. </summary>
-        private readonly Unit _unit;
+        private readonly Being _unit;
 
         /// <summary> The item's name or kind. </summary>
         private readonly String _itemKind;
@@ -25,7 +25,7 @@ namespace Khepri.GOAP.ActionStrategies
         /// <summary> Use an item in a unit's inventory. </summary>
         /// <param name="unit"> A reference to the unit being manipulated. </param>
         /// <param name="itemKind"> The desired item's name or kind. </param>
-        public UseInventoryItemActionStrategy(Unit unit, String itemKind)
+        public UseInventoryItemActionStrategy(Being unit, String itemKind)
         {
             _unit = unit;
             _itemKind = itemKind;

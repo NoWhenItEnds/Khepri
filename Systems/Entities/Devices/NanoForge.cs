@@ -20,14 +20,14 @@ namespace Khepri.Entities.Devices
 
 
         /// <inheritdoc/>
-        public override void Examine(Unit activatingEntity)
+        public override void Examine(Being activatingEntity)
         {
             throw new NotImplementedException();
         }
 
 
         /// <inheritdoc/>
-        public override void Use(Unit activatingEntity)
+        public override void Use(Being activatingEntity)
         {
             _itemController.CreateItem("apple", GlobalPosition);
         }

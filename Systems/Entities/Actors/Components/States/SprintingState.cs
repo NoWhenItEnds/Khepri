@@ -1,6 +1,5 @@
 using System;
 using Godot;
-using Khepri.Models.Input;
 using Khepri.Types;
 
 namespace Khepri.Entities.Actors.Components.States
@@ -14,7 +13,7 @@ namespace Khepri.Entities.Actors.Components.States
 
         /// <summary> The unit is moving quickly along the ground. </summary>
         /// <param name="unit"> A reference to the unit. </param>
-        public SprintingState(Unit unit) : base(unit) { }
+        public SprintingState(Being unit) : base(unit) { }
 
 
         /// <inheritdoc/>

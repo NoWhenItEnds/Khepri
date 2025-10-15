@@ -1,6 +1,5 @@
 using System;
 using Godot;
-using Khepri.Models.Input;
 using Khepri.Types;
 
 namespace Khepri.Entities.Actors.Components.States
@@ -14,7 +13,7 @@ namespace Khepri.Entities.Actors.Components.States
 
         /// <summary> The unit is standing idle, waiting for an action. </summary>
         /// <param name="unit"> A reference to the unit. </param>
-        public IdlingState(Unit unit) : base(unit) { }
+        public IdlingState(Being unit) : base(unit) { }
 
 
         /// <inheritdoc/>

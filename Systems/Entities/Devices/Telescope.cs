@@ -1,14 +1,14 @@
 using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Actors;
-using Khepri.Models.Input;
+using Khepri.Resources.Devices;
 using Khepri.Types.Extensions;
 using System;
 
 namespace Khepri.Entities.Devices
 {
     /// <summary> A device a unit can look through to see the night sky. </summary>
-    public partial class Telescope : DeviceNode, IControllable
+    public partial class Telescope : DeviceNode
     {
         /// <summary> A modifier to increase the sensitivity of the input. </summary>
         [ExportGroup("Settings")]
@@ -60,16 +60,16 @@ namespace Khepri.Entities.Devices
 
 
         /// <inheritdoc/>
-        public override void Examine(Unit activatingEntity)
+        public override void Examine(Being activatingEntity)
         {
             throw new NotImplementedException();
         }
 
 
         /// <inheritdoc/>
-        public override void Use(Unit activatingEntity)
+        public override void Use(Being activatingEntity)
         {
-            if (activatingEntity == _playerController.PlayerUnit)
+            if (activatingEntity == _playerController.PlayerBeing)
             {
                 _uiController.ShowTelescope(this);
                 _playerController.SetControllable(this);

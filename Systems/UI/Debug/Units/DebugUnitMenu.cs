@@ -5,6 +5,7 @@ using Khepri.Entities.Actors.Components;
 using Khepri.Entities.Devices;
 using Khepri.Entities.Items;
 using Khepri.GOAP;
+using Khepri.Resources.Items;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -28,7 +29,7 @@ namespace Khepri.UI.Debug.Units
         private AgentController _controller;
 
         /// <summary> The unit this menu represents. </summary>
-        private Unit _unit;
+        private Being _unit;
 
         /// <summary> An internal reference to the game's viewport. </summary>
         private Viewport _viewport;
@@ -57,7 +58,7 @@ namespace Khepri.UI.Debug.Units
 
         /// <summary> Construct the menu. </summary>
         /// <param name="unit"> The unit this menu represents. </param>
-        public void Initialise(AgentController controller, Unit unit)
+        public void Initialise(AgentController controller, Being unit)
         {
             _controller = controller;
             _unit = unit;
@@ -94,11 +95,11 @@ namespace Khepri.UI.Debug.Units
                 Double minutes = (currentTime - entity.LastSeenTimestamp).TotalMinutes;
                 switch (entity.Entity)
                 {
-                    case Unit unit:
+                    case Being unit:
                         sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, unit.Name, pos.X, pos.Y, pos.Z, minutes));
                         break;
                     case ItemNode item:
-                        sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, item.Resource.Id, pos.X, pos.Y, pos.Z, minutes));
+                        sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, item.GetResource<ItemResource>().Id, pos.X, pos.Y, pos.Z, minutes));
                         break;
                     case DeviceNode device:
                         sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, device.Name, pos.X, pos.Y, pos.Z, minutes));

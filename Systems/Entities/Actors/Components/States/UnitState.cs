@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Khepri.Models.Input;
 
 namespace Khepri.Entities.Actors.Components.States
 {
@@ -14,12 +13,12 @@ namespace Khepri.Entities.Actors.Components.States
         protected Dictionary<StateEvent, Type> _transitions = new Dictionary<StateEvent, Type>();
 
         /// <summary> A reference to the unit. </summary>
-        protected readonly Unit _unit;
+        protected readonly Being _unit;
 
 
         /// <summary> The basic data object representing a unit's potential state. </summary>
         /// <param name="unit"> A reference to the unit the state controls. </param>
-        public UnitState(Unit unit)
+        public UnitState(Being unit)
         {
             _unit = unit;
         }

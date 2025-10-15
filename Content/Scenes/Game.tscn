@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="Script" uid="uid://cgujt8yhxbsew" path="res://Systems/Controllers/WorldController.cs" id="1_8fov1"]
-[ext_resource type="PackedScene" uid="uid://rc2326u6agtf" path="res://Content/Prefabs/Entities/Actors/Unit.tscn" id="2_5p3x2"]
+[ext_resource type="PackedScene" uid="uid://rc2326u6agtf" path="res://Content/Prefabs/Entities/Actors/Being.tscn" id="2_5p3x2"]
 [ext_resource type="Script" uid="uid://cp43wylajjm3x" path="res://Systems/Resources/ResourceController.cs" id="2_nskmx"]
 [ext_resource type="Script" uid="uid://d1dxnpil1ufxm" path="res://Systems/GOAP/AgentController.cs" id="3_md4fn"]
 [ext_resource type="PackedScene" uid="uid://dm4tu3i0sn5s4" path="res://Content/Tiles/MountKosciuszko/MK_Terrain.tscn" id="4_5p3x2"]
@@ -79,9 +79,9 @@ script = ExtResource("1_8fov1")
 [node name="Resource Controller" type="Node" parent="Controllers"]
 script = ExtResource("2_nskmx")
 
-[node name="Player Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("PlayerUnit")]
+[node name="Player Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("PlayerBeing")]
 script = ExtResource("1_5p3x2")
-PlayerUnit = NodePath("../../World/Player Unit")
+PlayerBeing = NodePath("../../World/Player Unit")
 
 [node name="Agent Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("_controlledEntity")]
 script = ExtResource("3_md4fn")
@@ -577,7 +577,7 @@ script = ExtResource("14_nskmx")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1390452, 0, 2.37148)
 
 [node name="NanoForge" parent="World/Devices" instance=ExtResource("14_i3r7d")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.9648862, 0, -4.6624527)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.898831)
 
 [node name="UI" type="Control" parent="." node_paths=PackedStringArray("_astrolabe", "_statusBars", "_interactionMenu", "_inventoryWindow", "_telescopeWindow")]
 layout_mode = 3
