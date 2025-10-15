@@ -50,7 +50,7 @@ namespace Khepri.UI.HUD.Interaction
                             text = item.GetResource<ItemResource>().Id;
                             break;
                         case DeviceNode device:
-                            //text = device.GetResource<DeviceResource>().Id;
+                            text = device.GetResource<DeviceResource>().Id;
                             break;
                     }
 

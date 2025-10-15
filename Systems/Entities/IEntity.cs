@@ -23,11 +23,6 @@ namespace Khepri.Entities
         public T GetResource<T>() where T : EntityResource;
 
 
-        /// <summary> Handle the input sent to the entity by it's controller. </summary>
-        /// <param name="input"> The input data class to interpret. </param>
-        public virtual void HandleInput(IInput input) => throw new NotImplementedException("HandleInput has not been implemented. You're probably not meant to be here.");
-
-
         /// <summary> The internal logic to use when the entity is examined. </summary>
         /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
         public void Examine(Being activatingEntity);

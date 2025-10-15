@@ -17,7 +17,7 @@ namespace Khepri.Controllers
         [Export] public Being PlayerBeing { get; private set; }
 
         /// <summary> The current resource that the player is controlling. </summary>
-        private IEntity _currentControlledEntity;
+        private IControllable _currentControllable;
 
 
         /// <summary> Whether the user is currently using a controller. </summary>
@@ -46,7 +46,7 @@ namespace Khepri.Controllers
             _uiController = UIController.Instance;
 
             // Set up initial state.
-            _currentControlledEntity = PlayerBeing;
+            _currentControllable = PlayerBeing;
             _worldCamera.SetTarget(PlayerBeing.CameraPosition);
             Input.MouseMode = Input.MouseModeEnum.ConfinedHidden;
         }
@@ -55,7 +55,7 @@ namespace Khepri.Controllers
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
-            if (!_uiController.IsWindowOpen || PlayerBeing != _currentControlledEntity)  // TODO - This feels like a hack to check it like this to allow the player to control a window.
+            if (!_uiController.IsWindowOpen || PlayerBeing != _currentControllable)  // TODO - This feels like a hack to check it like this to allow the player to control a window.
             {
                 Single moveHorizontal = Input.GetAxis("action_move_left", "action_move_right");
                 Single moveVertical = Input.GetAxis("action_move_up", "action_move_down");
@@ -68,7 +68,7 @@ namespace Khepri.Controllers
                 }
 
                 MoveInput moveInput = new MoveInput(moveDirection, movementType);
-                _currentControlledEntity.HandleInput(moveInput);
+                _currentControllable.HandleInput(moveInput);
 
                 // Handle camera.
                 Vector2 ratio = Vector2.Zero;
@@ -154,9 +154,9 @@ namespace Khepri.Controllers
 
         /// <summary> Set the current entity being controlled by the controller. </summary>
         /// <param name="controllable"> The new entity to control. A null resets it back to the default being. </param>
-        public void SetControllable(IEntity? controllable = null)
+        public void SetControllable(IControllable? controllable = null)
         {
-            _currentControlledEntity = controllable ?? PlayerBeing;
+            _currentControllable = controllable ?? PlayerBeing;
         }
 
 

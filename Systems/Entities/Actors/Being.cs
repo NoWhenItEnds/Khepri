@@ -11,7 +11,7 @@ using System.Collections.Generic;
 namespace Khepri.Entities.Actors
 {
     /// <summary> An active entity controlled by something. </summary>
-    public partial class Being : CharacterBody3D, IEntity
+    public partial class Being : CharacterBody3D, IEntity, IControllable
     {
         /// <inheritdoc/>
         [ExportGroup("Nodes")]
