@@ -54,7 +54,7 @@ namespace Khepri.Entities.Actors.Components
         /// <summary> Transitions the unit's animations to a new one. </summary>
         /// <param name="state"> The current state of the unit. </param>
         /// <param name="direction"> The direction the unit is currently facing. </param>
-        public void TransitionAnimation(UnitState state, Direction direction = Direction.NONE)
+        public void TransitionAnimation(BeingState state, Direction direction = Direction.NONE)
         {
             _previousDirection = direction != Direction.NONE ? direction : _previousDirection;
             String animationName = state.AnimationPrefix + _previousDirection;

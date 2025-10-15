@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace Khepri.Entities.Actors.Components.States
 {
-    /// <summary> The basic data object representing a unit's potential state. </summary>
-    public abstract class UnitState : IEquatable<UnitState>
+    /// <summary> The basic data object representing a being's potential state. </summary>
+    public abstract class BeingState : IEquatable<BeingState>
     {
         /// <summary> The prefix of the animations to use for this state. </summary>
         public abstract String AnimationPrefix { get; }
@@ -12,15 +12,15 @@ namespace Khepri.Entities.Actors.Components.States
         /// <summary> The states this state can transition into. </summary>
         protected Dictionary<StateEvent, Type> _transitions = new Dictionary<StateEvent, Type>();
 
-        /// <summary> A reference to the unit. </summary>
-        protected readonly Being _unit;
+        /// <summary> A reference to the being. </summary>
+        protected readonly Being _being;
 
 
-        /// <summary> The basic data object representing a unit's potential state. </summary>
-        /// <param name="unit"> A reference to the unit the state controls. </param>
-        public UnitState(Being unit)
+        /// <summary> The basic data object representing a being's potential state. </summary>
+        /// <param name="being"> A reference to the being the state controls. </param>
+        public BeingState(Being being)
         {
-            _unit = unit;
+            _being = being;
         }
 
 
@@ -39,27 +39,27 @@ namespace Khepri.Entities.Actors.Components.States
         /// <param name="stateEvent"> The triggering event. </param>
         /// <returns> The altered state. </returns>
         /// <exception cref="ArgumentException"> If the new transition couldn't be added to the state. </exception>
-        public UnitState WithTransition<T>(StateEvent stateEvent) where T : UnitState
+        public BeingState WithTransition<T>(StateEvent stateEvent) where T : BeingState
         {
             if (!_transitions.TryAdd(stateEvent, typeof(T)))
             {
-                throw new ArgumentException("Unable to add the given transition to the unit's state machine.", $"{stateEvent.GetType()}");
+                throw new ArgumentException("Unable to add the given transition to the being's state machine.", $"{stateEvent.GetType()}");
             }
             return this;
         }
 
 
-        /// <summary> Update the unit state. Called on the physics frame. </summary>
+        /// <summary> Update the being state. Called on the physics frame. </summary>
         /// <param name="delta"> The time in second since the last physics frame. </param>
         public abstract void Update(Double delta);
 
 
-        /// <summary> Handle input during the current unit's state. </summary>
+        /// <summary> Handle input during the current being's state. </summary>
         /// <param name="input"> The input data object. </param>
         public abstract void HandleInput(IInput input);
 
 
-        /// <summary> Initialise the unit state. Called once when the state is created. </summary>
+        /// <summary> Initialise the being state. Called once when the state is created. </summary>
         public virtual void Start() { }
 
 
@@ -75,7 +75,7 @@ namespace Khepri.Entities.Actors.Components.States
 
 
         /// <inheritdoc/>
-        public Boolean Equals(UnitState? other)
+        public Boolean Equals(BeingState? other)
         {
             return other != null ? GetType() == other.GetType() : false;
         }

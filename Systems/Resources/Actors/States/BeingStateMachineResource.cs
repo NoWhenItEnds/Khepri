@@ -16,29 +16,35 @@ namespace Khepri.Entities.Actors.Components.States
     }
 
 
-    /// <summary> A state machine for unit states. </summary>
-    public partial class UnitStateMachine : Node
+    /// <summary> A state machine for being states. </summary>
+    public partial class BeingStateMachine : Resource
     {
-        /// <summary> A reference to the unit controlled by the state. </summary>
-        [ExportGroup("Nodes")]
-        [Export] private Being _unit;
+        /// <summary> A reference to the being controlled by the state. </summary>
+        private Being _being;
 
         /// <summary> The current state of the state machine. </summary>
-        public UnitState CurrentState { get; private set; }
+        public BeingState CurrentState { get; private set; }
 
 
         /// <summary> The default state to transition to if the state machine finds an invalid value. </summary>
-        private UnitState _defaultState;
+        private BeingState _defaultState;
 
         /// <summary> All the possible states the state machine can transition to. </summary>
-        private HashSet<UnitState> _states = new HashSet<UnitState>();
+        private HashSet<BeingState> _states = new HashSet<BeingState>();
 
 
-        /// <inheritdoc/>
-        public override void _Ready()
+        /// <summary> A state machine for being states. </summary>
+        public BeingStateMachine() { }
+
+
+        /// <summary> Initialise the resource. </summary>
+        /// <param name="being"> A reference to the being controlled by the state. </param>
+        public void Initialise(Being being)
         {
+            _being = being;
+
             // Set the default state.
-            _defaultState = new IdlingState(_unit)
+            _defaultState = new IdlingState(_being)
                 .WithTransition<WalkingState>(StateEvent.WALK)
                 .WithTransition<SprintingState>(StateEvent.SPRINT);
 
@@ -46,17 +52,17 @@ namespace Khepri.Entities.Actors.Components.States
 
             _states.Add(_defaultState);
 
-            _states.Add(new WalkingState(_unit)
+            _states.Add(new WalkingState(_being)
                 .WithTransition<IdlingState>(StateEvent.IDLE)
                 .WithTransition<SprintingState>(StateEvent.SPRINT));
 
-            _states.Add(new SprintingState(_unit)
+            _states.Add(new SprintingState(_being)
                 .WithTransition<IdlingState>(StateEvent.IDLE)
                 .WithTransition<WalkingState>(StateEvent.WALK));
         }
 
 
-        /// <summary> Handle the input sent to the unit by it's controller. </summary>
+        /// <summary> Handle the input sent to the being by it's controller. </summary>
         /// <param name="input"> The input data class to interpret. </param>
         public void HandleInput(IInput input)
         {
@@ -78,17 +84,17 @@ namespace Khepri.Entities.Actors.Components.States
             }
             else if (input is ExamineInput examineInput)    // TODO - State change?
             {
-                examineInput.Entity.Examine(_unit);
+                examineInput.Entity.Examine(_being);
             }
             else if (input is UseInput useInput)
             {
-                useInput.Entity.Use(_unit);
+                useInput.Entity.Use(_being);
             }
             else if (input is GrabInput grabInput)
             {
                 if (grabInput.Entity is ItemNode item)
                 {
-                    item.Grab(_unit);
+                    item.Grab(_being);
                 }
             }
 
@@ -110,8 +116,9 @@ namespace Khepri.Entities.Actors.Components.States
         }
 
 
-        /// <inheritdoc/>
-        public override void _PhysicsProcess(Double delta)
+        /// <summary> Update the current state every frame. </summary>
+        /// <param name="delta"> The time since the previous frame. </param>
+        public void Update(Double delta)
         {
             CurrentState.Update(delta);
         }
