@@ -2,6 +2,7 @@ using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Actors;
 using Khepri.GOAP.ActionStrategies;
+using Khepri.Resources;
 using Khepri.Resources.Actors;
 using System;
 using System.Collections.Generic;
@@ -52,6 +53,13 @@ namespace Khepri.GOAP
         {
             _playerController = PlayerController.Instance;
             _planner = new AgentPlanner();
+
+            BeingResource? agentResource = ResourceController.Instance.CreateResource<BeingResource>("human");
+            if (agentResource == null)
+            {
+                throw new ArgumentNullException("The returned BeingResource is undefined. For some reason, you are missing a BeingResource with the 'human' id.");
+            }
+            _controlledEntity.Initialise(agentResource, _controlledEntity.GlobalPosition);
 
             InitialiseBeliefs();
             InitialiseActions();

@@ -72,7 +72,7 @@ namespace Khepri.Resources
         public T? CreateResource<T>(String id) where T : EntityResource
         {
             Resource? resource = _resources.FirstOrDefault(x => x is T entity && entity.Id == id) ?? null;
-            if (resource != null) { return (T)resource.Duplicate(); }
+            if (resource != null) { return (T)resource.DuplicateDeep(); }
             else { return null; }
         }
     }

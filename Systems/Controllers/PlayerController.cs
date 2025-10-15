@@ -3,6 +3,8 @@ using Khepri.Entities;
 using Khepri.Entities.Actors;
 using Khepri.Nodes;
 using Khepri.Nodes.Singletons;
+using Khepri.Resources;
+using Khepri.Resources.Actors;
 using Khepri.Types.Extensions;
 using System;
 using System.Linq;
@@ -46,6 +48,12 @@ namespace Khepri.Controllers
             _uiController = UIController.Instance;
 
             // Set up initial state.
+            BeingResource? playerResource = ResourceController.Instance.CreateResource<BeingResource>("human");
+            if(playerResource == null)
+            {
+                throw new ArgumentNullException("The returned BeingResource is undefined. For some reason, you are missing a BeingResource with the 'human' id.");
+            }
+            PlayerBeing.Initialise(playerResource, PlayerBeing.GlobalPosition);
             _currentControllable = PlayerBeing;
             _worldCamera.SetTarget(PlayerBeing.CameraPosition);
             Input.MouseMode = Input.MouseModeEnum.ConfinedHidden;

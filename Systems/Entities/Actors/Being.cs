@@ -45,9 +45,6 @@ namespace Khepri.Entities.Actors
         [ExportGroup("Resources")]
         [Export] private Godot.Collections.Dictionary<UnitSpriteLayer, SpriteFrames> _spriteFrames;
 
-        /// <summary> The being's data component. </summary>
-        [Export] private BeingResource _resource;
-
 
         /// <inheritdoc/>
         public Vector3 WorldPosition => GlobalPosition;
@@ -62,11 +59,20 @@ namespace Khepri.Entities.Actors
         private WorldController _worldController;
 
 
-        /// <inheritdoc/>
-        public override void _Ready()
+        /// <summary> The being's data component. </summary>
+        private BeingResource _resource;
+
+
+        /// <summary> Initialise the being with its starting values. </summary>
+        /// <param name="resource"> The being's data component. </param>
+        /// <param name="position"> The world position to set the being at. </param>
+        public void Initialise(BeingResource resource, Vector3 position)
         {
             _worldController = WorldController.Instance;
             Inventory = new EntityInventory(_inventorySize);
+
+            GlobalPosition = position;
+            _resource = resource;
             _resource.Initialise(this);
 
             // Setup the sprite animations.
