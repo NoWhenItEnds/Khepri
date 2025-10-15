@@ -1,4 +1,4 @@
-[gd_scene load_steps=43 format=3 uid="uid://ko6nvcupfcf4"]
+[gd_scene load_steps=44 format=3 uid="uid://ko6nvcupfcf4"]
 
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="Script" uid="uid://cgujt8yhxbsew" path="res://Systems/Controllers/WorldController.cs" id="1_8fov1"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://d1dxnpil1ufxm" path="res://Systems/GOAP/AgentController.cs" id="3_md4fn"]
 [ext_resource type="PackedScene" uid="uid://dm4tu3i0sn5s4" path="res://Content/Tiles/MountKosciuszko/MK_Terrain.tscn" id="4_5p3x2"]
 [ext_resource type="PackedScene" uid="uid://dbsl418re8pu4" path="res://Content/Tiles/MountKosciuszko/MK_Wall.tscn" id="5_sa7mi"]
+[ext_resource type="Resource" uid="uid://dipd2ay6fla8a" path="res://Data/Actors/Beings/Being_Human.tres" id="6_4buj1"]
 [ext_resource type="PackedScene" uid="uid://c5oukv8uq6kbj" path="res://Content/Tiles/MountKosciuszko/MK_Stairs.tscn" id="6_fdsh7"]
 [ext_resource type="Script" uid="uid://cetn5kplov84b" path="res://Systems/Nodes/WorldCamera.cs" id="8_md4fn"]
 [ext_resource type="PackedScene" uid="uid://b4pnoeq7plx01" path="res://Content/Prefabs/Entities/Environment/Tree.tscn" id="8_vstfe"]
@@ -97,9 +98,11 @@ transform = Transform3D(1, 0, 0, 0, -4.3711385e-08, 0.99999994, 0, -0.99999994, 
 
 [node name="Player Unit" parent="World" instance=ExtResource("2_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -2)
+_resource = ExtResource("6_4buj1")
 
 [node name="Enemy Unit" parent="World" instance=ExtResource("2_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.065, 0, -0.318)
+_resource = ExtResource("6_4buj1")
 
 [node name="Playground" type="NavigationRegion3D" parent="World"]
 navigation_mesh = SubResource("NavigationMesh_fdsh7")
@@ -961,3 +964,4 @@ script = ExtResource("25_rvbhf")
 _unitMenuPrefab = ExtResource("26_1mywo")
 _enemyController = NodePath("../../../Controllers/Agent Controller")
 _enemyUnit = NodePath("../../../World/Enemy Unit")
+_showDebug = true

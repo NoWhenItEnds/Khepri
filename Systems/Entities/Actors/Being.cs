@@ -29,9 +29,6 @@ namespace Khepri.Entities.Actors
         /// <summary> A reference to the unit's sprite. </summary>
         [Export] public SpriteComponent Sprite { get; private set; }
 
-        /// <summary> A reference to the unit's needs component. </summary>
-        [Export] public NeedComponent Needs { get; private set; }
-
         /// <summary> A reference to the unit's sensors' component. </summary>
         [Export] public SensorComponent Sensors { get; private set; }
 
@@ -86,6 +83,7 @@ namespace Khepri.Entities.Actors
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
+            _resource.Needs.Update();
             UpdateDirection();
         }
 

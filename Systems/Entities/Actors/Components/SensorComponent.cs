@@ -1,6 +1,7 @@
 using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Items;
+using Khepri.Resources.Actors;
 using Khepri.Resources.Items;
 using Khepri.Types.Extensions;
 using System;
@@ -144,7 +145,7 @@ namespace Khepri.Entities.Actors.Components
                 Boolean isAdded = _knownLocations.Add(entity);
                 if (isAdded)    // Reward the unit by discovering new areas by increasing their entertainment.
                 {
-                    _unit.Needs.UpdateEntertainment(0.1f);
+                    _unit.GetResource<BeingResource>().Needs.UpdateEntertainment(0.1f);
                 }
             }
             return entity;

@@ -2,6 +2,7 @@ using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Actors;
 using Khepri.GOAP.ActionStrategies;
+using Khepri.Resources.Actors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,14 +70,15 @@ namespace Khepri.GOAP
             factory.AddBelief("IsIdle", () => _controlledEntity.NavigationAgent.IsNavigationFinished());
             factory.AddBelief("IsMoving", () => !_controlledEntity.NavigationAgent.IsNavigationFinished());
 
-            factory.AddBelief("IsHealthy", () => _controlledEntity.Needs.CurrentHealth >= 90f);
-            factory.AddBelief("IsHurt", () => _controlledEntity.Needs.CurrentHealth < 50);
-            factory.AddBelief("IsFed", () => _controlledEntity.Needs.CurrentHunger >= 90f);
-            factory.AddBelief("IsHungry", () => _controlledEntity.Needs.CurrentHunger < 50f);
-            factory.AddBelief("IsRested", () => _controlledEntity.Needs.CurrentFatigue >= 90f);
-            factory.AddBelief("IsTired", () => _controlledEntity.Needs.CurrentFatigue < 50f);
-            factory.AddBelief("IsEntertained", () => _controlledEntity.Needs.CurrentEntertainment >= 90f);
-            factory.AddBelief("IsBored", () => _controlledEntity.Needs.CurrentEntertainment < 50f);
+            BeingNeedsResource needs = _controlledEntity.GetResource<BeingResource>().Needs;
+            factory.AddBelief("IsHealthy", () => needs.CurrentHealth >= 90f);
+            factory.AddBelief("IsHurt", () => needs.CurrentHealth < 50);
+            factory.AddBelief("IsFed", () => needs.CurrentHunger >= 90f);
+            factory.AddBelief("IsHungry", () => needs.CurrentHunger < 50f);
+            factory.AddBelief("IsRested", () => needs.CurrentFatigue >= 90f);
+            factory.AddBelief("IsTired", () => needs.CurrentFatigue < 50f);
+            factory.AddBelief("IsEntertained", () => needs.CurrentEntertainment >= 90f);
+            factory.AddBelief("IsBored", () => needs.CurrentEntertainment < 50f);
 
             // TODO - Add belief packages. Such as food beliefs that contains both the Knows and Sees for the item.
             factory.AddKnownItemBelief("KnowsApple", "apple");

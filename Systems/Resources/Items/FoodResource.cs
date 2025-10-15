@@ -1,6 +1,7 @@
 using System;
 using Godot;
 using Khepri.Entities.Actors;
+using Khepri.Resources.Actors;
 
 namespace Khepri.Resources.Items
 {
@@ -39,10 +40,11 @@ namespace Khepri.Resources.Items
         /// <inheritdoc/>
         public override void Use(Being activatingEntity)
         {
-            activatingEntity.Needs.UpdateHealth(HealthRecovery);
-            activatingEntity.Needs.UpdateHunger(HungerRecovery);
-            activatingEntity.Needs.UpdateFatigue(FatigueRecovery);
-            activatingEntity.Needs.UpdateEntertainment(EntertainmentRecovery);
+            BeingNeedsResource needs = activatingEntity.GetResource<BeingResource>().Needs;
+            needs.UpdateHealth(HealthRecovery);
+            needs.UpdateHunger(HungerRecovery);
+            needs.UpdateFatigue(FatigueRecovery);
+            needs.UpdateEntertainment(EntertainmentRecovery);
 
             Portions -= 1;  // TODO - It should queue free.
         }
