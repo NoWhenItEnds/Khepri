@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3 uid="uid://dy6hxh2vbsm0s"]
 
 [ext_resource type="Script" uid="uid://c5p60o1bsyalv" path="res://Systems/Entities/Devices/Telescope.cs" id="1_qpvnc"]
-[ext_resource type="Resource" uid="uid://ckisfdu54q5v8" path="res://Data/Devices/Device_Telescope.tres" id="2_j1rno"]
+[ext_resource type="Resource" uid="uid://3g0h3r77ocky" path="res://Data/Devices/Device_Telescope.tres" id="2_j1rno"]
 [ext_resource type="SpriteFrames" uid="uid://dx5orqkv03mqp" path="res://Content/Resources/SpriteFrames/Actors/HumanF/SpriteFrame_Actor_HumanF_Base.tres" id="2_qpvnc"]
 [ext_resource type="Script" uid="uid://bghtlkqurxx24" path="res://Systems/Nodes/LayeredAnimatedSprite3D.cs" id="3_wt6ib"]
 

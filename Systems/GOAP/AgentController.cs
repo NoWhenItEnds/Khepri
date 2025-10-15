@@ -44,6 +44,9 @@ namespace Khepri.GOAP
         /// <summary> A reference to the player's controller. </summary>
         private PlayerController _playerController;
 
+        /// <summary> A reference to the game world's ui. </summary>
+        private UIController _uiController;
+
         /// <summary> A reference to the planner this controller will use. </summary>
         private AgentPlanner _planner;
 
@@ -52,6 +55,7 @@ namespace Khepri.GOAP
         public override void _Ready()
         {
             _playerController = PlayerController.Instance;
+            _uiController = UIController.Instance;
             _planner = new AgentPlanner();
 
             BeingResource? agentResource = ResourceController.Instance.CreateResource<BeingResource>("human");
@@ -175,16 +179,16 @@ namespace Khepri.GOAP
             // Update the plan and current action if there is one
             if (CurrentAction == null)
             {
-                GD.Print("Calculating any potential new plan.");
+                _uiController.SpawnSpeechBubble("Calculating any potential new plan.", _controlledEntity);
                 CalculatePlan();
 
                 if (CurrentPlan != null && CurrentPlan.Actions.Count > 0)
                 {
                     CurrentGoal = CurrentPlan.AgentGoal;
-                    GD.Print($"Goal: {CurrentGoal.Name} with {CurrentPlan.Actions.Count} actions in plan");
+                    _uiController.SpawnSpeechBubble($"Goal: {CurrentGoal.Name} with {CurrentPlan.Actions.Count} actions in plan", _controlledEntity);
 
                     CurrentAction = CurrentPlan.Actions.Pop();
-                    GD.Print($"Popped action: {CurrentAction.Name}");
+                    _uiController.SpawnSpeechBubble($"Popped action: {CurrentAction.Name}", _controlledEntity);
 
                     // Verify all precondition effects are true
                     if (CurrentAction.Preconditions.All(b => b.Evaluate()))
@@ -193,7 +197,7 @@ namespace Khepri.GOAP
                     }
                     else
                     {
-                        GD.Print("Preconditions not met, clearing current action and goal");
+                        _uiController.SpawnSpeechBubble("Preconditions not met, clearing current action and goal", _controlledEntity);
 
                         CurrentAction = null;
                         CurrentGoal = null;
@@ -209,14 +213,14 @@ namespace Khepri.GOAP
 
                 if (CurrentAction.IsComplete)
                 {
-                    GD.Print($"{CurrentAction.Name} complete");
+                    _uiController.SpawnSpeechBubble($"Action, {CurrentAction.Name}, complete.", _controlledEntity);
 
                     CurrentAction.Stop();
                     CurrentAction = null;
 
                     if (CurrentPlan.Actions.Count == 0)
                     {
-                        GD.Print("Plan complete");
+                        _uiController.SpawnSpeechBubble("Plan complete!", _controlledEntity);
 
                         ArchiveCurrentGoal();
                     }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=3 uid="uid://ko6nvcupfcf4"]
+[gd_scene load_steps=45 format=3 uid="uid://ko6nvcupfcf4"]
 
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="Script" uid="uid://cgujt8yhxbsew" path="res://Systems/Controllers/WorldController.cs" id="1_8fov1"]
@@ -7,7 +7,6 @@
 [ext_resource type="Script" uid="uid://d1dxnpil1ufxm" path="res://Systems/GOAP/AgentController.cs" id="3_md4fn"]
 [ext_resource type="PackedScene" uid="uid://dm4tu3i0sn5s4" path="res://Content/Tiles/MountKosciuszko/MK_Terrain.tscn" id="4_5p3x2"]
 [ext_resource type="PackedScene" uid="uid://dbsl418re8pu4" path="res://Content/Tiles/MountKosciuszko/MK_Wall.tscn" id="5_sa7mi"]
-[ext_resource type="Resource" uid="uid://dipd2ay6fla8a" path="res://Data/Actors/Beings/Being_Human.tres" id="6_4buj1"]
 [ext_resource type="PackedScene" uid="uid://c5oukv8uq6kbj" path="res://Content/Tiles/MountKosciuszko/MK_Stairs.tscn" id="6_fdsh7"]
 [ext_resource type="Script" uid="uid://cetn5kplov84b" path="res://Systems/Nodes/WorldCamera.cs" id="8_md4fn"]
 [ext_resource type="PackedScene" uid="uid://b4pnoeq7plx01" path="res://Content/Prefabs/Entities/Environment/Tree.tscn" id="8_vstfe"]
@@ -25,6 +24,8 @@
 [ext_resource type="Script" uid="uid://bvp2kcvx54mn7" path="res://Systems/UI/HUD/StatusBars.cs" id="14_rj7tm"]
 [ext_resource type="Texture2D" uid="uid://jm8q7n0aefdj" path="res://Content/Textures/UI/HUD/StatusBar/StatusBar_Progress.png" id="15_rj7tm"]
 [ext_resource type="Texture2D" uid="uid://be0foew3edrpc" path="res://Content/Textures/UI/HUD/StatusBar/StatusBar_Slider.png" id="17_kqbmc"]
+[ext_resource type="Script" uid="uid://bkvivpavak3rl" path="res://Systems/UI/HUD/SpeechBubbles/SpeechBubbleHUD.cs" id="18_4buj1"]
+[ext_resource type="PackedScene" uid="uid://dg53cc06rwfo5" path="res://Content/Prefabs/UI/HUD/Components/SpeechBubbleItem.tscn" id="19_kx5lk"]
 [ext_resource type="Script" uid="uid://vuqou0rktkpf" path="res://Systems/UI/Windows/InventoryWindow.cs" id="20_dulfu"]
 [ext_resource type="Texture2D" uid="uid://cykmv0wmfypeq" path="res://Content/Textures/UI/Windows/Inventory/Inventory_Grid_Tile.png" id="20_pt5vb"]
 [ext_resource type="Script" uid="uid://0jc0v8s8grx2" path="res://Systems/UI/HUD/Interaction/InteractionMenu.cs" id="21_gl22v"]
@@ -580,7 +581,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1390452, 0, 2.37148)
 [node name="NanoForge" parent="World/Devices" instance=ExtResource("14_i3r7d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.898831)
 
-[node name="UI" type="Control" parent="." node_paths=PackedStringArray("_astrolabe", "_statusBars", "_interactionMenu", "_inventoryWindow", "_telescopeWindow")]
+[node name="UI" type="Control" parent="." node_paths=PackedStringArray("_speechBubbles", "_astrolabe", "_statusBars", "_interactionMenu", "_inventoryWindow", "_telescopeWindow")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -588,6 +589,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("13_oaat0")
+_speechBubbles = NodePath("HUD/Speech Bubbles")
 _astrolabe = NodePath("HUD/Astrolabe")
 _statusBars = NodePath("HUD/Status Bars")
 _interactionMenu = NodePath("HUD/Interaction Menu")
@@ -602,6 +604,16 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Speech Bubbles" type="Control" parent="UI/HUD"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("18_4buj1")
+_speechBubblePrefab = ExtResource("19_kx5lk")
 
 [node name="Astrolabe" type="Control" parent="UI/HUD" node_paths=PackedStringArray("_ringTexture")]
 layout_mode = 1
@@ -962,4 +974,3 @@ script = ExtResource("25_rvbhf")
 _unitMenuPrefab = ExtResource("26_1mywo")
 _enemyController = NodePath("../../../Controllers/Agent Controller")
 _enemyUnit = NodePath("../../../World/Enemy Unit")
-_showDebug = true

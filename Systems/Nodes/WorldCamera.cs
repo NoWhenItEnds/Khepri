@@ -47,6 +47,10 @@ namespace Khepri.Nodes
         }
 
 
+        /// <summary> Get a reference to the main camera node. </summary>
+        public Camera3D GetCamera() => _mainCamera;
+
+
         /// <summary> Set's the orthographic camera's size. </summary>
         /// <param name="size"> The distance the camera is zoomed. Higher values means that it is more zoomed out.</param>
         public void SetCameraSize(Single size = 12f)
