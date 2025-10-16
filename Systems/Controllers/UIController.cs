@@ -1,7 +1,7 @@
 using System;
 using Godot;
-using Khepri.Entities.Devices;
 using Khepri.Nodes.Singletons;
+using Khepri.Resources.Devices;
 using Khepri.UI.HUD;
 using Khepri.UI.HUD.Interaction;
 using Khepri.UI.HUD.SpeechBubbles;
@@ -74,7 +74,7 @@ namespace Khepri.Controllers
 
         /// <summary> Show the telescope window to represent the view of a telescope. </summary>
         /// <param name="telescope"> A reference to the triggering telescope. </param>
-        public void ShowTelescope(Telescope telescope)
+        public void ShowTelescope(TelescopeResource telescope)
         {
             ToggleHUD(false);
             _telescopeWindow.Visible = true;

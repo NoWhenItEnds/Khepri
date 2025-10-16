@@ -41,14 +41,7 @@ namespace Khepri.Entities.Devices
         /// <returns> The initialised item. </returns>
         public DeviceNode CreateDevice(DeviceResource resource, Vector3 position)
         {
-            DeviceNode? device = resource.Prefab.InstantiateOrNull<DeviceNode>();
-            if (device == null)
-            {
-                throw new ArgumentException($"The resource's associated prefab could not be converted to a DeviceNode, which is expected.");
-            }
-
-            device.Initialise(resource, position);
-            return device;
+            throw new NotImplementedException();
         }
     }
 }

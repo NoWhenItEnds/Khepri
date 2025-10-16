@@ -8,7 +8,7 @@ using System;
 namespace Khepri.Entities.Devices
 {
     /// <summary> An entity that can be interacted with by a unit for a unique effect. </summary>
-    public abstract partial class DeviceNode : StaticBody3D, IEntity, IPoolable
+    public partial class DeviceNode : StaticBody3D, IEntity, IControllable, IPoolable
     {
         /// <summary> The device's bounding shape. </summary>
         [ExportGroup("Nodes")]
@@ -68,6 +68,16 @@ namespace Khepri.Entities.Devices
         }
 
 
+        /// <summary> The internal logic to use when the entity is examined. </summary>
+        /// <param name="activatingBeing"> A reference to the unit activating the action. </param>
+        public void Examine(Being activatingBeing) => _resource.Examine(activatingBeing);
+
+
+        /// <summary> The internal logic to use when the entity is used. </summary>
+        /// <param name="activatingBeing"> A reference to the unit activating the action. </param>
+        public void Use(Being activatingBeing) => _resource.Use(activatingBeing);
+
+
         /// <inheritdoc/>
         public Vector3 GetWorldPosition() => GlobalPosition;
 
@@ -90,18 +100,19 @@ namespace Khepri.Entities.Devices
         }
 
 
-        /// <summary> The internal logic to use when the entity is examined. </summary>
-        /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
-        public abstract void Examine(Being activatingEntity);
-
-
-        /// <summary> The internal logic to use when the entity is used. </summary>
-        /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
-        public abstract void Use(Being activatingEntity);
+        /// <inheritdoc/>
+        public void HandleInput(IInput input)
+        {
+            if(_resource is IControllable controllable)
+            {
+                controllable.HandleInput(input);
+            }
+        }
 
 
         /// <inheritdoc/>
         public void FreeObject() => throw new NotImplementedException();    // TODO - Implements.
+
 
         /// <inheritdoc/>
         public Godot.Collections.Dictionary<String, Variant> Serialise()
