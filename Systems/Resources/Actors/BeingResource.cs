@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using Godot.Collections;
 using Khepri.Controllers;
 
 namespace Khepri.Resources.Actors
@@ -8,9 +9,13 @@ namespace Khepri.Resources.Actors
     [GlobalClass]
     public partial class BeingResource : ActorResource
     {
+        /// <summary> The unit's base movement speed. </summary>
+        [ExportGroup("Settings")]
+        [Export] public Single BaseSpeed { get; private set; } = 3f;
+
+
         /// <summary> Modifies the amount of hunger the unit looses each tick. </summary>
-        [ExportGroup("Needs")]
-        [ExportSubgroup("Modifiers")]
+        [ExportSubgroup("Needs")]
         [Export] public Single HungerModifier { get; private set; } = 0.001f;
 
         /// <summary> Modifies the amount of fatigue the unit looses each tick. </summary>
@@ -26,11 +31,8 @@ namespace Khepri.Resources.Actors
         [Export] public Single SprintModifier { get; private set; } = 2f;
 
 
-        /// <summary> The unit's base movement speed. </summary>
-        [ExportSubgroup("Current State")]
-        [Export] public Single BaseSpeed { get; private set; } = 3f;
-
         /// <summary> A value between 0-100 representing the unit's current physical state. </summary>
+        [ExportGroup("State")]
         [Export] public Single CurrentHealth { get; private set; } = 100f;
 
         /// <summary> A value between 0-100 representing the unit's current hunger. </summary>
@@ -104,6 +106,32 @@ namespace Khepri.Resources.Actors
             // Find the largest problem, and that caps the unit's stamina reserve.
             Single minValue = Math.Min(CurrentHealth, Math.Min(CurrentHunger, Math.Min(CurrentFatigue, CurrentEntertainment)));
             CurrentStamina = Math.Clamp(CurrentStamina + amount, 0f, minValue);
+        }
+
+
+        /// <inheritdoc/>
+        public override Dictionary<String, Variant> Serialise()
+        {
+            return new Dictionary<String, Variant>()
+            {
+                { "id", Id },
+                { "health", CurrentHealth },
+                { "hunger", CurrentHunger },
+                { "fatigue", CurrentFatigue },
+                { "entertainment", CurrentEntertainment },
+                { "stamina", CurrentStamina }
+            };
+        }
+
+
+        /// <inheritdoc/>
+        public override void Deserialise(Dictionary<String, Variant> data)
+        {
+            CurrentHealth = (Single)data["health"];
+            CurrentHunger = (Single)data["hunger"];
+            CurrentFatigue = (Single)data["fatigue"];
+            CurrentEntertainment = (Single)data["entertainment"];
+            CurrentStamina = (Single)data["stamina"];
         }
     }
 }

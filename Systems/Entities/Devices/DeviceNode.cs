@@ -9,7 +9,7 @@ using System;
 namespace Khepri.Entities.Devices
 {
     /// <summary> An entity that can be interacted with by a unit for a unique effect. </summary>
-    public partial class DeviceNode : StaticBody3D, IEntity, IControllable, IPoolable
+    public partial class DeviceNode : StaticBody3D, IEntity, IPoolable
     {
         /// <summary> The device's bounding shape. </summary>
         [ExportGroup("Nodes")]
@@ -97,16 +97,6 @@ namespace Khepri.Entities.Devices
             else
             {
                 throw new InvalidCastException($"Unable to cast the resource to {typeof(T)}.");
-            }
-        }
-
-
-        /// <inheritdoc/>
-        public void HandleInput(IInput input)
-        {
-            if(_resource is IControllable controllable)
-            {
-                controllable.HandleInput(input);
             }
         }
 

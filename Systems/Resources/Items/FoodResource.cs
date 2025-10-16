@@ -23,7 +23,9 @@ namespace Khepri.Resources.Items
         /// <summary> The amount of a unit's entertainment the item recovers. </summary>
         [Export] public Single EntertainmentRecovery { get; private set; }
 
+
         /// <summary> The number of portions the item has remaining. </summary>
+        [ExportGroup("State")]
         [Export] public Int32 Portions { get; private set; }
 
 

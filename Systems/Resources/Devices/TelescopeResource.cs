@@ -16,7 +16,9 @@ namespace Khepri.Resources.Devices
         [ExportGroup("Settings")]
         [Export] private Single _inputSensitivity = 0.1f;
 
+
         /// <summary> The telescope's current altitude. It's up and down value. </summary>
+        [ExportGroup("State")]
         [Export] public Single Altitude { get; private set; } = 0f;
 
         /// <summary> The telescope's current azimuth. It's right to left value. Starts from N and rotates cloak-wise. </summary>

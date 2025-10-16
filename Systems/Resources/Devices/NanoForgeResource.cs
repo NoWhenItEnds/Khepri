@@ -11,7 +11,7 @@ namespace Khepri.Resources.Devices
     public partial class NanoForgeResource : DeviceResource
     {
         /// <summary> The id of the item the nano forge will attempt to spawn. </summary>
-        [ExportGroup("Settings")]
+        [ExportGroup("State")]
         [Export] public String SelectedItem { get; private set; }
 
 
