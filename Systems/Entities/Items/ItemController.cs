@@ -5,6 +5,7 @@ using Khepri.Nodes.Singletons;
 using Khepri.Resources;
 using Khepri.Resources.Items;
 using Khepri.Types;
+using Khepri.Types.Exceptions;
 
 namespace Khepri.Entities.Items
 {
@@ -83,7 +84,7 @@ namespace Khepri.Entities.Items
             FileAccess? file = FileAccess.Open("user://save_game.dat", FileAccess.ModeFlags.Write);
             if (file == null)
             {
-                throw new Exception(FileAccess.GetOpenError().ToString());
+                throw new ItemException(FileAccess.GetOpenError().ToString());
             }
 
             ItemNode[] activeObjects = ItemPool.GetActiveObjects();
@@ -101,7 +102,7 @@ namespace Khepri.Entities.Items
             FileAccess? file = FileAccess.Open(filepath, FileAccess.ModeFlags.Read);
             if (file == null)
             {
-                throw new Exception(FileAccess.GetOpenError().ToString());
+                throw new ItemException(FileAccess.GetOpenError().ToString());
             }
 
             Variant t = file.GetVar();

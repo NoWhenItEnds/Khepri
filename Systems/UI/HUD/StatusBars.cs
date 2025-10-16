@@ -1,6 +1,7 @@
 using Godot;
 using Khepri.Controllers;
 using Khepri.Resources.Actors;
+using Khepri.Types.Exceptions;
 using Khepri.Types.Extensions;
 using System;
 using System.Linq;
@@ -82,7 +83,7 @@ namespace Khepri.UI.HUD
             }
             else
             {
-                throw new ArgumentOutOfRangeException("Unable to find a texture progress bar in the needs container.");
+                throw new UIException("Unable to find a texture progress bar in the needs container.");
             }
         }
 
