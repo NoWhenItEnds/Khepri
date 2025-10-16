@@ -22,7 +22,7 @@ namespace Khepri.Resources.Devices
         /// <inheritdoc/>
         public override void Use(Being activatingBeing)
         {
-            ItemController.Instance.CreateItem("apple", activatingBeing.GlobalPosition);
+            ItemController.Instance.CreateItem(SelectedItem, activatingBeing.GlobalPosition);
         }
 
 

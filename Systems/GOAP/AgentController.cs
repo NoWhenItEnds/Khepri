@@ -58,10 +58,10 @@ namespace Khepri.GOAP
             _uiController = UIController.Instance;
             _planner = new AgentPlanner();
 
-            BeingResource? agentResource = ResourceController.Instance.CreateResource<BeingResource>("human");
+            BeingResource? agentResource = ResourceController.Instance.CreateResource<BeingResource>("being_human");
             if (agentResource == null)
             {
-                throw new ArgumentNullException("The returned BeingResource is undefined. For some reason, you are missing a BeingResource with the 'human' id.");
+                throw new ArgumentNullException("The returned BeingResource is undefined. For some reason, you are missing a BeingResource with the 'being_human' id.");
             }
             _controlledEntity.Initialise(agentResource, _controlledEntity.GlobalPosition);
 

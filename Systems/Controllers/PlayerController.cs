@@ -48,7 +48,7 @@ namespace Khepri.Controllers
             _uiController = UIController.Instance;
 
             // Set up initial state.
-            BeingResource? playerResource = ResourceController.Instance.CreateResource<BeingResource>("human");
+            BeingResource? playerResource = ResourceController.Instance.CreateResource<BeingResource>("being_human");
             if(playerResource == null)
             {
                 throw new ArgumentNullException("The returned BeingResource is undefined. For some reason, you are missing a BeingResource with the 'human' id.");
