@@ -32,6 +32,6 @@ namespace Khepri.Entities
         /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
         public void Use(Being activatingEntity);
 
-        public void Serialise();
+        public Godot.Collections.Dictionary<String, Variant> Serialise();
     }
 }

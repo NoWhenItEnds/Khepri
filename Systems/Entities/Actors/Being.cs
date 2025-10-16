@@ -161,7 +161,7 @@ namespace Khepri.Entities.Actors
         }
 
         /// <inheritdoc/>
-        public void Serialise()
+        public Godot.Collections.Dictionary<String, Variant> Serialise()
         {
             throw new NotImplementedException();
         }

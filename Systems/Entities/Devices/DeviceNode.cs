@@ -104,7 +104,7 @@ namespace Khepri.Entities.Devices
         public void FreeObject() => throw new NotImplementedException();    // TODO - Implements.
 
         /// <inheritdoc/>
-        public void Serialise()
+        public Godot.Collections.Dictionary<String, Variant> Serialise()
         {
             throw new NotImplementedException();
         }

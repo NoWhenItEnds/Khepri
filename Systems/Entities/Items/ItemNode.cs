@@ -139,9 +139,13 @@ namespace Khepri.Entities.Items
 
 
         /// <inheritdoc/>
-        public void Serialise()
+        public Godot.Collections.Dictionary<String, Variant> Serialise()
         {
-            throw new NotImplementedException();
+            return new Godot.Collections.Dictionary<String, Variant>()
+            {
+                { "position", GlobalPosition },
+                { "item_id", _resource.Id }
+            };
         }
     }
 }

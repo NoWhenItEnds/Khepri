@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using Godot.Collections;
 using Khepri.Nodes.Singletons;
 using Khepri.Resources;
 using Khepri.Resources.Items;
@@ -55,6 +56,54 @@ namespace Khepri.Entities.Items
             ItemNode item = ItemPool.GetAvailableObject();
             item.Initialise(resource, position);
             return item;
+        }
+
+        public override void _Input(InputEvent @event)
+        {
+            if (@event is InputEventKey key && key.IsReleased())
+            {
+                if (key.Keycode == Key.Ctrl)
+                {
+                    GD.Print(OS.GetDataDir());
+                    Save();
+                }
+                else if(key.Keycode == Key.Alt)
+                {
+                    Load("user://save_game.dat");
+                }
+            }
+        }
+
+
+
+        public void Save()
+        {
+            FileAccess? file = FileAccess.Open("user://save_game.dat", FileAccess.ModeFlags.Write);
+            if (file == null)
+            {
+                throw new Exception(FileAccess.GetOpenError().ToString());
+            }
+
+            ItemNode[] activeObjects = ItemPool.GetActiveObjects();
+            foreach (ItemNode item in activeObjects)
+            {
+                Dictionary<String, Variant> data = item.Serialise();
+                file.StoreVar(data);
+            }
+            file.Close();
+        }
+
+
+        public void Load(String filepath)
+        {
+            FileAccess? file = FileAccess.Open(filepath, FileAccess.ModeFlags.Read);
+            if (file == null)
+            {
+                throw new Exception(FileAccess.GetOpenError().ToString());
+            }
+
+            Variant t = file.GetVar();
+            GD.Print(t);
         }
     }
 }
