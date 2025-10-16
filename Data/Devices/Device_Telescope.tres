@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="TelescopeResource" load_steps=3 format=3 uid="uid://3g0h3r77ocky"]
+
+[ext_resource type="SpriteFrames" uid="uid://dx5orqkv03mqp" path="res://Content/Resources/SpriteFrames/Actors/HumanF/SpriteFrame_Actor_HumanF_Base.tres" id="1_c7frj"]
+[ext_resource type="Script" uid="uid://dwcsu0xkc8yyw" path="res://Systems/Resources/Devices/TelescopeResource.cs" id="1_i6kk2"]
+
+[resource]
+script = ExtResource("1_i6kk2")
+WorldSprites = ExtResource("1_c7frj")
+Id = "telescope"
+metadata/_custom_type_script = "uid://dwcsu0xkc8yyw"
