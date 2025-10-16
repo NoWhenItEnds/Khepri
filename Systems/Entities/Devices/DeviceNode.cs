@@ -102,5 +102,11 @@ namespace Khepri.Entities.Devices
 
         /// <inheritdoc/>
         public void FreeObject() => throw new NotImplementedException();    // TODO - Implements.
+
+        /// <inheritdoc/>
+        public void Serialise()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 
-namespace Khepri.Entities.Actors.Components.States
+namespace Khepri.Entities.Actors.States
 {
     /// <summary> The basic data object representing a being's potential state. </summary>
-    public abstract class BeingState : IEquatable<BeingState>
+    public abstract class ActorState : IEquatable<ActorState>
     {
         /// <summary> The prefix of the animations to use for this state. </summary>
         public abstract String AnimationPrefix { get; }
@@ -18,7 +18,7 @@ namespace Khepri.Entities.Actors.Components.States
 
         /// <summary> The basic data object representing a being's potential state. </summary>
         /// <param name="being"> A reference to the being the state controls. </param>
-        public BeingState(Being being)
+        public ActorState(Being being)
         {
             _being = being;
         }
@@ -39,7 +39,7 @@ namespace Khepri.Entities.Actors.Components.States
         /// <param name="stateEvent"> The triggering event. </param>
         /// <returns> The altered state. </returns>
         /// <exception cref="ArgumentException"> If the new transition couldn't be added to the state. </exception>
-        public BeingState WithTransition<T>(StateEvent stateEvent) where T : BeingState
+        public ActorState WithTransition<T>(StateEvent stateEvent) where T : ActorState
         {
             if (!_transitions.TryAdd(stateEvent, typeof(T)))
             {
@@ -75,7 +75,7 @@ namespace Khepri.Entities.Actors.Components.States
 
 
         /// <inheritdoc/>
-        public Boolean Equals(BeingState? other)
+        public Boolean Equals(ActorState? other)
         {
             return other != null ? GetType() == other.GetType() : false;
         }

@@ -1,7 +1,7 @@
 using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Actors.Components;
-using Khepri.Entities.Actors.Components.States;
+using Khepri.Entities.Actors.States;
 using Khepri.Entities.Items;
 using Khepri.Resources;
 using Khepri.Resources.Actors;
@@ -52,6 +52,8 @@ namespace Khepri.Entities.Actors
         /// <summary> The current direction the being is facing. </summary>
         public Single Direction { get; private set; } = 0f;
 
+        public ActorStateMachine StateMachine { get; private set; }
+
         /// <summary> A list of entities that the being is close enough to interact with. </summary>
         public HashSet<IEntity> UsableEntities = new HashSet<IEntity>();
 
@@ -69,11 +71,11 @@ namespace Khepri.Entities.Actors
         public void Initialise(BeingResource resource, Vector3 position)
         {
             _worldController = WorldController.Instance;
+            StateMachine = new ActorStateMachine(this);
             Inventory = new EntityInventory(_inventorySize);
 
             GlobalPosition = position;
             _resource = resource;
-            _resource.Initialise(this);
 
             // Setup the sprite animations.
             foreach (var frames in _spriteFrames)
@@ -87,7 +89,7 @@ namespace Khepri.Entities.Actors
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
-            _resource.StateMachine.Update(delta);
+            StateMachine.Update(delta);
             _resource.Needs.Update();
             UpdateDirection();
         }
@@ -131,7 +133,7 @@ namespace Khepri.Entities.Actors
 
 
         /// <inheritdoc/>
-        public void HandleInput(IInput input) => _resource.StateMachine.HandleInput(input);
+        public void HandleInput(IInput input) => StateMachine.HandleInput(input);
 
 
         public void AddUsableEntity(IEntity entity)
@@ -154,6 +156,12 @@ namespace Khepri.Entities.Actors
 
         /// <inheritdoc/>
         public void Use(Being activatingEntity)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public void Serialise()
         {
             throw new NotImplementedException();
         }

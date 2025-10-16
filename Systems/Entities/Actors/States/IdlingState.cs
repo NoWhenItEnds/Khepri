@@ -2,10 +2,10 @@ using System;
 using Godot;
 using Khepri.Types;
 
-namespace Khepri.Entities.Actors.Components.States
+namespace Khepri.Entities.Actors.States
 {
     /// <summary> The being is standing idle, waiting for an action. </summary>
-    public class IdlingState : BeingState
+    public class IdlingState : ActorState
     {
         /// <inheritdoc/>
         public override String AnimationPrefix { get; } = "Idle_";

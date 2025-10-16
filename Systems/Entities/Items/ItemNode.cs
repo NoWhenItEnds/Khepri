@@ -136,5 +136,12 @@ namespace Khepri.Entities.Items
 
         /// <inheritdoc/>
         public void FreeObject() => _itemController.ItemPool.FreeObject(this);
+
+
+        /// <inheritdoc/>
+        public void Serialise()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

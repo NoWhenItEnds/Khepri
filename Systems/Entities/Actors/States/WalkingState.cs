@@ -3,10 +3,10 @@ using Godot;
 using Khepri.Resources.Actors;
 using Khepri.Types;
 
-namespace Khepri.Entities.Actors.Components.States
+namespace Khepri.Entities.Actors.States
 {
     /// <summary> The being is walking across the ground. </summary>
-    public class WalkingState : BeingState
+    public class WalkingState : ActorState
     {
         /// <inheritdoc/>
         public override String AnimationPrefix { get; } = "Walk_";
