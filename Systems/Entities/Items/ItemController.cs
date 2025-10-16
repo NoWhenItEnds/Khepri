@@ -78,7 +78,8 @@ namespace Khepri.Entities.Items
         }
 
 
-
+        /// <summary> Save all the items within the world to the persistent data. </summary>
+        /// <exception cref="ItemException"> If a file or item is unable to be opened. </exception>
         public void Save()
         {
             FileAccess? file = FileAccess.Open("user://save_game.dat", FileAccess.ModeFlags.Write);
@@ -88,15 +89,19 @@ namespace Khepri.Entities.Items
             }
 
             ItemNode[] activeObjects = ItemPool.GetActiveObjects();
+            Array<Dictionary<String, Variant>> data = new Array<Dictionary<string, Variant>>();
             foreach (ItemNode item in activeObjects)
             {
-                Dictionary<String, Variant> data = item.Serialise();
-                file.StoreVar(data);
+                data.Add(item.Serialise());
             }
+            file.StoreVar(data);
             file.Close();
         }
 
 
+        /// <summary> Load all the items within the world from the persistent data. </summary>
+        /// <param name="filepath"> The filepath of the save data to load. </param>
+        /// <exception cref="ItemException"> If a file or item is unable to be loaded. </exception>
         public void Load(String filepath)
         {
             FileAccess? file = FileAccess.Open(filepath, FileAccess.ModeFlags.Read);
@@ -105,8 +110,20 @@ namespace Khepri.Entities.Items
                 throw new ItemException(FileAccess.GetOpenError().ToString());
             }
 
-            Variant t = file.GetVar();
-            GD.Print(t);
+            Array<Dictionary<String, Variant>> data = (Array<Dictionary<String, Variant>>)file.GetVar();
+            foreach (Dictionary<String, Variant> item in data)
+            {
+                String id = (String)item["item_id"];
+                Vector3 position = (Vector3)item["position"];
+
+                ItemNode? newItem = CreateItem(id, position);
+                if (newItem == null)
+                {
+                    throw new ItemException($"Unable to create item with the id: {id}.");
+                }
+
+                // TODO - Set other variables here.
+            }
         }
     }
 }
