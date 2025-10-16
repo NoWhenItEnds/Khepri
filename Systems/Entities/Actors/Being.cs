@@ -160,10 +160,20 @@ namespace Khepri.Entities.Actors
             throw new NotImplementedException();
         }
 
+
         /// <inheritdoc/>
         public Godot.Collections.Dictionary<String, Variant> Serialise()
         {
-            throw new NotImplementedException();
+            Godot.Collections.Dictionary<String, Variant> data = _resource.Serialise();
+            data.Add("position", GlobalPosition);
+            return data;
+        }
+
+
+        /// <inheritdoc/>
+        public void Deserialise(Godot.Collections.Dictionary<String, Variant> data)
+        {
+            _resource.Deserialise(data);
         }
     }
 }

@@ -1,4 +1,5 @@
 using Godot;
+using Godot.Collections;
 using Khepri.Controllers;
 using Khepri.Entities;
 using Khepri.Entities.Actors;
@@ -54,6 +55,26 @@ namespace Khepri.Resources.Devices
             {
                 throw new NotImplementedException();
             }
+        }
+
+
+        /// <inheritdoc/>
+        public override Dictionary<String, Variant> Serialise()
+        {
+            return new Dictionary<String, Variant>()
+            {
+                { "id", Id },
+                { "altitude", Altitude },
+                { "azimuth", Azimuth }
+            };
+        }
+
+
+        /// <inheritdoc/>
+        public override void Deserialise(Dictionary<String, Variant> data)
+        {
+            Altitude = (Single)data["altitude"];
+            Azimuth = (Single)data["azimuth"];
         }
     }
 }

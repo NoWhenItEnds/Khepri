@@ -35,5 +35,15 @@ namespace Khepri.Resources
                 UIController.Instance.SpawnSpeechBubble(description, activatingEntity);
             }
         }
+
+
+        /// <summary> Package the entity into a serialised object. </summary>
+        /// <returns> A dictionary containing the key, value pairs that represent the entity's state. </returns>
+        public abstract Godot.Collections.Dictionary<String, Variant> Serialise();
+
+
+        /// <summary> Rebuild the entity using the serialised object. </summary>
+        /// <param name="data"> A dictionary containing the key, value pairs that represent the entity's state. </param>
+        public abstract void Deserialise(Godot.Collections.Dictionary<String, Variant> data);
     }
 }

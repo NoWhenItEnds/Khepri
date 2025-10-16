@@ -32,6 +32,14 @@ namespace Khepri.Entities
         /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
         public void Use(Being activatingEntity);
 
+
+        /// <summary> Package the entity into a serialised object. </summary>
+        /// <returns> A dictionary containing the key, value pairs that represent the entity's state. </returns>
         public Godot.Collections.Dictionary<String, Variant> Serialise();
+
+
+        /// <summary> Rebuild the entity using the serialised object. </summary>
+        /// <param name="data"> A dictionary containing the key, value pairs that represent the entity's state. </param>
+        public void Deserialise(Godot.Collections.Dictionary<String, Variant> data);
     }
 }

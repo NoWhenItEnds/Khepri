@@ -6,5 +6,5 @@
 [resource]
 script = ExtResource("1_i6kk2")
 WorldSprites = ExtResource("1_c7frj")
-Id = "telescope"
+Id = "device_telescope"
 metadata/_custom_type_script = "uid://dwcsu0xkc8yyw"

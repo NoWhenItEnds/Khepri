@@ -113,7 +113,7 @@ namespace Khepri.Entities.Items
             Array<Dictionary<String, Variant>> data = (Array<Dictionary<String, Variant>>)file.GetVar();
             foreach (Dictionary<String, Variant> item in data)
             {
-                String id = (String)item["item_id"];
+                String id = (String)item["id"];
                 Vector3 position = (Vector3)item["position"];
 
                 ItemNode? newItem = CreateItem(id, position);
@@ -122,7 +122,7 @@ namespace Khepri.Entities.Items
                     throw new ItemException($"Unable to create item with the id: {id}.");
                 }
 
-                // TODO - Set other variables here.
+                newItem.Deserialise(item);
             }
         }
     }

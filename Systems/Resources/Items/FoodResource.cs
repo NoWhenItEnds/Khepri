@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using Godot.Collections;
 using Khepri.Entities.Actors;
 using Khepri.Resources.Actors;
 
@@ -10,7 +11,7 @@ namespace Khepri.Resources.Items
     public partial class FoodResource : ItemResource
     {
         /// <summary> The amount of a unit's health the item recovers. </summary>
-        [ExportGroup("Statistics")]
+        [ExportGroup("Settings")]
         [Export] public Single HealthRecovery { get; private set; }
 
         /// <summary> The amount of a unit's hunger the item recovers. </summary>
@@ -40,6 +41,24 @@ namespace Khepri.Resources.Items
             resource.UpdateEntertainment(EntertainmentRecovery);
 
             Portions -= 1;  // TODO - It should queue free.
+        }
+
+
+        /// <inheritdoc/>
+        public override Dictionary<String, Variant> Serialise()
+        {
+            return new Dictionary<String, Variant>()
+            {
+                { "id", Id },
+                { "portions", Portions }
+            };
+        }
+
+
+        /// <inheritdoc/>
+        public override void Deserialise(Dictionary<String, Variant> data)
+        {
+            Portions = (Int32)data["portions"];
         }
     }
 }

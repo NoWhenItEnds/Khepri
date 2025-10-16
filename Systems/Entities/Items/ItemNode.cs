@@ -1,4 +1,5 @@
 using Godot;
+using Godot.Collections;
 using Khepri.Entities.Actors;
 using Khepri.Resources;
 using Khepri.Resources.Items;
@@ -139,13 +140,18 @@ namespace Khepri.Entities.Items
 
 
         /// <inheritdoc/>
-        public Godot.Collections.Dictionary<String, Variant> Serialise()
+        public Dictionary<String, Variant> Serialise()
         {
-            return new Godot.Collections.Dictionary<String, Variant>()
-            {
-                { "position", GlobalPosition },
-                { "item_id", _resource.Id }
-            };
+            Dictionary<String, Variant> data = _resource.Serialise();
+            data.Add("position", GlobalPosition);
+            return data;
+        }
+
+
+        /// <inheritdoc/>
+        public void Deserialise(Dictionary<String, Variant> data)
+        {
+            _resource.Deserialise(data);
         }
     }
 }
