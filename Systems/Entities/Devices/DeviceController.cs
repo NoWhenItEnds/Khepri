@@ -3,12 +3,22 @@ using Godot;
 using Khepri.Nodes.Singletons;
 using Khepri.Resources;
 using Khepri.Resources.Devices;
+using Khepri.Types;
 
 namespace Khepri.Entities.Devices
 {
     /// <summary> A factory for making device objects. </summary>
     public partial class DeviceController : SingletonNode3D<DeviceController>
     {
+        /// <summary> The prefab to use for creating devices. </summary>
+        [ExportGroup("Prefabs")]
+        [Export] private PackedScene _itemPrefab;
+
+
+        /// <summary> A pool of instantiated devices to pull from first. </summary>
+        public ObjectPool<DeviceNode> DevicePool { get; private set; }
+
+
         /// <summary> A reference to the resource controller. </summary>
         private ResourceController _resourceController;
 
@@ -17,6 +27,7 @@ namespace Khepri.Entities.Devices
         public override void _Ready()
         {
             _resourceController = ResourceController.Instance;
+            DevicePool = new ObjectPool<DeviceNode>(this, _itemPrefab);
         }
 
 
@@ -41,7 +52,9 @@ namespace Khepri.Entities.Devices
         /// <returns> The initialised item. </returns>
         public DeviceNode CreateDevice(DeviceResource resource, Vector3 position)
         {
-            throw new NotImplementedException();
+            DeviceNode device = DevicePool.GetAvailableObject();
+            device.Initialise(resource, position);
+            return device;
         }
     }
 }

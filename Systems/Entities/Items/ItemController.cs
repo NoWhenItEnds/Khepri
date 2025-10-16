@@ -58,6 +58,8 @@ namespace Khepri.Entities.Items
             return item;
         }
 
+
+        /// <inheritdoc/>
         public override void _Input(InputEvent @event)
         {
             if (@event is InputEventKey key && key.IsReleased())
@@ -67,7 +69,7 @@ namespace Khepri.Entities.Items
                     GD.Print(OS.GetDataDir());
                     Save();
                 }
-                else if(key.Keycode == Key.Alt)
+                else if (key.Keycode == Key.Alt)
                 {
                     Load("user://save_game.dat");
                 }
