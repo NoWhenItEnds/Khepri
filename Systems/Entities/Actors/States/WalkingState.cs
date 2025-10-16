@@ -22,7 +22,7 @@ namespace Khepri.Entities.Actors.States
         {
             if (input is MoveInput move)
             {
-                _being.Velocity = move.Direction * _being.GetResource<BeingResource>().Needs.BaseSpeed;
+                _being.Velocity = move.Direction * _being.GetResource<BeingResource>().BaseSpeed;
                 _being.Sprite.TransitionAnimation(this, move.Direction.ToDirection());
             }
         }

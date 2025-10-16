@@ -47,12 +47,12 @@ namespace Khepri.UI.HUD
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
-            BeingNeedsResource needs = _playerController.PlayerBeing.GetResource<BeingResource>().Needs;
-            _staminaBar.Value = needs.CurrentStamina;
-            _healthBar.Value = needs.CurrentHealth;
-            _hungerBar.Value = needs.CurrentHunger;
-            _fatigueBar.Value = needs.CurrentFatigue;
-            _entertainmentBar.Value = needs.CurrentEntertainment;
+            BeingResource resource = _playerController.PlayerBeing.GetResource<BeingResource>();
+            _staminaBar.Value = resource.CurrentStamina;
+            _healthBar.Value = resource.CurrentHealth;
+            _hungerBar.Value = resource.CurrentHunger;
+            _fatigueBar.Value = resource.CurrentFatigue;
+            _entertainmentBar.Value = resource.CurrentEntertainment;
 
             TextureProgressBar highestNeed = OrderNeedsBars();
             Single sliderPosition = (Single)Mathf.Lerp(0f, 255f, highestNeed.Value / 100f) - 2f;    // Small offset to bring it inline.

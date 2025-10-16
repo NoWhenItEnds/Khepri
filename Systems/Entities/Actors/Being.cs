@@ -90,7 +90,7 @@ namespace Khepri.Entities.Actors
         public override void _PhysicsProcess(Double delta)
         {
             StateMachine.Update(delta);
-            _resource.Needs.Update();
+            _resource.Update();
             UpdateDirection();
         }
 

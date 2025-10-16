@@ -74,8 +74,8 @@ namespace Khepri.UI.Debug.Units
             GlobalPosition = screenPosition;
 
             // Update information.
-            BeingNeedsResource needs = _being.GetResource<BeingResource>().Needs;
-            _needsLabel.Text = String.Format(NEEDS_FORMAT, needs.CurrentHealth, needs.CurrentHunger, needs.CurrentFatigue, needs.CurrentEntertainment, needs.CurrentStamina);
+            BeingResource resource = _being.GetResource<BeingResource>();
+            _needsLabel.Text = String.Format(NEEDS_FORMAT, resource.CurrentHealth, resource.CurrentHunger, resource.CurrentFatigue, resource.CurrentEntertainment, resource.CurrentStamina);
 
             // Update Beliefs.
             StringBuilder beliefBuilder = new StringBuilder();

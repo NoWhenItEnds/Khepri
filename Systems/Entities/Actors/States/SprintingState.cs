@@ -22,8 +22,8 @@ namespace Khepri.Entities.Actors.States
         {
             if (input is MoveInput move)
             {
-                BeingNeedsResource needs = _being.GetResource<BeingResource>().Needs;
-                _being.Velocity = move.Direction * needs.BaseSpeed * needs.SprintModifier;
+                BeingResource resource = _being.GetResource<BeingResource>();
+                _being.Velocity = move.Direction * resource.BaseSpeed * resource.SprintModifier;
                 _being.Sprite.TransitionAnimation(this, move.Direction.ToDirection());
             }
         }

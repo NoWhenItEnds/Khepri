@@ -40,11 +40,11 @@ namespace Khepri.Resources.Items
         /// <inheritdoc/>
         public override void Use(Being activatingEntity)
         {
-            BeingNeedsResource needs = activatingEntity.GetResource<BeingResource>().Needs;
-            needs.UpdateHealth(HealthRecovery);
-            needs.UpdateHunger(HungerRecovery);
-            needs.UpdateFatigue(FatigueRecovery);
-            needs.UpdateEntertainment(EntertainmentRecovery);
+            BeingResource resource = activatingEntity.GetResource<BeingResource>();
+            resource.UpdateHealth(HealthRecovery);
+            resource.UpdateHunger(HungerRecovery);
+            resource.UpdateFatigue(FatigueRecovery);
+            resource.UpdateEntertainment(EntertainmentRecovery);
 
             Portions -= 1;  // TODO - It should queue free.
         }

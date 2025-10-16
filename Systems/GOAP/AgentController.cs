@@ -82,15 +82,15 @@ namespace Khepri.GOAP
             factory.AddBelief("IsIdle", () => _controlledEntity.NavigationAgent.IsNavigationFinished());
             factory.AddBelief("IsMoving", () => !_controlledEntity.NavigationAgent.IsNavigationFinished());
 
-            BeingNeedsResource needs = _controlledEntity.GetResource<BeingResource>().Needs;
-            factory.AddBelief("IsHealthy", () => needs.CurrentHealth >= 90f);
-            factory.AddBelief("IsHurt", () => needs.CurrentHealth < 50);
-            factory.AddBelief("IsFed", () => needs.CurrentHunger >= 90f);
-            factory.AddBelief("IsHungry", () => needs.CurrentHunger < 50f);
-            factory.AddBelief("IsRested", () => needs.CurrentFatigue >= 90f);
-            factory.AddBelief("IsTired", () => needs.CurrentFatigue < 50f);
-            factory.AddBelief("IsEntertained", () => needs.CurrentEntertainment >= 90f);
-            factory.AddBelief("IsBored", () => needs.CurrentEntertainment < 50f);
+            BeingResource resource = _controlledEntity.GetResource<BeingResource>();
+            factory.AddBelief("IsHealthy", () => resource.CurrentHealth >= 90f);
+            factory.AddBelief("IsHurt", () => resource.CurrentHealth < 50);
+            factory.AddBelief("IsFed", () => resource.CurrentHunger >= 90f);
+            factory.AddBelief("IsHungry", () => resource.CurrentHunger < 50f);
+            factory.AddBelief("IsRested", () => resource.CurrentFatigue >= 90f);
+            factory.AddBelief("IsTired", () => resource.CurrentFatigue < 50f);
+            factory.AddBelief("IsEntertained", () => resource.CurrentEntertainment >= 90f);
+            factory.AddBelief("IsBored", () => resource.CurrentEntertainment < 50f);
 
             // TODO - Add belief packages. Such as food beliefs that contains both the Knows and Sees for the item.
             factory.AddKnownItemBelief("KnowsApple", "apple");

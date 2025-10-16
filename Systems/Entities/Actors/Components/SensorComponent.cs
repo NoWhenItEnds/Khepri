@@ -145,7 +145,7 @@ namespace Khepri.Entities.Actors.Components
                 Boolean isAdded = _knownLocations.Add(entity);
                 if (isAdded)    // Reward the unit by discovering new areas by increasing their entertainment.
                 {
-                    _unit.GetResource<BeingResource>().Needs.UpdateEntertainment(0.1f);
+                    _unit.GetResource<BeingResource>().UpdateEntertainment(0.1f);
                 }
             }
             return entity;
