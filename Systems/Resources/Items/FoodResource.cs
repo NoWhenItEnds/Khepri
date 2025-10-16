@@ -31,13 +31,6 @@ namespace Khepri.Resources.Items
 
 
         /// <inheritdoc/>
-        public override void Examine(Being activatingEntity)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        /// <inheritdoc/>
         public override void Use(Being activatingEntity)
         {
             BeingResource resource = activatingEntity.GetResource<BeingResource>();
