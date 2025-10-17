@@ -25,12 +25,12 @@ namespace Khepri.Entities
 
         /// <summary> The internal logic to use when the entity is examined. </summary>
         /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
-        public void Examine(BeingNode activatingEntity);
+        public void Examine(ActorNode activatingEntity);
 
 
         /// <summary> The internal logic to use when the entity is used. </summary>
         /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
-        public void Use(BeingNode activatingEntity);
+        public void Use(ActorNode activatingEntity);
 
 
         /// <summary> Package the entity into a serialised object. </summary>

@@ -26,7 +26,7 @@ namespace Khepri.Resources
 
         /// <summary> The internal logic to use when the entity is examined. </summary>
         /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
-        public void Examine(BeingNode activatingEntity)
+        public void Examine(ActorNode activatingEntity)
         {
             if (Descriptions.Length > 0)
             {

@@ -45,7 +45,7 @@ namespace Khepri.Entities.Items
         /// <param name="body"> A reference to the unit. </param>
         private void OnBodyEntered(Node3D body)
         {
-            if (body is BeingNode unit)
+            if (body is ActorNode unit)
             {
                 unit.AddUsableEntity(this);
             }
@@ -56,7 +56,7 @@ namespace Khepri.Entities.Items
         /// <param name="body"> A reference to the unit. </param>
         private void OnBodyExited(Node3D body)
         {
-            if (body is BeingNode unit)
+            if (body is ActorNode unit)
             {
                 unit.RemoveUsableEntity(this);
             }
@@ -107,11 +107,11 @@ namespace Khepri.Entities.Items
 
 
         /// <inheritdoc/>
-        public void Examine(BeingNode activatingEntity) => _resource.Examine(activatingEntity);
+        public void Examine(ActorNode activatingEntity) => _resource.Examine(activatingEntity);
 
 
         /// <inheritdoc/>
-        public void Use(BeingNode activatingEntity)
+        public void Use(ActorNode activatingEntity)
         {
             _resource.Use(activatingEntity);
 
@@ -125,7 +125,7 @@ namespace Khepri.Entities.Items
 
         /// <summary> Attempt to grab the item and add it to the inventory. </summary>
         /// <param name="activatingEntity"> The unit attempting to grab the item. </param>
-        public void Grab(BeingNode activatingEntity)
+        public void Grab(ActorNode activatingEntity)
         {
             Boolean isSuccessful = activatingEntity.Inventory.TryAddItem(_resource);
             if (isSuccessful)   // If the item was added, free it back to the pool.

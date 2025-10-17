@@ -20,7 +20,7 @@ namespace Khepri.GOAP.ActionStrategies
 
 
         /// <summary> A reference to the unit being manipulated. </summary>
-        private readonly BeingNode _unit;
+        private readonly ActorNode _unit;
 
         /// <summary> The desired item's unique name. </summary>
         private readonly String _itemId;
@@ -29,7 +29,7 @@ namespace Khepri.GOAP.ActionStrategies
         /// <summary> Attempt to pickup an item. </summary>
         /// <param name="unit"> A reference to the unit being manipulated. </param>
         /// <param name="itemId"> The desired item's unique name. </param>
-        public PickupActionStrategy(BeingNode unit, String itemId)
+        public PickupActionStrategy(ActorNode unit, String itemId)
         {
             _unit = unit;
             _itemId = itemId;

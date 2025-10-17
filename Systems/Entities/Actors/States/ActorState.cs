@@ -13,12 +13,12 @@ namespace Khepri.Entities.Actors.States
         protected Dictionary<StateEvent, Type> _transitions = new Dictionary<StateEvent, Type>();
 
         /// <summary> A reference to the being. </summary>
-        protected readonly BeingNode _being;
+        protected readonly ActorNode _being;
 
 
         /// <summary> The basic data object representing a being's potential state. </summary>
         /// <param name="being"> A reference to the being the state controls. </param>
-        public ActorState(BeingNode being)
+        public ActorState(ActorNode being)
         {
             _being = being;
         }

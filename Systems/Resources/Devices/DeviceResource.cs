@@ -17,6 +17,6 @@ namespace Khepri.Resources.Devices
 
         /// <summary> Use the device. </summary>
         /// <param name="activatingBeing"> The being activating the action. </param>
-        public abstract void Use(BeingNode activatingBeing);
+        public abstract void Use(ActorNode activatingBeing);
     }
 }

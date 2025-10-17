@@ -13,7 +13,7 @@ namespace Khepri.Entities.Actors.States
 
         /// <summary> The being is standing idle, waiting for an action. </summary>
         /// <param name="being"> A reference to the being. </param>
-        public IdlingState(BeingNode being) : base(being) { }
+        public IdlingState(ActorNode being) : base(being) { }
 
 
         /// <inheritdoc/>

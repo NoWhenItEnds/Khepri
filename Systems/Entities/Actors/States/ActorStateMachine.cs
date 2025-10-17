@@ -19,7 +19,7 @@ namespace Khepri.Entities.Actors.States
     public class ActorStateMachine
     {
         /// <summary> A reference to the being controlled by the state. </summary>
-        private BeingNode _being;
+        private ActorNode _being;
 
         /// <summary> The current state of the state machine. </summary>
         public ActorState CurrentState { get; private set; }
@@ -34,7 +34,7 @@ namespace Khepri.Entities.Actors.States
 
         /// <summary> A state machine for being states. </summary>
         /// <param name="being"> A reference to the being controlled by the state. </param>
-        public ActorStateMachine(BeingNode being)
+        public ActorStateMachine(ActorNode being)
         {
             _being = being;
 

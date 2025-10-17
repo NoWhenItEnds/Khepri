@@ -15,7 +15,7 @@ namespace Khepri.UI.Debug.Units
 
         [Export] private AgentController _enemyController;   // TODO - REPLACE!!!
 
-        [Export] private BeingNode _enemyUnit;   // TODO - REPLACE!!!
+        [Export] private ActorNode _enemyUnit;   // TODO - REPLACE!!!
 
 
         /// <summary> Whether the window should be rendered. </summary>
@@ -27,7 +27,7 @@ namespace Khepri.UI.Debug.Units
 
 
         /// <summary> A reference to all the currently visible units and their active menus on the screen. </summary>
-        private Dictionary<BeingNode, DebugUnitMenu> _activeMenus = new Dictionary<BeingNode, DebugUnitMenu>();
+        private Dictionary<ActorNode, DebugUnitMenu> _activeMenus = new Dictionary<ActorNode, DebugUnitMenu>();
 
 
         /// <inheritdoc/>
@@ -50,7 +50,7 @@ namespace Khepri.UI.Debug.Units
             }
         }
 
-        private void CreateMenu(BeingNode unit)
+        private void CreateMenu(ActorNode unit)
         {
             DebugUnitMenu? window = _unitMenuPrefab.InstantiateOrNull<DebugUnitMenu>();
             if (window != null)
@@ -61,7 +61,7 @@ namespace Khepri.UI.Debug.Units
             }
         }
 
-        private void FreeMenu(BeingNode unit)
+        private void FreeMenu(ActorNode unit)
         {
             DebugUnitMenu? window = _activeMenus[unit];
             if (window != null)

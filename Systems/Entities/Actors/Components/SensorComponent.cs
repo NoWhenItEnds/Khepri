@@ -15,7 +15,7 @@ namespace Khepri.Entities.Actors.Components
     {
         /// <summary> A reference to the brain's unit. </summary>
         [ExportGroup("Nodes")]
-        [Export] private BeingNode _unit;
+        [Export] private ActorNode _unit;
 
         /// <summary> Represents the unit's rendered line of sight. </summary>
         /// <remarks> This should only be used by a unit controlled by the player. </remarks>

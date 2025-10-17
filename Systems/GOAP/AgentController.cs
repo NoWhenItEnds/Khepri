@@ -15,7 +15,7 @@ namespace Khepri.GOAP
     {
         /// <summary> The entity this controller is responsible for controlling. </summary>
         [ExportGroup("Nodes")]
-        [Export] private BeingNode _controlledEntity;
+        [Export] private ActorNode _controlledEntity;
 
 
         /// <summary> The current goal the agent is trying to accomplish. </summary>
@@ -58,7 +58,7 @@ namespace Khepri.GOAP
             _uiController = UIController.Instance;
             _planner = new AgentPlanner();
 
-            BeingResource? agentResource = ResourceController.Instance.CreateResource<BeingResource>("actor_being_human");
+            BeingResource? agentResource = ResourceController.Instance.CreateResource<BeingResource>("actor_human");
             if (agentResource == null)
             {
                 throw new ArgumentNullException("The returned BeingResource is undefined. For some reason, you are missing a BeingResource with the 'being_human' id.");

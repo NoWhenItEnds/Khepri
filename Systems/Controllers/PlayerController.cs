@@ -16,7 +16,7 @@ namespace Khepri.Controllers
     {
         /// <summary> The being representing the player's unit. </summary>
         [ExportGroup("Nodes")]
-        [Export] public BeingNode PlayerBeing { get; private set; }
+        [Export] public ActorNode PlayerBeing { get; private set; }
 
         /// <summary> The current resource that the player is controlling. </summary>
         private IControllable _currentControllable;
@@ -48,7 +48,7 @@ namespace Khepri.Controllers
             _uiController = UIController.Instance;
 
             // Set up initial state.
-            BeingResource? playerResource = ResourceController.Instance.CreateResource<BeingResource>("actor_being_human");
+            BeingResource? playerResource = ResourceController.Instance.CreateResource<BeingResource>("actor_human");
             if(playerResource == null)
             {
                 throw new ArgumentNullException("The returned BeingResource is undefined. For some reason, you are missing a BeingResource with the 'human' id.");
