@@ -42,7 +42,7 @@ namespace Khepri.Entities.Actors
         public override void _Ready()
         {
             _resourceController = ResourceController.Instance;
-            ActorPool = new ObjectPool<ActorNode>(_actorParent, _actorPrefab);
+            ActorPool = new ObjectPool<ActorNode>(_actorParent, _actorPrefab, 0);
         }
 
 
@@ -117,5 +117,15 @@ namespace Khepri.Entities.Actors
 
         /// <summary> Get a reference to the player being. </summary>
         public ActorNode GetPlayer() => _playerController.PlayerBeing;
+
+
+        /// <summary> Set the current entity being controlled by the player. </summary>
+        /// <param name="controllable"> The new entity to control. A null resets it back to the default being. </param>
+        public void SetPlayerControllable(IControllable? controllable = null) => _playerController.SetControllable(controllable);
+
+
+        /// <summary> Get the currently selected entity the player is interacting with. </summary>
+        /// <returns> Either a reference to the selected entity, or a null if there isn't one. </returns>
+        public IEntity? GetPlayerInteractable() => _playerController.GetCurrentInteractable();
     }
 }

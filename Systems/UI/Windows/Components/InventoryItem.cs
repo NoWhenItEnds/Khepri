@@ -1,5 +1,5 @@
 using Godot;
-using Khepri.Controllers;
+using Khepri.Entities.Actors;
 using Khepri.Entities.Items;
 using Khepri.Resources;
 using Khepri.Resources.Items;
@@ -92,7 +92,7 @@ namespace Khepri.UI.Windows.Components
         public void DropItem()
         {
             _inventory.RemoveItem(_resource);
-            Vector3 playerPosition = PlayerController.Instance.PlayerBeing.GlobalPosition;
+            Vector3 playerPosition = ActorController.Instance.GetPlayer().GlobalPosition;
             ItemController.Instance.CreateItem(_resource, playerPosition);
             FreeObject();
         }

@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using Khepri.Entities.Actors;
 using Khepri.Nodes.Singletons;
 using Khepri.Resources.Devices;
 using Khepri.UI.HUD;
@@ -39,15 +40,9 @@ namespace Khepri.Controllers
         public Boolean IsWindowOpen { get; private set; } = false;
 
 
-        /// <summary> A reference to the player controller. </summary>
-        private PlayerController _playerController;
-
-
         /// <inheritdoc/>
         public override void _Ready()
         {
-            _playerController = PlayerController.Instance;
-
             ShowWindow(WindowType.NONE);
         }
 
@@ -61,7 +56,7 @@ namespace Khepri.Controllers
                 case WindowType.INVENTORY:
                     ToggleHUD(false);
                     _inventoryWindow.Visible = true;
-                    _inventoryWindow.Initialise(_playerController.PlayerBeing.Inventory);
+                    _inventoryWindow.Initialise(ActorController.Instance.GetPlayer().Inventory);
                     break;
                 default:
                     ToggleHUD(true);

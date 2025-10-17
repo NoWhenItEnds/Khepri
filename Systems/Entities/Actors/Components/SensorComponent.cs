@@ -49,7 +49,7 @@ namespace Khepri.Entities.Actors.Components
             _worldController = WorldController.Instance;
 
             // Only render the lights if the unit is controlled by the player
-            ToggleLights(PlayerController.Instance.PlayerBeing == _unit);
+            ToggleLights(ActorController.Instance.GetPlayer() == _unit);
         }
 
 

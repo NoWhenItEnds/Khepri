@@ -27,7 +27,7 @@
 [ext_resource type="Texture2D" uid="uid://be0foew3edrpc" path="res://Content/Textures/UI/HUD/StatusBar/StatusBar_Slider.png" id="17_kqbmc"]
 [ext_resource type="Script" uid="uid://bkvivpavak3rl" path="res://Systems/UI/HUD/SpeechBubbles/SpeechBubbleHUD.cs" id="18_4buj1"]
 [ext_resource type="Script" uid="uid://cp14rq2amuxge" path="res://Systems/Entities/Actors/ActorController.cs" id="18_cwenm"]
-[ext_resource type="Resource" uid="uid://dipd2ay6fla8a" path="res://Data/Actors/Actor_Human.tres" id="19_ckrvs"]
+[ext_resource type="Resource" uid="uid://dipd2ay6fla8a" path="res://Data/Actors/Actor_Being_Human.tres" id="19_ckrvs"]
 [ext_resource type="PackedScene" uid="uid://dg53cc06rwfo5" path="res://Content/Prefabs/UI/HUD/Components/SpeechBubbleItem.tscn" id="19_kx5lk"]
 [ext_resource type="Script" uid="uid://vuqou0rktkpf" path="res://Systems/UI/Windows/InventoryWindow.cs" id="20_dulfu"]
 [ext_resource type="Texture2D" uid="uid://cykmv0wmfypeq" path="res://Content/Textures/UI/Windows/Inventory/Inventory_Grid_Tile.png" id="20_pt5vb"]
@@ -80,21 +80,13 @@ albedo_texture = SubResource("ViewportTexture_gh1u3")
 
 [node name="World Controller" type="Node" parent="Controllers"]
 script = ExtResource("1_8fov1")
-Latitude = null
-Longitude = null
-_timescale = null
-_starSegmentSize = null
 
 [node name="Resource Controller" type="Node" parent="Controllers"]
 script = ExtResource("2_nskmx")
 
-[node name="Player Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("PlayerBeing")]
-script = ExtResource("1_5p3x2")
-PlayerBeing = NodePath("../../World/Actors/Actors/Player Unit")
-
 [node name="Agent Controller" type="Node" parent="Controllers" node_paths=PackedStringArray("_controlledEntity")]
 script = ExtResource("3_md4fn")
-_controlledEntity = NodePath("../../World/Enemy Unit")
+_controlledEntity = NodePath("../../World/Actors/Actors/Enemy Unit")
 
 [node name="World" type="Node3D" parent="."]
 
@@ -103,10 +95,6 @@ environment = SubResource("Environment_gh1u3")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="World/WorldEnvironment"]
 transform = Transform3D(1, 0, 0, 0, -4.3711385e-08, 0.99999994, 0, -0.99999994, -4.3711385e-08, 0, 0, 0)
-
-[node name="Enemy Unit" parent="World" instance=ExtResource("2_5p3x2")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.065, 0, -0.318)
-_inventorySize = null
 
 [node name="Playground" type="NavigationRegion3D" parent="World"]
 navigation_mesh = SubResource("NavigationMesh_fdsh7")
@@ -540,7 +528,6 @@ _occlusionSubViewport = NodePath("Main Camera/Occlusion SubViewport")
 _occlusionCamera = NodePath("Main Camera/Occlusion SubViewport/Occlusion Camera")
 _occlusionMaskSubViewport = NodePath("Main Camera/Occlusion Mask SubViewport")
 _occlusionMesh = NodePath("MeshInstance3D")
-_cameraRadiusModifier = null
 
 [node name="Main Camera" type="Camera3D" parent="World/World Camera"]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
@@ -590,17 +577,29 @@ _resource = ExtResource("16_j3683")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6694043, 0, 2.6195474)
 _resource = ExtResource("17_cwenm")
 
-[node name="Actors" type="Node3D" parent="World"]
+[node name="Actors" type="Node3D" parent="World" node_paths=PackedStringArray("_controllerParent", "_actorParent", "_playerController")]
 script = ExtResource("18_cwenm")
 _actorPrefab = ExtResource("2_5p3x2")
+_controllerParent = NodePath("Controllers")
+_actorParent = NodePath("Actors")
+_playerController = NodePath("Controllers/Player Controller")
 
 [node name="Controllers" type="Node3D" parent="World/Actors"]
+
+[node name="Player Controller" type="Node3D" parent="World/Actors/Controllers" node_paths=PackedStringArray("PlayerBeing")]
+script = ExtResource("1_5p3x2")
+PlayerBeing = NodePath("../../Actors/Player Unit")
+
+[node name="Agent Controller" type="Node3D" parent="World/Actors/Controllers"]
 
 [node name="Actors" type="Node3D" parent="World/Actors"]
 
 [node name="Player Unit" parent="World/Actors/Actors" instance=ExtResource("2_5p3x2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -2)
-_inventorySize = null
+_resource = ExtResource("19_ckrvs")
+
+[node name="Enemy Unit" parent="World/Actors/Actors" instance=ExtResource("2_5p3x2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.065, 0, -0.318)
 _resource = ExtResource("19_ckrvs")
 
 [node name="UI" type="Control" parent="." node_paths=PackedStringArray("_speechBubbles", "_astrolabe", "_statusBars", "_interactionMenu", "_inventoryWindow", "_telescopeWindow")]
@@ -636,8 +635,6 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("18_4buj1")
 _speechBubblePrefab = ExtResource("19_kx5lk")
-_poolSize = null
-_itemLifetime = null
 
 [node name="Astrolabe" type="Control" parent="UI/HUD" node_paths=PackedStringArray("_ringTexture")]
 layout_mode = 1
@@ -857,7 +854,6 @@ _starId = NodePath("VBoxContainer/Star Id")
 _starProperName = NodePath("VBoxContainer/Star Proper Name")
 _starRightAscension = NodePath("VBoxContainer/Star Right Ascension")
 _starDeclination = NodePath("VBoxContainer/Star Declination")
-_starSegmentSize = null
 _starfieldShader = ExtResource("28_5lwn5")
 
 [node name="Helper Camera" type="Camera3D" parent="UI/Windows/Telescope"]
@@ -998,6 +994,4 @@ mouse_filter = 2
 script = ExtResource("25_rvbhf")
 _unitMenuPrefab = ExtResource("26_1mywo")
 _enemyController = NodePath("../../../Controllers/Agent Controller")
-_enemyUnit = NodePath("../../../World/Enemy Unit")
-_showDebug = null
-_showPlayer = null
+_enemyUnit = NodePath("../../../World/Actors/Actors/Enemy Unit")

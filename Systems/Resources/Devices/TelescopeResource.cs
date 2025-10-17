@@ -32,10 +32,10 @@ namespace Khepri.Resources.Devices
         /// <inheritdoc/>
         public override void Use(ActorNode activatingBeing)
         {
-            if (activatingBeing == PlayerController.Instance.PlayerBeing)
+            if (activatingBeing == ActorController.Instance.GetPlayer())
             {
                 UIController.Instance.ShowTelescope(this);
-                PlayerController.Instance.SetControllable(this);
+                ActorController.Instance.SetPlayerControllable(this);
             }
             else
             {

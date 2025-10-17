@@ -41,9 +41,6 @@ namespace Khepri.GOAP
         public HashSet<AgentAction> AvailableActions { get; private set; }
 
 
-        /// <summary> A reference to the player's controller. </summary>
-        private PlayerController _playerController;
-
         /// <summary> A reference to the game world's ui. </summary>
         private UIController _uiController;
 
@@ -54,16 +51,8 @@ namespace Khepri.GOAP
         /// <inheritdoc/>
         public override void _Ready()
         {
-            _playerController = PlayerController.Instance;
             _uiController = UIController.Instance;
             _planner = new AgentPlanner();
-
-            BeingResource? agentResource = ResourceController.Instance.CreateResource<BeingResource>("actor_human");
-            if (agentResource == null)
-            {
-                throw new ArgumentNullException("The returned BeingResource is undefined. For some reason, you are missing a BeingResource with the 'being_human' id.");
-            }
-            _controlledEntity.Initialise(agentResource, _controlledEntity.GlobalPosition);
 
             InitialiseBeliefs();
             InitialiseActions();

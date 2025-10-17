@@ -68,18 +68,13 @@ namespace Khepri.Entities.Actors
         private ActorController _actorController;
 
 
-        /// <summary> Initialise the actor with its starting values. </summary>
-        /// <param name="resource"> The actor's data component. </param>
-        /// <param name="position"> The world position to set the actor at. </param>
-        public void Initialise(ActorResource resource, Vector3 position)
+        /// <inheritdoc/>
+        public override void _Ready()
         {
             _worldController = WorldController.Instance;
             _actorController = ActorController.Instance;
             StateMachine = new ActorStateMachine(this);
             Inventory = new EntityInventory(_inventorySize);
-
-            GlobalPosition = position;
-            _resource = resource;
 
             // Setup the sprite animations.
             foreach (var frames in _spriteFrames)
@@ -87,6 +82,17 @@ namespace Khepri.Entities.Actors
                 Sprite.SetSpriteLayer(frames.Key, frames.Value);
             }
             Sprite.Play();
+        }
+
+
+
+        /// <summary> Initialise the actor with its starting values. </summary>
+        /// <param name="resource"> The actor's data component. </param>
+        /// <param name="position"> The world position to set the actor at. </param>
+        public void Initialise(ActorResource resource, Vector3 position)
+        {
+            GlobalPosition = position;
+            _resource = resource;
         }
 
 

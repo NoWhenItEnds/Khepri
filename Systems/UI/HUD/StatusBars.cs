@@ -1,5 +1,6 @@
 using Godot;
 using Khepri.Controllers;
+using Khepri.Entities.Actors;
 using Khepri.Resources.Actors;
 using Khepri.Types.Exceptions;
 using Khepri.Types.Extensions;
@@ -34,21 +35,21 @@ namespace Khepri.UI.HUD
         [Export] private TextureRect _statusBarSlider;
 
 
-        /// <summary> A reference to the player controller. </summary>
-        private PlayerController _playerController;
+        /// <summary> A reference to the actor controller. </summary>
+        private ActorController _actorController;
 
 
         /// <inheritdoc/>
         public override void _Ready()
         {
-            _playerController = PlayerController.Instance;
+            _actorController = ActorController.Instance;
         }
 
 
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
-            BeingResource resource = _playerController.PlayerBeing.GetResource<BeingResource>();
+            BeingResource resource = _actorController.GetPlayer().GetResource<BeingResource>();
             _staminaBar.Value = resource.CurrentStamina;
             _healthBar.Value = resource.CurrentHealth;
             _hungerBar.Value = resource.CurrentHunger;

@@ -1,6 +1,6 @@
 using Godot;
-using Khepri.Controllers;
 using Khepri.Entities;
+using Khepri.Entities.Actors;
 using Khepri.Entities.Devices;
 using Khepri.Entities.Items;
 using Khepri.Resources.Devices;
@@ -18,30 +18,19 @@ namespace Khepri.UI.HUD.Interaction
         [Export] private RichTextLabel _label;
 
 
-        /// <summary> A reference to the player controller singleton. </summary>
-        private PlayerController _playerController;
-
-
         /// <summary> The format to use for the interaction item labels. </summary>
         private const String LABEL_FORMAT = "[color={1}]{0}[/color]";
-
-
-        /// <inheritdoc/>
-        public override void _Ready()
-        {
-            _playerController = PlayerController.Instance;
-        }
 
 
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
             StringBuilder builder = new StringBuilder();
-            IEntity? selectedEntity = _playerController.GetCurrentInteractable();
+            IEntity? selectedEntity = ActorController.Instance.GetPlayerInteractable();
             if (selectedEntity != null)
             {
 
-                foreach (IEntity entity in _playerController.PlayerBeing.UsableEntities)
+                foreach (IEntity entity in ActorController.Instance.GetPlayer().UsableEntities)
                 {
                     String text = "Placeholder";
                     switch (entity)
