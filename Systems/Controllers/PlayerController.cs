@@ -48,7 +48,7 @@ namespace Khepri.Controllers
             _uiController = UIController.Instance;
 
             // Set up initial state.
-            BeingResource? playerResource = ResourceController.Instance.CreateResource<BeingResource>("being_human");
+            BeingResource? playerResource = ResourceController.Instance.CreateResource<BeingResource>("actor_being_human");
             if(playerResource == null)
             {
                 throw new ArgumentNullException("The returned BeingResource is undefined. For some reason, you are missing a BeingResource with the 'human' id.");
@@ -138,6 +138,14 @@ namespace Khepri.Controllers
                 else if (@event.IsActionReleased("action_ui_down"))
                 {
                     _currentInteractableIndex = (Int32)MathExtensions.WrapValue(_currentInteractableIndex - 1, PlayerBeing.UsableEntities.Count);
+                }
+                else if (@event.IsActionReleased("action_quicksave"))
+                {
+                    WorldController.Instance.Save();
+                }
+                else if (@event.IsActionReleased("action_quickload"))
+                {
+                    WorldController.Instance.Load("user://save_game.dat");
                 }
             }
         }

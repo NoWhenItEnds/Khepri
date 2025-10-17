@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Godot;
 using Godot.Collections;
 using Khepri.Nodes.Singletons;
@@ -60,66 +61,41 @@ namespace Khepri.Entities.Items
         }
 
 
-        /// <inheritdoc/>
-        public override void _Input(InputEvent @event)
+        /// <summary> Package the world state for saving. </summary>
+        /// <returns> An array of the items representing the current world state. </returns>
+        public Array<Dictionary<String, Variant>> Serialise()
         {
-            if (@event is InputEventKey key && key.IsReleased())
-            {
-                if (key.Keycode == Key.Ctrl)
-                {
-                    GD.Print(OS.GetDataDir());
-                    Save();
-                }
-                else if (key.Keycode == Key.Alt)
-                {
-                    Load("user://save_game.dat");
-                }
-            }
-        }
-
-
-        /// <summary> Save all the items within the world to the persistent data. </summary>
-        /// <exception cref="ItemException"> If a file or item is unable to be opened. </exception>
-        public void Save()
-        {
-            FileAccess? file = FileAccess.Open("user://save_game.dat", FileAccess.ModeFlags.Write);
-            if (file == null)
-            {
-                throw new ItemException(FileAccess.GetOpenError().ToString());
-            }
-
             ItemNode[] activeObjects = ItemPool.GetActiveObjects();
-            Array<Dictionary<String, Variant>> data = new Array<Dictionary<string, Variant>>();
+            Array<Dictionary<String, Variant>> data = new Array<Dictionary<String, Variant>>();
             foreach (ItemNode item in activeObjects)
             {
                 data.Add(item.Serialise());
             }
-            file.StoreVar(data);
-            file.Close();
+            return data;
         }
 
 
-        /// <summary> Load all the items within the world from the persistent data. </summary>
-        /// <param name="filepath"> The filepath of the save data to load. </param>
-        /// <exception cref="ItemException"> If a file or item is unable to be loaded. </exception>
-        public void Load(String filepath)
+        /// <summary> Unpack the given data and instantiate the world state. </summary>
+        /// <param name="data"> Data that has the 'item' type to unpack. </param>
+        /// <exception cref="ItemException"> If one of the items was unable to be created. </exception>
+        public void Deserialise(Array<Dictionary<String, Variant>> data)
         {
-            FileAccess? file = FileAccess.Open(filepath, FileAccess.ModeFlags.Read);
-            if (file == null)
-            {
-                throw new ItemException(FileAccess.GetOpenError().ToString());
-            }
+            ItemNode[] activeObjects = ItemPool.GetActiveObjects();
 
-            Array<Dictionary<String, Variant>> data = (Array<Dictionary<String, Variant>>)file.GetVar();
             foreach (Dictionary<String, Variant> item in data)
             {
+                UInt64 instance = (UInt64)item["instance"];
                 String id = (String)item["id"];
                 Vector3 position = (Vector3)item["position"];
 
-                ItemNode? newItem = CreateItem(id, position);
+                ItemNode? newItem = activeObjects.FirstOrDefault(x => x.GetInstanceId() == instance) ?? null;
                 if (newItem == null)
                 {
-                    throw new ItemException($"Unable to create item with the id: {id}.");
+                    newItem = CreateItem(id, position);
+                    if (newItem == null)
+                    {
+                        throw new ItemException($"Unable to create item with the id: {id}.");
+                    }
                 }
 
                 newItem.Deserialise(item);

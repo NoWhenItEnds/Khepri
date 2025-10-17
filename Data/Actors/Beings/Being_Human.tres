@@ -6,5 +6,5 @@
 [resource]
 script = ExtResource("1_5w4nd")
 WorldSprites = ExtResource("2_bbwes")
-Id = "being_human"
+Id = "actor_being_human"
 metadata/_custom_type_script = "uid://beb6huw33t0c0"

@@ -1,9 +1,12 @@
 using System;
+using System.Linq;
 using Godot;
+using Godot.Collections;
 using Khepri.Nodes.Singletons;
 using Khepri.Resources;
 using Khepri.Resources.Devices;
 using Khepri.Types;
+using Khepri.Types.Exceptions;
 
 namespace Khepri.Entities.Devices
 {
@@ -55,6 +58,48 @@ namespace Khepri.Entities.Devices
             DeviceNode device = DevicePool.GetAvailableObject();
             device.Initialise(resource, position);
             return device;
+        }
+
+
+        /// <summary> Package the world state for saving. </summary>
+        /// <returns> An array of the devices representing the current world state. </returns>
+        public Array<Dictionary<String, Variant>> Serialise()
+        {
+            DeviceNode[] activeObjects = DevicePool.GetActiveObjects();
+            Array<Dictionary<String, Variant>> data = new Array<Dictionary<String, Variant>>();
+            foreach (DeviceNode item in activeObjects)
+            {
+                data.Add(item.Serialise());
+            }
+            return data;
+        }
+
+
+        /// <summary> Unpack the given data and instantiate the world state. </summary>
+        /// <param name="data"> Data that has the 'device' type to unpack. </param>
+        /// <exception cref="DeviceException"> If one of the devices was unable to be created. </exception>
+        public void Deserialise(Array<Dictionary<String, Variant>> data)
+        {
+            DeviceNode[] activeObjects = DevicePool.GetActiveObjects();
+
+            foreach (Dictionary<String, Variant> item in data)
+            {
+                UInt64 instance = (UInt64)item["instance"];
+                String id = (String)item["id"];
+                Vector3 position = (Vector3)item["position"];
+
+                DeviceNode? newDevice = activeObjects.FirstOrDefault(x => x.GetInstanceId() == instance) ?? null;
+                if (newDevice == null)
+                {
+                    newDevice = CreateDevice(id, position);
+                    if (newDevice == null)
+                    {
+                        throw new DeviceException($"Unable to create device with the id: {id}.");
+                    }
+                }
+
+                newDevice.Deserialise(item);
+            }
         }
     }
 }

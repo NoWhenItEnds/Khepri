@@ -165,6 +165,7 @@ namespace Khepri.Entities.Actors
         public Godot.Collections.Dictionary<String, Variant> Serialise()
         {
             Godot.Collections.Dictionary<String, Variant> data = _resource.Serialise();
+            data.Add("instance", GetInstanceId());
             data.Add("position", GlobalPosition);
             return data;
         }

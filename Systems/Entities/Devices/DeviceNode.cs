@@ -109,6 +109,7 @@ namespace Khepri.Entities.Devices
         public Dictionary<String, Variant> Serialise()
         {
             Dictionary<String, Variant> data = _resource.Serialise();
+            data.Add("instance", GetInstanceId());
             data.Add("position", GlobalPosition);
             return data;
         }
