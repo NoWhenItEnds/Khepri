@@ -2,6 +2,7 @@ using System;
 using Godot;
 using Khepri.Entities.Actors;
 using Khepri.Nodes.Singletons;
+using Khepri.Resources.Actors;
 using Khepri.Resources.Devices;
 using Khepri.UI.HUD;
 using Khepri.UI.HUD.Interaction;
@@ -56,7 +57,7 @@ namespace Khepri.Controllers
                 case WindowType.INVENTORY:
                     ToggleHUD(false);
                     _inventoryWindow.Visible = true;
-                    _inventoryWindow.Initialise(ActorController.Instance.GetPlayer().Inventory);
+                    _inventoryWindow.Initialise(ActorController.Instance.GetPlayer().GetResource<BeingResource>().Inventory);
                     break;
                 default:
                     ToggleHUD(true);

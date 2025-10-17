@@ -1,6 +1,7 @@
 using Aphelion.Types.Extensions;
 using Godot;
 using Godot.Collections;
+using Khepri.Entities.Actors;
 using Khepri.Entities.Devices;
 using Khepri.Entities.Items;
 using Khepri.Nodes.Singletons;
@@ -58,6 +59,7 @@ namespace Khepri.Controllers
             }
 
             Array<Dictionary<String, Variant>> data = new Array<Dictionary<string, Variant>>();
+            data.AddRange(ActorController.Instance.Serialise());
             data.AddRange(DeviceController.Instance.Serialise());
             data.AddRange(ItemController.Instance.Serialise());
             file.StoreVar(data);
@@ -81,7 +83,7 @@ namespace Khepri.Controllers
 
             if (filteredEntities.TryGetValue("actor", out Array<Dictionary<String, Variant>>? actors) && actors != null)
             {
-                // TODO - Pass to actor controller.
+                ActorController.Instance.Deserialise(actors);
             }
             if (filteredEntities.TryGetValue("device", out Array<Dictionary<String, Variant>>? devices) && devices != null)
             {

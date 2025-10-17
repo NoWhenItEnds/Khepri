@@ -2,6 +2,7 @@ using Godot;
 using Godot.Collections;
 using Khepri.Entities.Actors;
 using Khepri.Resources;
+using Khepri.Resources.Actors;
 using Khepri.Resources.Items;
 using Khepri.Types;
 using System;
@@ -127,7 +128,7 @@ namespace Khepri.Entities.Items
         /// <param name="activatingEntity"> The unit attempting to grab the item. </param>
         public void Grab(ActorNode activatingEntity)
         {
-            Boolean isSuccessful = activatingEntity.Inventory.TryAddItem(_resource);
+            Boolean isSuccessful = activatingEntity.GetResource<BeingResource>().Inventory.TryAddItem(_resource);
             if (isSuccessful)   // If the item was added, free it back to the pool.
             {
                 FreeObject();

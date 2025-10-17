@@ -2,6 +2,7 @@ using System;
 using Godot;
 using Godot.Collections;
 using Khepri.Controllers;
+using Khepri.Entities.Items;
 
 namespace Khepri.Resources.Actors
 {
@@ -12,6 +13,9 @@ namespace Khepri.Resources.Actors
         /// <summary> The unit's base movement speed. </summary>
         [ExportGroup("Settings")]
         [Export] public Single BaseSpeed { get; private set; } = 3f;
+
+        /// <summary> The grid size of the being's inventory. </summary>
+        [Export] public Vector2I InventorySize { get; private set; } = new Vector2I(10, 10);
 
 
         /// <summary> Modifies the amount of hunger the unit looses each tick. </summary>
@@ -49,8 +53,15 @@ namespace Khepri.Resources.Actors
         [Export] public Single CurrentStamina { get; private set; } = 100f;
 
 
+        /// <summary> A reference to the actor's inventory component. </summary>
+        public EntityInventory Inventory { get; private set; }
+
+
         /// <summary> The data component for a living creature within the game world. </summary>
-        public BeingResource() { }
+        public BeingResource()
+        {
+            Inventory = new EntityInventory(InventorySize);
+        }
 
 
         /// <summary> Update the needs internal state every tick. </summary>

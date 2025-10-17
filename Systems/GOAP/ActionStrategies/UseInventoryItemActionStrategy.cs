@@ -1,4 +1,5 @@
 using Khepri.Entities.Actors;
+using Khepri.Resources.Actors;
 using Khepri.Resources.Items;
 using Khepri.Types.Exceptions;
 using System;
@@ -9,7 +10,7 @@ namespace Khepri.GOAP.ActionStrategies
     public partial class UseInventoryItemActionStrategy : IActionStrategy
     {
         /// <inheritdoc/>
-        public Boolean IsValid => _unit.Inventory.HasItem(_itemKind) > 0;
+        public Boolean IsValid => _unit.GetResource<BeingResource>().Inventory.HasItem(_itemKind) > 0;
 
         /// <inheritdoc/>
         public Boolean IsComplete { get; private set; } = false;
@@ -35,7 +36,7 @@ namespace Khepri.GOAP.ActionStrategies
         /// <inheritdoc/>
         public void Start()
         {
-            ItemResource[] items = _unit.Inventory.GetItem(_itemKind);
+            ItemResource[] items = _unit.GetResource<BeingResource>().Inventory.GetItem(_itemKind);
             if (items.Length > 0)
             {
                 ItemResource item = items[0];

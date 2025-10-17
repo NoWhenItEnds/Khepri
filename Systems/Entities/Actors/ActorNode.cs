@@ -2,7 +2,6 @@ using Godot;
 using Khepri.Controllers;
 using Khepri.Entities.Actors.Components;
 using Khepri.Entities.Actors.States;
-using Khepri.Entities.Items;
 using Khepri.Resources;
 using Khepri.Resources.Actors;
 using Khepri.Types;
@@ -34,15 +33,9 @@ namespace Khepri.Entities.Actors
         [Export] public SensorComponent Sensors { get; private set; }
 
 
-        /// <summary> The grid size of the actor's inventory. </summary>
-        [ExportGroup("Settings")]
-        [Export] private Vector2I _inventorySize = new Vector2I(10, 10);
-
         /// <summary> The actor's data component. </summary>
+        [ExportGroup("Settings")]
         [Export] private ActorResource _resource;
-
-        /// <summary> A reference to the actor's inventory component. </summary>
-        public EntityInventory Inventory { get; private set; }
 
 
         /// <summary> The animation sheets to use for the actor's animations. </summary>
@@ -74,7 +67,6 @@ namespace Khepri.Entities.Actors
             _worldController = WorldController.Instance;
             _actorController = ActorController.Instance;
             StateMachine = new ActorStateMachine(this);
-            Inventory = new EntityInventory(_inventorySize);
 
             // Setup the sprite animations.
             foreach (var frames in _spriteFrames)

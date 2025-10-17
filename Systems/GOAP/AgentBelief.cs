@@ -1,5 +1,6 @@
 using Godot;
 using Khepri.Entities.Actors;
+using Khepri.Resources.Actors;
 using Khepri.Resources.Items;
 using System;
 using System.Collections.Generic;
@@ -66,7 +67,7 @@ namespace Khepri.GOAP
         public void AddInventoryBelief(String key, String kind)
         {
             _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => _unit.Inventory.HasItem(kind) > 0)
+                .WithCondition(() => _unit.GetResource<BeingResource>().Inventory.HasItem(kind) > 0)
                 .Build());
         }
 
@@ -77,7 +78,7 @@ namespace Khepri.GOAP
         public void AddInventoryBelief(String key, ItemResource resource)
         {
             _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => _unit.Inventory.HasItem(resource))
+                .WithCondition(() => _unit.GetResource<BeingResource>().Inventory.HasItem(resource))
                 .Build());
         }
 
