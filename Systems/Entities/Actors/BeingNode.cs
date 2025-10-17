@@ -5,13 +5,14 @@ using Khepri.Entities.Actors.States;
 using Khepri.Entities.Items;
 using Khepri.Resources;
 using Khepri.Resources.Actors;
+using Khepri.Types;
 using System;
 using System.Collections.Generic;
 
 namespace Khepri.Entities.Actors
 {
     /// <summary> An active entity controlled by something. </summary>
-    public partial class Being : CharacterBody3D, IEntity, IControllable
+    public partial class BeingNode : ActorNode, IEntity, IControllable
     {
         /// <inheritdoc/>
         [ExportGroup("Nodes")]
@@ -37,6 +38,9 @@ namespace Khepri.Entities.Actors
         [ExportGroup("Settings")]
         [Export] private Vector2I _inventorySize = new Vector2I(10, 10);
 
+        /// <summary> The being's data component. </summary>
+        [Export] private BeingResource _resource;
+
         /// <summary> A reference to the being's inventory component. </summary>
         public EntityInventory Inventory { get; private set; }
 
@@ -60,9 +64,8 @@ namespace Khepri.Entities.Actors
         /// <summary> A reference to the world controller. </summary>
         private WorldController _worldController;
 
-
-        /// <summary> The being's data component. </summary>
-        private BeingResource _resource;
+        /// <summary> A reference to the actor's world controller. </summary>
+        private ActorController _actorController;
 
 
         /// <summary> Initialise the being with its starting values. </summary>
@@ -71,6 +74,7 @@ namespace Khepri.Entities.Actors
         public void Initialise(BeingResource resource, Vector3 position)
         {
             _worldController = WorldController.Instance;
+            _actorController = ActorController.Instance;
             StateMachine = new ActorStateMachine(this);
             Inventory = new EntityInventory(_inventorySize);
 
@@ -111,15 +115,7 @@ namespace Khepri.Entities.Actors
 
 
         /// <inheritdoc/>
-        public Vector3 GetWorldPosition() => GlobalPosition;
-
-
-        /// <inheritdoc/>
-        public CollisionShape3D GetCollisionShape() => _collisionShape;
-
-
-        /// <inheritdoc/>
-        public T GetResource<T>() where T : EntityResource
+        public override T GetResource<T>()
         {
             if (_resource is T resource)
             {
@@ -130,6 +126,14 @@ namespace Khepri.Entities.Actors
                 throw new InvalidCastException($"Unable to cast the resource to {typeof(T)}.");
             }
         }
+
+
+        /// <inheritdoc/>
+        public Vector3 GetWorldPosition() => GlobalPosition;
+
+
+        /// <inheritdoc/>
+        public CollisionShape3D GetCollisionShape() => _collisionShape;
 
 
         /// <inheritdoc/>
@@ -148,14 +152,14 @@ namespace Khepri.Entities.Actors
 
 
         /// <inheritdoc/>
-        public void Examine(Being activatingEntity)
+        public void Examine(BeingNode activatingEntity)
         {
             throw new NotImplementedException();
         }
 
 
         /// <inheritdoc/>
-        public void Use(Being activatingEntity)
+        public void Use(BeingNode activatingEntity)
         {
             throw new NotImplementedException();
         }

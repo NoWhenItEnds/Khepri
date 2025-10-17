@@ -14,7 +14,7 @@ namespace Khepri.Entities.Actors.States
 
         /// <summary> The being is moving quickly along the ground. </summary>
         /// <param name="being"> A reference to the being. </param>
-        public SprintingState(Being being) : base(being) { }
+        public SprintingState(BeingNode being) : base(being) { }
 
 
         /// <inheritdoc/>

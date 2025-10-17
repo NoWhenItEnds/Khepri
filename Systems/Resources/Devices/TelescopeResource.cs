@@ -30,7 +30,7 @@ namespace Khepri.Resources.Devices
 
 
         /// <inheritdoc/>
-        public override void Use(Being activatingBeing)
+        public override void Use(BeingNode activatingBeing)
         {
             if (activatingBeing == PlayerController.Instance.PlayerBeing)
             {

@@ -16,7 +16,7 @@ namespace Khepri.Controllers
     {
         /// <summary> The being representing the player's unit. </summary>
         [ExportGroup("Nodes")]
-        [Export] public Being PlayerBeing { get; private set; }
+        [Export] public BeingNode PlayerBeing { get; private set; }
 
         /// <summary> The current resource that the player is controlling. </summary>
         private IControllable _currentControllable;

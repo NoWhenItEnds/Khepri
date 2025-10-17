@@ -39,7 +39,7 @@ namespace Khepri.Entities.Devices
         /// <param name="body"> A reference to the unit. </param>
         private void OnBodyEntered(Node3D body)
         {
-            if (body is Being unit)
+            if (body is BeingNode unit)
             {
                 unit.AddUsableEntity(this);
             }
@@ -50,7 +50,7 @@ namespace Khepri.Entities.Devices
         /// <param name="body"> A reference to the unit. </param>
         private void OnBodyExited(Node3D body)
         {
-            if (body is Being unit)
+            if (body is BeingNode unit)
             {
                 unit.RemoveUsableEntity(this);
             }
@@ -71,12 +71,12 @@ namespace Khepri.Entities.Devices
 
         /// <summary> The internal logic to use when the entity is examined. </summary>
         /// <param name="activatingBeing"> A reference to the unit activating the action. </param>
-        public void Examine(Being activatingBeing) => _resource.Examine(activatingBeing);
+        public void Examine(BeingNode activatingBeing) => _resource.Examine(activatingBeing);
 
 
         /// <summary> The internal logic to use when the entity is used. </summary>
         /// <param name="activatingBeing"> A reference to the unit activating the action. </param>
-        public void Use(Being activatingBeing) => _resource.Use(activatingBeing);
+        public void Use(BeingNode activatingBeing) => _resource.Use(activatingBeing);
 
 
         /// <inheritdoc/>

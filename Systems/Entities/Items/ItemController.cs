@@ -10,7 +10,7 @@ using Khepri.Types.Exceptions;
 
 namespace Khepri.Entities.Items
 {
-    /// <summary> A factory for making item objects. </summary>
+    /// <summary> A controller for item entities within the game world. </summary>
     public partial class ItemController : SingletonNode3D<ItemController>
     {
         /// <summary> The prefab to use for creating items. </summary>

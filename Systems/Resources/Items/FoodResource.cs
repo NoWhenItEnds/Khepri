@@ -34,7 +34,7 @@ namespace Khepri.Resources.Items
 
 
         /// <inheritdoc/>
-        public override void Use(Being activatingEntity)
+        public override void Use(BeingNode activatingEntity)
         {
             BeingResource resource = activatingEntity.GetResource<BeingResource>();
             resource.UpdateHealth(HealthRecovery);

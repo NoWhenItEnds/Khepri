@@ -30,7 +30,7 @@ namespace Khepri.UI.Debug.Units
         private AgentController _controller;
 
         /// <summary> The unit this menu represents. </summary>
-        private Being _being;
+        private BeingNode _being;
 
         /// <summary> An internal reference to the game's viewport. </summary>
         private Viewport _viewport;
@@ -59,7 +59,7 @@ namespace Khepri.UI.Debug.Units
 
         /// <summary> Construct the menu. </summary>
         /// <param name="being"> The being this menu represents. </param>
-        public void Initialise(AgentController controller, Being being)
+        public void Initialise(AgentController controller, BeingNode being)
         {
             _controller = controller;
             _being = being;
@@ -96,7 +96,7 @@ namespace Khepri.UI.Debug.Units
                 Double minutes = (currentTime - entity.LastSeenTimestamp).TotalMinutes;
                 switch (entity.Entity)
                 {
-                    case Being unit:
+                    case BeingNode unit:
                         sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, unit.Name, pos.X, pos.Y, pos.Z, minutes));
                         break;
                     case ItemNode item:

@@ -14,7 +14,7 @@ namespace Khepri.Entities.Actors.States
 
         /// <summary> The being is walking across the ground. </summary>
         /// <param name="being"> A reference to the being. </param>
-        public WalkingState(Being being) : base(being) { }
+        public WalkingState(BeingNode being) : base(being) { }
 
 
         /// <inheritdoc/>
