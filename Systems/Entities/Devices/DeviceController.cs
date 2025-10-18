@@ -6,7 +6,6 @@ using Khepri.Nodes.Singletons;
 using Khepri.Resources;
 using Khepri.Resources.Devices;
 using Khepri.Types;
-using Khepri.Types.Exceptions;
 
 namespace Khepri.Entities.Devices
 {
@@ -37,14 +36,10 @@ namespace Khepri.Entities.Devices
         /// <summary> Initialise a new device. </summary>
         /// <param name="kind"> The specific kind or common name of the resource. </param>
         /// <param name="position"> The position to create the object at. </param>
-        /// <returns> The initialised item, or a null if one couldn't be created. </returns>
-        public DeviceNode? CreateDevice(String kind, Vector3 position)
+        /// <returns> The initialised device. </returns>
+        public DeviceNode CreateDevice(String kind, Vector3 position)
         {
-            DeviceResource? resource = _resourceController.CreateResource<DeviceResource>(kind);
-            if (resource == null)
-            {
-                return null;
-            }
+            DeviceResource resource = _resourceController.CreateResource<DeviceResource>(kind);
             return CreateDevice(resource, position);
         }
 
@@ -77,7 +72,6 @@ namespace Khepri.Entities.Devices
 
         /// <summary> Unpack the given data and instantiate the world state. </summary>
         /// <param name="data"> Data that has the 'device' type to unpack. </param>
-        /// <exception cref="DeviceException"> If one of the devices was unable to be created. </exception>
         public void Deserialise(Array<Dictionary<String, Variant>> data)
         {
             DeviceNode[] activeObjects = DevicePool.GetActiveObjects();
@@ -92,10 +86,6 @@ namespace Khepri.Entities.Devices
                 if (newDevice == null)
                 {
                     newDevice = CreateDevice(id, position);
-                    if (newDevice == null)
-                    {
-                        throw new DeviceException($"Unable to create device with the id: {id}.");
-                    }
                 }
 
                 newDevice.Deserialise(item);

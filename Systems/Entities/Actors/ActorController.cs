@@ -5,7 +5,6 @@ using Khepri.Nodes.Singletons;
 using Khepri.Resources;
 using Khepri.Resources.Actors;
 using Khepri.Types;
-using Khepri.Types.Exceptions;
 using System;
 using System.Linq;
 
@@ -49,14 +48,10 @@ namespace Khepri.Entities.Actors
         /// <summary> Initialise a new actor. </summary>
         /// <param name="kind"> The specific kind or common name of the resource. </param>
         /// <param name="position"> The position to create the object at. </param>
-        /// <returns> The initialised actor, or a null if one couldn't be created. </returns>
-        public ActorNode? CreateActor(String kind, Vector3 position)
+        /// <returns> The initialised actor. </returns>
+        public ActorNode CreateActor(String kind, Vector3 position)
         {
-            ActorResource? resource = _resourceController.CreateResource<ActorResource>(kind);
-            if (resource == null)
-            {
-                return null;
-            }
+            ActorResource resource = _resourceController.CreateResource<ActorResource>(kind);
             return CreateActor(resource, position);
         }
 
@@ -89,7 +84,6 @@ namespace Khepri.Entities.Actors
 
         /// <summary> Unpack the given data and instantiate the world state. </summary>
         /// <param name="data"> Data that has the 'actor' type to unpack. </param>
-        /// <exception cref="ActorException"> If one of the actors was unable to be created. </exception>
         public void Deserialise(Array<Dictionary<String, Variant>> data)
         {
             ActorNode[] activeObjects = ActorPool.GetActiveObjects();
@@ -100,17 +94,13 @@ namespace Khepri.Entities.Actors
                 String id = (String)item["id"];
                 Vector3 position = (Vector3)item["position"];
 
-                ActorNode? newDevice = activeObjects.FirstOrDefault(x => x.GetInstanceId() == instance) ?? null;
-                if (newDevice == null)
+                ActorNode? newActor = activeObjects.FirstOrDefault(x => x.GetInstanceId() == instance) ?? null;
+                if (newActor == null)
                 {
-                    newDevice = CreateActor(id, position);
-                    if (newDevice == null)
-                    {
-                        throw new ActorException($"Unable to create actor with the id: {id}.");
-                    }
+                    newActor = CreateActor(id, position);
                 }
 
-                newDevice.Deserialise(item);
+                newActor.Deserialise(item);
             }
         }
 

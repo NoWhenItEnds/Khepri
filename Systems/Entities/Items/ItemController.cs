@@ -6,7 +6,6 @@ using Khepri.Nodes.Singletons;
 using Khepri.Resources;
 using Khepri.Resources.Items;
 using Khepri.Types;
-using Khepri.Types.Exceptions;
 
 namespace Khepri.Entities.Items
 {
@@ -37,14 +36,10 @@ namespace Khepri.Entities.Items
         /// <summary> Initialise a new item by pulling from the pool. </summary>
         /// <param name="kind"> The specific kind or common name of the resource. </param>
         /// <param name="position"> The position to create the object at. </param>
-        /// <returns> The initialised item, or a null if one couldn't be created. </returns>
-        public ItemNode? CreateItem(String kind, Vector3 position)
+        /// <returns> The initialised item. </returns>
+        public ItemNode CreateItem(String kind, Vector3 position)
         {
-            ItemResource? resource = _resourceController.CreateResource<ItemResource>(kind);
-            if (resource == null)
-            {
-                return null;
-            }
+            ItemResource resource = _resourceController.CreateResource<ItemResource>(kind);
             return CreateItem(resource, position);
         }
 
@@ -77,7 +72,6 @@ namespace Khepri.Entities.Items
 
         /// <summary> Unpack the given data and instantiate the world state. </summary>
         /// <param name="data"> Data that has the 'item' type to unpack. </param>
-        /// <exception cref="ItemException"> If one of the items was unable to be created. </exception>
         public void Deserialise(Array<Dictionary<String, Variant>> data)
         {
             ItemNode[] activeObjects = ItemPool.GetActiveObjects();
@@ -92,10 +86,6 @@ namespace Khepri.Entities.Items
                 if (newItem == null)
                 {
                     newItem = CreateItem(id, position);
-                    if (newItem == null)
-                    {
-                        throw new ItemException($"Unable to create item with the id: {id}.");
-                    }
                 }
 
                 newItem.Deserialise(item);
