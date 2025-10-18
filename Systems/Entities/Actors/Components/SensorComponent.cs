@@ -22,9 +22,9 @@ namespace Khepri.Entities.Actors.Components
         [Export] private Node3D _lights;
 
 
-        /// <summary> How long, in hours, a unit should remember an entity before forgetting it if it hasn't been seen (in that period of time). </summary>
+        /// <summary> How long, in days, a unit should remember an entity before forgetting it if it hasn't been seen (in that period of time). </summary>
         [ExportGroup("Settings")]
-        [Export] private Single _memoryLength = 6f;
+        [Export] private Single _memoryLength = 7f;
 
 
         /// <summary> Whether the debug tools should be shown. </summary>
@@ -47,9 +47,19 @@ namespace Khepri.Entities.Actors.Components
         public override void _Ready()
         {
             _worldController = WorldController.Instance;
+            _worldController.NewDay += OnNewDay;
 
             // Only render the lights if the unit is controlled by the player
             ToggleLights(ActorController.Instance.GetPlayer() == _unit);
+        }
+
+
+        private void OnNewDay(DateOnly date)
+        {
+            // Remove entities that the unit hasn't seen for a while.
+            TimeSpan memoryTimespan = TimeSpan.FromDays(_memoryLength);
+            _knownEntities.RemoveWhere(x => x.LastSeenTimestamp < _worldController.CurrentTime - memoryTimespan);
+            _knownLocations.RemoveWhere(x => x.LastSeenTimestamp < _worldController.CurrentTime - memoryTimespan);
         }
 
 
@@ -58,10 +68,6 @@ namespace Khepri.Entities.Actors.Components
         {
             // Add the current position to the known positions.
             RememberPosition(GlobalPosition);
-
-            // Remove entities that the unit hasn't seen for a while.
-            _knownEntities.RemoveWhere(x => x.LastSeenTimestamp < _worldController.CurrentTime - TimeSpan.FromHours(_memoryLength));
-            _knownLocations.RemoveWhere(x => x.LastSeenTimestamp < _worldController.CurrentTime - TimeSpan.FromHours(_memoryLength));
 
             // Render debug gizmos.
             if (_showDebug)
@@ -86,7 +92,7 @@ namespace Khepri.Entities.Actors.Components
         /// <returns> A reference to the newly remembered know entity. </returns>
         public KnownEntity RememberEntity(IEntity entity)
         {
-            KnownEntity newEntity = new KnownEntity(entity);
+            KnownEntity newEntity = new KnownEntity(entity, entity.GetWorldPosition(), _worldController.CurrentTime);
             _knownEntities.Add(newEntity);
             return newEntity;
         }
@@ -138,17 +144,22 @@ namespace Khepri.Entities.Actors.Components
         public KnownPosition RememberPosition(Vector3 position)
         {
             Vector3 modifiedPosition = new Vector3((Single)Math.Round(position.X), (Single)Math.Round(position.Y), (Single)Math.Round(position.Z));
-            KnownPosition? entity = _knownLocations.FirstOrDefault(x => x.Position == modifiedPosition);
-            if (entity == null)
+
+            KnownPosition knownPosition = new KnownPosition(modifiedPosition, _worldController.CurrentTime);
+            if (_knownLocations.Add(knownPosition))
             {
-                entity = new KnownPosition(modifiedPosition);
-                Boolean isAdded = _knownLocations.Add(entity);
-                if (isAdded)    // Reward the unit by discovering new areas by increasing their entertainment.
+                _unit.GetResource<BeingResource>().UpdateEntertainment(0.1f);
+            }
+            else
+            {
+                if(_knownLocations.TryGetValue(knownPosition, out KnownPosition? existingPosition) && existingPosition != null)
                 {
-                    _unit.GetResource<BeingResource>().UpdateEntertainment(0.1f);
+                    existingPosition.SetLastSeen(knownPosition.LastSeenTimestamp);
+                    knownPosition = existingPosition;
                 }
             }
-            return entity;
+
+            return knownPosition;
         }
 
 
@@ -216,19 +227,15 @@ namespace Khepri.Entities.Actors.Components
         public DateTimeOffset LastSeenTimestamp { get; private set; }
 
 
-        /// <summary> A reference to the global world controller. </summary>
-        private WorldController _worldController;
-
-
         /// <summary> A data object that is 'known' by an agent. </summary>
         /// <param name="entity"> A reference to the known entity. </param>
-        public KnownEntity(IEntity entity)
+        /// <param name="position"> The last known position of the entity. </param>
+        /// <param name="lastSeen"> When the position was last visited. </param>
+        public KnownEntity(IEntity entity, Vector3 position, DateTimeOffset lastSeen)
         {
-            _worldController = WorldController.Instance;
-
             Entity = entity;
-            LastKnownPosition = entity.GetWorldPosition();
-            LastSeenTimestamp = _worldController.CurrentTime;
+            LastKnownPosition = position;
+            LastSeenTimestamp = lastSeen;
         }
 
 
@@ -241,12 +248,13 @@ namespace Khepri.Entities.Actors.Components
 
 
         /// <summary> Updates the last known position of the entity. </summary>
-        /// <param name="position"> An optional position. A null will use the entity's actual position, a value will override it. </param>
-        public void UpdateLastKnownPosition(Vector3? position = null)
+        /// <param name="position"> The last known position of the entity. </param>
+        public void UpdateLastKnownPosition(Vector3 position)
         {
-            LastSeenTimestamp = _worldController.CurrentTime;
-            LastKnownPosition = position == null ? Entity.GetCollisionShape().GlobalPosition : position.Value;
+            LastKnownPosition = position;
+            LastSeenTimestamp = WorldController.Instance.CurrentTime;
         }
+
 
         /// <inheritdoc/>
         public override Int32 GetHashCode() => HashCode.Combine(Entity);
@@ -275,19 +283,19 @@ namespace Khepri.Entities.Actors.Components
         public DateTimeOffset LastSeenTimestamp { get; private set; }
 
 
-        /// <summary> A reference to the global world controller. </summary>
-        private WorldController _worldController;
-
-
         /// <summary> A position that the unit knows about and has visited recently. </summary>
         /// <param name="position"> The position in godot's world space. </param>
-        public KnownPosition(Vector3 position)
+        /// <param name="lastSeen"> When the position was last visited. </param>
+        public KnownPosition(Vector3 position, DateTimeOffset lastSeen)
         {
-            _worldController = WorldController.Instance;
-
             Position = position;
-            LastSeenTimestamp = _worldController.CurrentTime;
+            SetLastSeen(lastSeen);
         }
+
+
+        /// <summary> Update when the position was last seen. </summary>
+        /// <param name="lastSeen"> When the position was last visited. </param>
+        public void SetLastSeen(DateTimeOffset lastSeen) => LastSeenTimestamp = lastSeen;
 
 
         /// <inheritdoc/>

@@ -39,12 +39,22 @@ namespace Khepri.Controllers
         public Double GameTimeDelta { get; private set; }
 
 
+        /// <summary> Announce that it is the dawn of a new day. </summary>
+        public event Action<DateOnly> NewDay;
+
+
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
             DateTimeOffset previousTime = CurrentTime;
             CurrentTime = CurrentTime.AddSeconds(delta * _timescale);
             GameTimeDelta = (CurrentTime.ToUnixTimeMilliseconds() - previousTime.ToUnixTimeMilliseconds()) * 0.001f;
+
+            // If the day has changed, fire the new day event.
+            if (CurrentTime.Day != previousTime.Day)
+            {
+                NewDay?.Invoke(DateOnly.FromDateTime(CurrentTime.Date));
+            }
         }
 
 
