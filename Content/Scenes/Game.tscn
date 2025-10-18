@@ -1,4 +1,4 @@
-[gd_scene load_steps=48 format=3 uid="uid://ko6nvcupfcf4"]
+[gd_scene load_steps=49 format=3 uid="uid://ko6nvcupfcf4"]
 
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="Script" uid="uid://cgujt8yhxbsew" path="res://Systems/Controllers/WorldController.cs" id="1_8fov1"]
@@ -23,6 +23,7 @@
 [ext_resource type="PackedScene" uid="uid://d3h3gyl2w4p6t" path="res://Content/Prefabs/Entities/Device.tscn" id="15_4buj1"]
 [ext_resource type="Texture2D" uid="uid://jm8q7n0aefdj" path="res://Content/Textures/UI/HUD/StatusBar/StatusBar_Progress.png" id="15_rj7tm"]
 [ext_resource type="Resource" uid="uid://jret43wdghyu" path="res://Data/Devices/Device_NanoForge.tres" id="16_j3683"]
+[ext_resource type="Resource" uid="uid://dnbfvjmqsoiai" path="res://Data/Devices/Device_Storage_Chest.tres" id="16_xoxxo"]
 [ext_resource type="Resource" uid="uid://3g0h3r77ocky" path="res://Data/Devices/Device_Telescope.tres" id="17_cwenm"]
 [ext_resource type="Texture2D" uid="uid://be0foew3edrpc" path="res://Content/Textures/UI/HUD/StatusBar/StatusBar_Slider.png" id="17_kqbmc"]
 [ext_resource type="Script" uid="uid://bkvivpavak3rl" path="res://Systems/UI/HUD/SpeechBubbles/SpeechBubbleHUD.cs" id="18_4buj1"]
@@ -576,6 +577,10 @@ _resource = ExtResource("16_j3683")
 [node name="Telescope" parent="World/Devices" instance=ExtResource("15_4buj1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6694043, 0, 2.6195474)
 _resource = ExtResource("17_cwenm")
+
+[node name="Chest" parent="World/Devices" instance=ExtResource("15_4buj1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.314577, 0, -1.6943463)
+_resource = ExtResource("16_xoxxo")
 
 [node name="Actors" type="Node3D" parent="World" node_paths=PackedStringArray("_controllerParent", "_actorParent", "_playerController")]
 script = ExtResource("18_cwenm")
