@@ -8,6 +8,9 @@ namespace Khepri.Entities
     /// <summary> The entity is persistent, meaning that its information should be remembered between game sessions. </summary>
     public interface IEntity
     {
+        /// <summary> The entity's unique identifier in the game world. </summary>
+        public UInt64 UId { get; }
+
         /// <summary> Get the entity's current position within the game world. </summary>
         public Vector3 GetWorldPosition();
 

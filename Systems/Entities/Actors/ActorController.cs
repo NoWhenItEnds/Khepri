@@ -90,11 +90,11 @@ namespace Khepri.Entities.Actors
 
             foreach (Dictionary<String, Variant> item in data)
             {
-                UInt64 instance = (UInt64)item["instance"];
+                UInt64 uid = (UInt64)item["uid"];
                 String id = (String)item["id"];
                 Vector3 position = (Vector3)item["position"];
 
-                ActorNode? newActor = activeObjects.FirstOrDefault(x => x.GetInstanceId() == instance) ?? null;
+                ActorNode? newActor = activeObjects.FirstOrDefault(x => x.UId == uid) ?? null;
                 if (newActor == null)
                 {
                     newActor = CreateActor(id, position);

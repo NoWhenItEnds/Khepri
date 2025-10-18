@@ -14,6 +14,9 @@ namespace Khepri.Entities.Actors
     public partial class ActorNode : CharacterBody3D, IEntity, IControllable, IPoolable
     {
         /// <inheritdoc/>
+        public UInt64 UId { get; private set; }
+
+        /// <inheritdoc/>
         [ExportGroup("Nodes")]
         [Export] private CollisionShape3D _collisionShape;
 
@@ -64,6 +67,7 @@ namespace Khepri.Entities.Actors
         /// <inheritdoc/>
         public override void _Ready()
         {
+            UId = GetInstanceId();
             _worldController = WorldController.Instance;
             _actorController = ActorController.Instance;
             StateMachine = new ActorStateMachine(this);
@@ -171,8 +175,9 @@ namespace Khepri.Entities.Actors
         public Godot.Collections.Dictionary<String, Variant> Serialise()
         {
             Godot.Collections.Dictionary<String, Variant> data = _resource.Serialise();
-            data.Add("instance", GetInstanceId());
+            data.Add("uid", UId);
             data.Add("position", GlobalPosition);
+            data.Add("sensor", Sensors.Serialise());
             return data;
         }
 
@@ -180,7 +185,10 @@ namespace Khepri.Entities.Actors
         /// <inheritdoc/>
         public void Deserialise(Godot.Collections.Dictionary<String, Variant> data)
         {
+            UId = (UInt64)data["uid"];
+            GlobalPosition = (Vector3)data["position"];
             _resource.Deserialise(data);
+            Sensors.Deserialise((Godot.Collections.Dictionary<String, Godot.Collections.Array<Godot.Collections.Dictionary<String, Variant>>>)data["sensor"]);
         }
     }
 }

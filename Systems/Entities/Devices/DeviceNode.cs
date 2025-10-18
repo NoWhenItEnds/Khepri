@@ -11,6 +11,9 @@ namespace Khepri.Entities.Devices
     /// <summary> An entity that can be interacted with by a unit for a unique effect. </summary>
     public partial class DeviceNode : StaticBody3D, IEntity, IPoolable
     {
+        /// <inheritdoc/>
+        public UInt64 UId { get; private set; }
+
         /// <summary> The device's bounding shape. </summary>
         [ExportGroup("Nodes")]
         [Export] private CollisionShape3D _collisionShape;
@@ -109,7 +112,7 @@ namespace Khepri.Entities.Devices
         public Dictionary<String, Variant> Serialise()
         {
             Dictionary<String, Variant> data = _resource.Serialise();
-            data.Add("instance", GetInstanceId());
+            data.Add("uid", UId);
             data.Add("position", GlobalPosition);
             return data;
         }
@@ -118,6 +121,8 @@ namespace Khepri.Entities.Devices
         /// <inheritdoc/>
         public void Deserialise(Dictionary<String, Variant> data)
         {
+            UId = (UInt64)data["uid"];
+            GlobalPosition = (Vector3)data["position"];
             _resource.Deserialise(data);
         }
     }

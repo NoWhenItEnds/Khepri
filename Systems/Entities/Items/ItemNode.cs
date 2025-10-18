@@ -12,6 +12,9 @@ namespace Khepri.Entities.Items
     /// <summary> A node representing an item in the game world. </summary>
     public partial class ItemNode : StaticBody3D, IEntity, IPoolable
     {
+        /// <inheritdoc/>
+        public UInt64 UId { get; private set; }
+
         /// <summary> The item's bounding shape. </summary>
         [ExportGroup("Nodes")]
         [Export] private CollisionShape3D _collisionShape;
@@ -144,7 +147,7 @@ namespace Khepri.Entities.Items
         public Dictionary<String, Variant> Serialise()
         {
             Dictionary<String, Variant> data = _resource.Serialise();
-            data.Add("instance", GetInstanceId());
+            data.Add("uid", UId);
             data.Add("position", GlobalPosition);
             return data;
         }
@@ -153,6 +156,8 @@ namespace Khepri.Entities.Items
         /// <inheritdoc/>
         public void Deserialise(Dictionary<String, Variant> data)
         {
+            UId = (UInt64)data["uid"];
+            GlobalPosition = (Vector3)data["position"];
             _resource.Deserialise(data);
         }
     }

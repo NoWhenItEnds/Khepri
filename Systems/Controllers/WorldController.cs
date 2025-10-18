@@ -91,21 +91,21 @@ namespace Khepri.Controllers
             Array<Dictionary<String, Variant>> data = (Array<Dictionary<String, Variant>>)file.GetVar();
             Dictionary<String, Array<Dictionary<String, Variant>>> filteredEntities = FilterEntities(data);
 
-            if (filteredEntities.TryGetValue("actor", out Array<Dictionary<String, Variant>>? actors) && actors != null)
+            if (filteredEntities.TryGetValue("celestial", out Array<Dictionary<String, Variant>>? celestials) && celestials != null)
             {
-                ActorController.Instance.Deserialise(actors);
-            }
-            if (filteredEntities.TryGetValue("device", out Array<Dictionary<String, Variant>>? devices) && devices != null)
-            {
-                DeviceController.Instance.Deserialise(devices);
+                // TODO - Pass to celestial controller.
             }
             if (filteredEntities.TryGetValue("item", out Array<Dictionary<String, Variant>>? items) && items != null)
             {
                 ItemController.Instance.Deserialise(items);
             }
-            if (filteredEntities.TryGetValue("celestial", out Array<Dictionary<String, Variant>>? celestials) && actors != null)
+            if (filteredEntities.TryGetValue("device", out Array<Dictionary<String, Variant>>? devices) && devices != null)
             {
-                // TODO - Pass to celestial controller.
+                DeviceController.Instance.Deserialise(devices);
+            }
+            if (filteredEntities.TryGetValue("actor", out Array<Dictionary<String, Variant>>? actors) && actors != null)
+            {
+                ActorController.Instance.Deserialise(actors);
             }
         }
 

@@ -36,7 +36,7 @@ namespace Khepri.Entities.Actors.Components
         private HashSet<KnownEntity> _knownEntities = new HashSet<KnownEntity>();
 
         /// <summary> An array of positions recently visited by the unit. </summary>
-        private HashSet<KnownPosition> _knownLocations = new HashSet<KnownPosition>();
+        private HashSet<KnownPosition> _knownPositions = new HashSet<KnownPosition>();
 
 
         /// <summary> A reference to the global world controller. </summary>
@@ -54,12 +54,14 @@ namespace Khepri.Entities.Actors.Components
         }
 
 
+        /// <summary> When a new day dawns, check if some things are forgotten. </summary>
+        /// <param name="date"> The world's new date. </param>
         private void OnNewDay(DateOnly date)
         {
             // Remove entities that the unit hasn't seen for a while.
             TimeSpan memoryTimespan = TimeSpan.FromDays(_memoryLength);
             _knownEntities.RemoveWhere(x => x.LastSeenTimestamp < _worldController.CurrentTime - memoryTimespan);
-            _knownLocations.RemoveWhere(x => x.LastSeenTimestamp < _worldController.CurrentTime - memoryTimespan);
+            _knownPositions.RemoveWhere(x => x.LastSeenTimestamp < _worldController.CurrentTime - memoryTimespan);
         }
 
 
@@ -90,9 +92,16 @@ namespace Khepri.Entities.Actors.Components
         /// <summary> Adds an entity to the ones being tracked by the unit. Represents its memory. </summary>
         /// <param name="entity"> The object to begin tracking. </param>
         /// <returns> A reference to the newly remembered know entity. </returns>
-        public KnownEntity RememberEntity(IEntity entity)
+        public KnownEntity RememberEntity(IEntity entity) => RememberEntity(entity, _worldController.CurrentTime);
+
+
+        /// <summary> Adds an entity to the ones being tracked by the unit. Represents its memory. </summary>
+        /// <param name="entity"> The object to begin tracking. </param>
+        /// <param name="lastSeen"> When the object was last seen. </param>
+        /// <returns> A reference to the newly remembered know entity. </returns>
+        public KnownEntity RememberEntity(IEntity entity, DateTimeOffset lastSeen)
         {
-            KnownEntity newEntity = new KnownEntity(entity, entity.GetWorldPosition(), _worldController.CurrentTime);
+            KnownEntity newEntity = new KnownEntity(entity, entity.GetWorldPosition(), lastSeen);
             _knownEntities.Add(newEntity);
             return newEntity;
         }
@@ -141,18 +150,25 @@ namespace Khepri.Entities.Actors.Components
         /// <summary> Attempts to register the position as one it has visited recently. </summary>
         /// <param name="position"> The position in world space to register. </param>
         /// <returns> The known position data class representing this memory. </returns>
-        public KnownPosition RememberPosition(Vector3 position)
+        public KnownPosition RememberPosition(Vector3 position) => RememberPosition(position, _worldController.CurrentTime);
+
+
+        /// <summary> Attempts to register the position as one it has visited recently. </summary>
+        /// <param name="position"> The position in world space to register. </param>
+        /// <param name="lastSeen"> When the object was last seen. </param>
+        /// <returns> The known position data class representing this memory. </returns>
+        public KnownPosition RememberPosition(Vector3 position, DateTimeOffset lastSeen)
         {
             Vector3 modifiedPosition = new Vector3((Single)Math.Round(position.X), (Single)Math.Round(position.Y), (Single)Math.Round(position.Z));
 
-            KnownPosition knownPosition = new KnownPosition(modifiedPosition, _worldController.CurrentTime);
-            if (_knownLocations.Add(knownPosition))
+            KnownPosition knownPosition = new KnownPosition(modifiedPosition, lastSeen);
+            if (_knownPositions.Add(knownPosition))
             {
                 _unit.GetResource<BeingResource>().UpdateEntertainment(0.1f);
             }
             else
             {
-                if(_knownLocations.TryGetValue(knownPosition, out KnownPosition? existingPosition) && existingPosition != null)
+                if(_knownPositions.TryGetValue(knownPosition, out KnownPosition? existingPosition) && existingPosition != null)
                 {
                     existingPosition.SetLastSeen(knownPosition.LastSeenTimestamp);
                     knownPosition = existingPosition;
@@ -169,12 +185,12 @@ namespace Khepri.Entities.Actors.Components
         public Boolean ForgetPosition(Vector3 position)
         {
             Vector3 modifiedPosition = new Vector3((Single)Math.Round(position.X), (Single)Math.Round(position.Y), (Single)Math.Round(position.Z));
-            return _knownLocations.RemoveWhere(x => x.Position == modifiedPosition) > 0;
+            return _knownPositions.RemoveWhere(x => x.Position == modifiedPosition) > 0;
         }
 
 
         /// <summary> Get an array of all the currently known locations. </summary>
-        public KnownPosition[] GetLocations() => _knownLocations.ToArray();
+        public KnownPosition[] GetPositions() => _knownPositions.ToArray();
 
 
         /// <summary> Searches the tracked entity's for a particular location. </summary>
@@ -183,7 +199,7 @@ namespace Khepri.Entities.Actors.Components
         public KnownPosition? TryGetPosition(Vector3 position)
         {
             Vector3 modifiedPosition = new Vector3((Single)Math.Round(position.X), (Single)Math.Round(position.Y), (Single)Math.Round(position.Z));
-            return _knownLocations.FirstOrDefault(x => x.Position == position);
+            return _knownPositions.FirstOrDefault(x => x.Position == position);
         }
 
 
@@ -191,7 +207,7 @@ namespace Khepri.Entities.Actors.Components
         /// <returns> An array of positions in the game world that the unit is current aware of. </returns>
         public Vector3[] GetKnownPositions()
         {
-            return _knownLocations.Select(x => x.Position).ToArray();
+            return _knownPositions.Select(x => x.Position).ToArray();
         }
 
 
@@ -201,13 +217,72 @@ namespace Khepri.Entities.Actors.Components
         /// <returns> An array of positions in the game world that the unit is current aware of. </returns>
         public Vector3[] GetKnownPositions(Vector3 position, Single radius)
         {
-            return _knownLocations.Select(x => x.Position).Where(x => x.DistanceTo(position) <= radius).ToArray();
+            return _knownPositions.Select(x => x.Position).Where(x => x.DistanceTo(position) <= radius).ToArray();
         }
 
 
         /// <summary> Toggle whether the lights are active. </summary>
         /// <param name="isActive"> Whether the visibility lights should be active or not. </param>
         public void ToggleLights(Boolean isActive) => _lights.Visible = isActive;
+
+
+        /// <summary> Buddle the saved sensor information for the purpose of saving. </summary>
+        /// <returns> A keyed collection of entity and positions. </returns>
+        public Godot.Collections.Dictionary<String, Godot.Collections.Array<Godot.Collections.Dictionary<String, Variant>>> Serialise()
+        {
+            var entities = new Godot.Collections.Array<Godot.Collections.Dictionary<String, Variant>>();
+            foreach (KnownEntity entity in _knownEntities)
+            {
+                // Build a new dictionary to represent each item.
+                entities.Add(new Godot.Collections.Dictionary<string, Variant>()
+                {
+                    { "entity_uid" , entity.Entity.UId },
+                    { "is_visible" , entity.IsVisible },
+                    { "position" , entity.LastKnownPosition },
+                    { "timestamp" , entity.LastSeenTimestamp.ToUnixTimeSeconds() }
+                });
+            }
+
+            var positions = new Godot.Collections.Array<Godot.Collections.Dictionary<String, Variant>>();
+            foreach (KnownPosition position in _knownPositions)
+            {
+                // Build a new dictionary to represent each item.
+                positions.Add(new Godot.Collections.Dictionary<string, Variant>()
+                {
+                    { "position" , position.Position },
+                    { "timestamp" , position.LastSeenTimestamp.ToUnixTimeSeconds() }
+                });
+            }
+
+            return new Godot.Collections.Dictionary<String, Godot.Collections.Array<Godot.Collections.Dictionary<String, Variant>>>()
+            {
+                { "entities", entities },
+                { "positions", positions }
+            };
+        }
+
+
+        /// <summary> Unpack the saved data to represent a previous world state. </summary>
+        /// <param name="data"> The raw data. </param>
+        public void Deserialise(Godot.Collections.Dictionary<String, Godot.Collections.Array<Godot.Collections.Dictionary<String, Variant>>> data)
+        {
+            var entities = (Godot.Collections.Array<Godot.Collections.Dictionary<String, Variant>>)data["entities"];
+            foreach (Godot.Collections.Dictionary<String, Variant> entity in entities)
+            {
+                UInt64 uid = (UInt64)entity["entity_uid"];
+                Boolean isVisible = (Boolean)entity["is_visible"];
+                Vector3 position = (Vector3)entity["position"];
+                DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds((Int64)entity["timestamp"]);
+                //RememberEntity();
+                // TODO - Find a way to get the entity.
+            }
+
+            var positions = (Godot.Collections.Array<Godot.Collections.Dictionary<String, Variant>>)data["positions"];
+            foreach (Godot.Collections.Dictionary<String, Variant> position in positions)
+            {
+                RememberPosition((Vector3)position["position"], DateTimeOffset.FromUnixTimeSeconds((Int64)position["timestamp"]));
+            }
+        }
     }
 
 

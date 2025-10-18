@@ -78,11 +78,11 @@ namespace Khepri.Entities.Devices
 
             foreach (Dictionary<String, Variant> item in data)
             {
-                UInt64 instance = (UInt64)item["instance"];
+                UInt64 uid = (UInt64)item["uid"];
                 String id = (String)item["id"];
                 Vector3 position = (Vector3)item["position"];
 
-                DeviceNode? newDevice = activeObjects.FirstOrDefault(x => x.GetInstanceId() == instance) ?? null;
+                DeviceNode? newDevice = activeObjects.FirstOrDefault(x => x.UId == uid) ?? null;
                 if (newDevice == null)
                 {
                     newDevice = CreateDevice(id, position);

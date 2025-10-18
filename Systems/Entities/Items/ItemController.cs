@@ -78,11 +78,11 @@ namespace Khepri.Entities.Items
 
             foreach (Dictionary<String, Variant> item in data)
             {
-                UInt64 instance = (UInt64)item["instance"];
+                UInt64 uid = (UInt64)item["uid"];
                 String id = (String)item["id"];
                 Vector3 position = (Vector3)item["position"];
 
-                ItemNode? newItem = activeObjects.FirstOrDefault(x => x.GetInstanceId() == instance) ?? null;
+                ItemNode? newItem = activeObjects.FirstOrDefault(x => x.UId == uid) ?? null;
                 if (newItem == null)
                 {
                     newItem = CreateItem(id, position);
