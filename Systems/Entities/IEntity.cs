@@ -8,6 +8,9 @@ namespace Khepri.Entities
     /// <summary> The entity is persistent, meaning that its information should be remembered between game sessions. </summary>
     public interface IEntity
     {
+        /// <summary> The entity's unique identifier in the game world. </summary>
+        public UInt64 UId { get; }
+
         /// <summary> Get the entity's current position within the game world. </summary>
         public Vector3 GetWorldPosition();
 
@@ -25,11 +28,21 @@ namespace Khepri.Entities
 
         /// <summary> The internal logic to use when the entity is examined. </summary>
         /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
-        public void Examine(Being activatingEntity);
+        public void Examine(ActorNode activatingEntity);
 
 
         /// <summary> The internal logic to use when the entity is used. </summary>
         /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
-        public void Use(Being activatingEntity);
+        public void Use(ActorNode activatingEntity);
+
+
+        /// <summary> Package the entity into a serialised object. </summary>
+        /// <returns> A dictionary containing the key, value pairs that represent the entity's state. </returns>
+        public Godot.Collections.Dictionary<String, Variant> Serialise();
+
+
+        /// <summary> Rebuild the entity using the serialised object. </summary>
+        /// <param name="data"> A dictionary containing the key, value pairs that represent the entity's state. </param>
+        public void Deserialise(Godot.Collections.Dictionary<String, Variant> data);
     }
 }

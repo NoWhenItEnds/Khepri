@@ -1,4 +1,5 @@
 using Godot;
+using Godot.Collections;
 using Khepri.Entities.Actors;
 using Khepri.Resources;
 using Khepri.Resources.Devices;
@@ -8,8 +9,11 @@ using System;
 namespace Khepri.Entities.Devices
 {
     /// <summary> An entity that can be interacted with by a unit for a unique effect. </summary>
-    public abstract partial class DeviceNode : StaticBody3D, IEntity, IPoolable
+    public partial class DeviceNode : StaticBody3D, IEntity, IPoolable
     {
+        /// <inheritdoc/>
+        public UInt64 UId { get; private set; }
+
         /// <summary> The device's bounding shape. </summary>
         [ExportGroup("Nodes")]
         [Export] private CollisionShape3D _collisionShape;
@@ -38,7 +42,7 @@ namespace Khepri.Entities.Devices
         /// <param name="body"> A reference to the unit. </param>
         private void OnBodyEntered(Node3D body)
         {
-            if (body is Being unit)
+            if (body is ActorNode unit)
             {
                 unit.AddUsableEntity(this);
             }
@@ -49,7 +53,7 @@ namespace Khepri.Entities.Devices
         /// <param name="body"> A reference to the unit. </param>
         private void OnBodyExited(Node3D body)
         {
-            if (body is Being unit)
+            if (body is ActorNode unit)
             {
                 unit.RemoveUsableEntity(this);
             }
@@ -66,6 +70,16 @@ namespace Khepri.Entities.Devices
             _sprite.SpriteFrames = _resource.WorldSprites;
             _sprite.Play();
         }
+
+
+        /// <summary> The internal logic to use when the entity is examined. </summary>
+        /// <param name="activatingBeing"> A reference to the unit activating the action. </param>
+        public void Examine(ActorNode activatingBeing) => _resource.Examine(activatingBeing);
+
+
+        /// <summary> The internal logic to use when the entity is used. </summary>
+        /// <param name="activatingBeing"> A reference to the unit activating the action. </param>
+        public void Use(ActorNode activatingBeing) => _resource.Use(activatingBeing);
 
 
         /// <inheritdoc/>
@@ -90,17 +104,26 @@ namespace Khepri.Entities.Devices
         }
 
 
-        /// <summary> The internal logic to use when the entity is examined. </summary>
-        /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
-        public abstract void Examine(Being activatingEntity);
-
-
-        /// <summary> The internal logic to use when the entity is used. </summary>
-        /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
-        public abstract void Use(Being activatingEntity);
+        /// <inheritdoc/>
+        public void FreeObject() => throw new NotImplementedException();    // TODO - Implements.
 
 
         /// <inheritdoc/>
-        public void FreeObject() => throw new NotImplementedException();    // TODO - Implements.
+        public Dictionary<String, Variant> Serialise()
+        {
+            Dictionary<String, Variant> data = _resource.Serialise();
+            data.Add("uid", UId);
+            data.Add("position", GlobalPosition);
+            return data;
+        }
+
+
+        /// <inheritdoc/>
+        public void Deserialise(Dictionary<String, Variant> data)
+        {
+            UId = (UInt64)data["uid"];
+            GlobalPosition = (Vector3)data["position"];
+            _resource.Deserialise(data);
+        }
     }
 }

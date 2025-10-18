@@ -15,7 +15,7 @@ namespace Khepri.GOAP
     {
         /// <summary> The entity this controller is responsible for controlling. </summary>
         [ExportGroup("Nodes")]
-        [Export] private Being _controlledEntity;
+        [Export] private ActorNode _controlledEntity;
 
 
         /// <summary> The current goal the agent is trying to accomplish. </summary>
@@ -41,9 +41,6 @@ namespace Khepri.GOAP
         public HashSet<AgentAction> AvailableActions { get; private set; }
 
 
-        /// <summary> A reference to the player's controller. </summary>
-        private PlayerController _playerController;
-
         /// <summary> A reference to the game world's ui. </summary>
         private UIController _uiController;
 
@@ -54,16 +51,8 @@ namespace Khepri.GOAP
         /// <inheritdoc/>
         public override void _Ready()
         {
-            _playerController = PlayerController.Instance;
             _uiController = UIController.Instance;
             _planner = new AgentPlanner();
-
-            BeingResource? agentResource = ResourceController.Instance.CreateResource<BeingResource>("human");
-            if (agentResource == null)
-            {
-                throw new ArgumentNullException("The returned BeingResource is undefined. For some reason, you are missing a BeingResource with the 'human' id.");
-            }
-            _controlledEntity.Initialise(agentResource, _controlledEntity.GlobalPosition);
 
             InitialiseBeliefs();
             InitialiseActions();
@@ -82,15 +71,15 @@ namespace Khepri.GOAP
             factory.AddBelief("IsIdle", () => _controlledEntity.NavigationAgent.IsNavigationFinished());
             factory.AddBelief("IsMoving", () => !_controlledEntity.NavigationAgent.IsNavigationFinished());
 
-            BeingNeedsResource needs = _controlledEntity.GetResource<BeingResource>().Needs;
-            factory.AddBelief("IsHealthy", () => needs.CurrentHealth >= 90f);
-            factory.AddBelief("IsHurt", () => needs.CurrentHealth < 50);
-            factory.AddBelief("IsFed", () => needs.CurrentHunger >= 90f);
-            factory.AddBelief("IsHungry", () => needs.CurrentHunger < 50f);
-            factory.AddBelief("IsRested", () => needs.CurrentFatigue >= 90f);
-            factory.AddBelief("IsTired", () => needs.CurrentFatigue < 50f);
-            factory.AddBelief("IsEntertained", () => needs.CurrentEntertainment >= 90f);
-            factory.AddBelief("IsBored", () => needs.CurrentEntertainment < 50f);
+            BeingResource resource = _controlledEntity.GetResource<BeingResource>();
+            factory.AddBelief("IsHealthy", () => resource.CurrentHealth >= 90f);
+            factory.AddBelief("IsHurt", () => resource.CurrentHealth < 50);
+            factory.AddBelief("IsFed", () => resource.CurrentHunger >= 90f);
+            factory.AddBelief("IsHungry", () => resource.CurrentHunger < 50f);
+            factory.AddBelief("IsRested", () => resource.CurrentFatigue >= 90f);
+            factory.AddBelief("IsTired", () => resource.CurrentFatigue < 50f);
+            factory.AddBelief("IsEntertained", () => resource.CurrentEntertainment >= 90f);
+            factory.AddBelief("IsBored", () => resource.CurrentEntertainment < 50f);
 
             // TODO - Add belief packages. Such as food beliefs that contains both the Knows and Sees for the item.
             factory.AddKnownItemBelief("KnowsApple", "apple");

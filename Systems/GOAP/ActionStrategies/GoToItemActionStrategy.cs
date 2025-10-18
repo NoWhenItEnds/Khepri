@@ -18,7 +18,7 @@ namespace Khepri.GOAP.ActionStrategies
 
 
         /// <summary> A reference to the unit being manipulated. </summary>
-        private readonly Being _unit;
+        private readonly ActorNode _unit;
 
         /// <summary> The desired item's name or kind. </summary>
         private readonly String _itemKind;
@@ -27,7 +27,7 @@ namespace Khepri.GOAP.ActionStrategies
         /// <summary> Go to the know location of an item. </summary>
         /// <param name="unit"> A reference to the unit being manipulated. </param>
         /// <param name="itemKind"> The desired item's name or kind. </param>
-        public GoToItemActionStrategy(Being unit, String itemKind)
+        public GoToItemActionStrategy(ActorNode unit, String itemKind)
         {
             _unit = unit;
             _itemKind = itemKind;

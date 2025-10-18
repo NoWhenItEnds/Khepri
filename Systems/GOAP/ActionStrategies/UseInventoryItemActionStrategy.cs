@@ -1,4 +1,5 @@
 using Khepri.Entities.Actors;
+using Khepri.Resources.Actors;
 using Khepri.Resources.Items;
 using Khepri.Types.Exceptions;
 using System;
@@ -9,14 +10,14 @@ namespace Khepri.GOAP.ActionStrategies
     public partial class UseInventoryItemActionStrategy : IActionStrategy
     {
         /// <inheritdoc/>
-        public Boolean IsValid => _unit.Inventory.HasItem(_itemKind) > 0;
+        public Boolean IsValid => _unit.GetResource<BeingResource>().Inventory.HasItem(_itemKind) > 0;
 
         /// <inheritdoc/>
         public Boolean IsComplete { get; private set; } = false;
 
 
         /// <summary> A reference to the unit being manipulated. </summary>
-        private readonly Being _unit;
+        private readonly ActorNode _unit;
 
         /// <summary> The item's name or kind. </summary>
         private readonly String _itemKind;
@@ -25,7 +26,7 @@ namespace Khepri.GOAP.ActionStrategies
         /// <summary> Use an item in a unit's inventory. </summary>
         /// <param name="unit"> A reference to the unit being manipulated. </param>
         /// <param name="itemKind"> The desired item's name or kind. </param>
-        public UseInventoryItemActionStrategy(Being unit, String itemKind)
+        public UseInventoryItemActionStrategy(ActorNode unit, String itemKind)
         {
             _unit = unit;
             _itemKind = itemKind;
@@ -35,7 +36,7 @@ namespace Khepri.GOAP.ActionStrategies
         /// <inheritdoc/>
         public void Start()
         {
-            ItemResource[] items = _unit.Inventory.GetItem(_itemKind);
+            ItemResource[] items = _unit.GetResource<BeingResource>().Inventory.GetItem(_itemKind);
             if (items.Length > 0)
             {
                 ItemResource item = items[0];

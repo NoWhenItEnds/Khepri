@@ -107,19 +107,7 @@ namespace Khepri.UI.Windows
             _inventoryGrid.OffsetRight = _gridSize.Y * halfSize;
 
             // Get the items. We need to do this as a 'unique' check as a single item takes up multiple slots.
-            Dictionary<ItemResource, Vector2I> items = new Dictionary<ItemResource, Vector2I>();
-            for (Int32 x = 0; x < originInventory.InventorySize.X; x++)
-            {
-                for (Int32 y = 0; y < originInventory.InventorySize.Y; y++)
-                {
-                    ItemResource? item = originInventory.GetItem(x, y);
-                    if (item != null)
-                    {
-                        items.TryAdd(item, new Vector2I(x, y));
-                    }
-                }
-            }
-
+            Dictionary<ItemResource, Vector2I> items = originInventory.GetItems();
             foreach (KeyValuePair<ItemResource, Vector2I> item in items)
             {
                 CreateItem(item.Key, item.Value);

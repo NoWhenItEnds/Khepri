@@ -1,8 +1,8 @@
 using Godot;
 using Khepri.Controllers;
-using Khepri.Entities.Devices;
 using Khepri.Nodes.Extensions;
 using Khepri.Resources.Celestial;
+using Khepri.Resources.Devices;
 using Khepri.Types.Extensions;
 using System;
 using System.Collections.Generic;
@@ -59,7 +59,7 @@ namespace Khepri.UI.Windows
         private StarResource[][] _stars = Array.Empty<StarResource[]>();
 
         /// <summary> A reference to the telescope the player is currently using. </summary>
-        private Telescope? _currentTelescope = null;
+        private TelescopeResource? _currentTelescope = null;
 
         /// <summary> A reference to the game's world controller for latitude and longitude. </summary>
         private WorldController _worldController;
@@ -85,7 +85,7 @@ namespace Khepri.UI.Windows
 
         /// <summary> Initialise the window. </summary>
         /// <param name="telescope"> The telescope the window is attached to. </param>
-        public void Initialise(Telescope telescope)
+        public void Initialise(TelescopeResource telescope)
         {
             _currentTelescope = telescope;
         }

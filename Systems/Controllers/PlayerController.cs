@@ -2,7 +2,6 @@ using Godot;
 using Khepri.Entities;
 using Khepri.Entities.Actors;
 using Khepri.Nodes;
-using Khepri.Nodes.Singletons;
 using Khepri.Resources;
 using Khepri.Resources.Actors;
 using Khepri.Types.Extensions;
@@ -12,11 +11,11 @@ using System.Linq;
 namespace Khepri.Controllers
 {
     /// <summary> Allows the player to control an entity and the game world. </summary>
-    public partial class PlayerController : SingletonNode<PlayerController>
+    public partial class PlayerController : Node3D
     {
         /// <summary> The being representing the player's unit. </summary>
         [ExportGroup("Nodes")]
-        [Export] public Being PlayerBeing { get; private set; }
+        [Export] public ActorNode PlayerBeing { get; private set; }
 
         /// <summary> The current resource that the player is controlling. </summary>
         private IControllable _currentControllable;
@@ -47,13 +46,6 @@ namespace Khepri.Controllers
             _worldCamera = WorldCamera.Instance;
             _uiController = UIController.Instance;
 
-            // Set up initial state.
-            BeingResource? playerResource = ResourceController.Instance.CreateResource<BeingResource>("human");
-            if(playerResource == null)
-            {
-                throw new ArgumentNullException("The returned BeingResource is undefined. For some reason, you are missing a BeingResource with the 'human' id.");
-            }
-            PlayerBeing.Initialise(playerResource, PlayerBeing.GlobalPosition);
             _currentControllable = PlayerBeing;
             _worldCamera.SetTarget(PlayerBeing.CameraPosition);
             Input.MouseMode = Input.MouseModeEnum.ConfinedHidden;
@@ -138,6 +130,14 @@ namespace Khepri.Controllers
                 else if (@event.IsActionReleased("action_ui_down"))
                 {
                     _currentInteractableIndex = (Int32)MathExtensions.WrapValue(_currentInteractableIndex - 1, PlayerBeing.UsableEntities.Count);
+                }
+                else if (@event.IsActionReleased("action_quicksave"))
+                {
+                    WorldController.Instance.Save();
+                }
+                else if (@event.IsActionReleased("action_quickload"))
+                {
+                    WorldController.Instance.Load("user://save_game.dat");
                 }
             }
         }

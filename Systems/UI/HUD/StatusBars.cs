@@ -1,6 +1,8 @@
 using Godot;
 using Khepri.Controllers;
+using Khepri.Entities.Actors;
 using Khepri.Resources.Actors;
+using Khepri.Types.Exceptions;
 using Khepri.Types.Extensions;
 using System;
 using System.Linq;
@@ -33,26 +35,26 @@ namespace Khepri.UI.HUD
         [Export] private TextureRect _statusBarSlider;
 
 
-        /// <summary> A reference to the player controller. </summary>
-        private PlayerController _playerController;
+        /// <summary> A reference to the actor controller. </summary>
+        private ActorController _actorController;
 
 
         /// <inheritdoc/>
         public override void _Ready()
         {
-            _playerController = PlayerController.Instance;
+            _actorController = ActorController.Instance;
         }
 
 
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
-            BeingNeedsResource needs = _playerController.PlayerBeing.GetResource<BeingResource>().Needs;
-            _staminaBar.Value = needs.CurrentStamina;
-            _healthBar.Value = needs.CurrentHealth;
-            _hungerBar.Value = needs.CurrentHunger;
-            _fatigueBar.Value = needs.CurrentFatigue;
-            _entertainmentBar.Value = needs.CurrentEntertainment;
+            BeingResource resource = _actorController.GetPlayer().GetResource<BeingResource>();
+            _staminaBar.Value = resource.CurrentStamina;
+            _healthBar.Value = resource.CurrentHealth;
+            _hungerBar.Value = resource.CurrentHunger;
+            _fatigueBar.Value = resource.CurrentFatigue;
+            _entertainmentBar.Value = resource.CurrentEntertainment;
 
             TextureProgressBar highestNeed = OrderNeedsBars();
             Single sliderPosition = (Single)Mathf.Lerp(0f, 255f, highestNeed.Value / 100f) - 2f;    // Small offset to bring it inline.
@@ -82,7 +84,7 @@ namespace Khepri.UI.HUD
             }
             else
             {
-                throw new ArgumentOutOfRangeException("Unable to find a texture progress bar in the needs container.");
+                throw new UIException("Unable to find a texture progress bar in the needs container.");
             }
         }
 

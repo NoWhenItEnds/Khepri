@@ -13,7 +13,7 @@ namespace Khepri.Resources.Celestial
     public partial class StarResource : EntityResource, IComparable<StarResource>
     {
         /// <summary> A common name for the star, such as "Barnard's Star" or "Sirius". These are taken from the International Astronomical Union (https://www.iau.org/public/themes/naming_stars/, specifically, the formatted version from https://github.com/mirandadam/iau-starnames). </summary>
-        [ExportGroup("Statistics")]
+        [ExportGroup("Settings")]
         [Export] public String ProperName { get; set; }
 
         /// <summary> The star's ID in the Hipparcos catalog, if known. </summary>
@@ -59,6 +59,11 @@ namespace Khepri.Resources.Celestial
 
         /// <summary> The star's color index (blue magnitude - visual magnitude), where known. </summary>
         [Export] public Single ColourIndex { get; set; }
+
+
+        /// <summary> Whether the player has observed the star. </summary>
+        [ExportGroup("State")]
+        public Boolean HasBeenObserved { get; set; }
 
 
         /// <summary> The data component of a star entity. </summary>
@@ -154,6 +159,24 @@ namespace Khepri.Resources.Celestial
             }
 
             return new Color(r, g, b);
+        }
+
+
+        /// <inheritdoc/>
+        public override Godot.Collections.Dictionary<String, Variant> Serialise()
+        {
+            return new Godot.Collections.Dictionary<String, Variant>()
+            {
+                { "id", Id },
+                { "observed", HasBeenObserved }
+            };
+        }
+
+
+        /// <inheritdoc/>
+        public override void Deserialise(Godot.Collections.Dictionary<String, Variant> data)
+        {
+            HasBeenObserved = (Boolean)data["observed"];
         }
 
 

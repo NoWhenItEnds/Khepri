@@ -19,7 +19,7 @@ namespace Khepri.GOAP.ActionStrategies
         private readonly Random _random = new Random();
 
         /// <summary> A reference to the unit being manipulated. </summary>
-        private readonly Being _unit;
+        private readonly ActorNode _unit;
 
         /// <summary> The radius to choose a point to wander towards. </summary>
         private readonly Single _radius;
@@ -28,7 +28,7 @@ namespace Khepri.GOAP.ActionStrategies
         /// <summary> Wander randomly. Take in the scenery. </summary>
         /// <param name="unit"> A reference to the unit being manipulated. </param>
         /// <param name="radius"> The radius to choose a point to wander towards. </param>
-        public WanderActionStrategy(Being unit, Single radius)
+        public WanderActionStrategy(ActorNode unit, Single radius)
         {
             _unit = unit;
             _radius = radius;

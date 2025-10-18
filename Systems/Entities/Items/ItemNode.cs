@@ -1,6 +1,8 @@
 using Godot;
+using Godot.Collections;
 using Khepri.Entities.Actors;
 using Khepri.Resources;
+using Khepri.Resources.Actors;
 using Khepri.Resources.Items;
 using Khepri.Types;
 using System;
@@ -10,6 +12,9 @@ namespace Khepri.Entities.Items
     /// <summary> A node representing an item in the game world. </summary>
     public partial class ItemNode : StaticBody3D, IEntity, IPoolable
     {
+        /// <inheritdoc/>
+        public UInt64 UId { get; private set; }
+
         /// <summary> The item's bounding shape. </summary>
         [ExportGroup("Nodes")]
         [Export] private CollisionShape3D _collisionShape;
@@ -22,7 +27,7 @@ namespace Khepri.Entities.Items
 
 
         /// <summary> The data resource representing the device. </summary>
-        [ExportGroup("Statistics")]
+        [ExportGroup("Settings")]
         [Export] private ItemResource _resource;
 
 
@@ -44,7 +49,7 @@ namespace Khepri.Entities.Items
         /// <param name="body"> A reference to the unit. </param>
         private void OnBodyEntered(Node3D body)
         {
-            if (body is Being unit)
+            if (body is ActorNode unit)
             {
                 unit.AddUsableEntity(this);
             }
@@ -55,7 +60,7 @@ namespace Khepri.Entities.Items
         /// <param name="body"> A reference to the unit. </param>
         private void OnBodyExited(Node3D body)
         {
-            if (body is Being unit)
+            if (body is ActorNode unit)
             {
                 unit.RemoveUsableEntity(this);
             }
@@ -106,11 +111,11 @@ namespace Khepri.Entities.Items
 
 
         /// <inheritdoc/>
-        public void Examine(Being activatingEntity) => _resource.Examine(activatingEntity);
+        public void Examine(ActorNode activatingEntity) => _resource.Examine(activatingEntity);
 
 
         /// <inheritdoc/>
-        public void Use(Being activatingEntity)
+        public void Use(ActorNode activatingEntity)
         {
             _resource.Use(activatingEntity);
 
@@ -124,9 +129,9 @@ namespace Khepri.Entities.Items
 
         /// <summary> Attempt to grab the item and add it to the inventory. </summary>
         /// <param name="activatingEntity"> The unit attempting to grab the item. </param>
-        public void Grab(Being activatingEntity)
+        public void Grab(ActorNode activatingEntity)
         {
-            Boolean isSuccessful = activatingEntity.Inventory.TryAddItem(_resource);
+            Boolean isSuccessful = activatingEntity.GetResource<BeingResource>().Inventory.TryAddItem(_resource);
             if (isSuccessful)   // If the item was added, free it back to the pool.
             {
                 FreeObject();
@@ -136,5 +141,24 @@ namespace Khepri.Entities.Items
 
         /// <inheritdoc/>
         public void FreeObject() => _itemController.ItemPool.FreeObject(this);
+
+
+        /// <inheritdoc/>
+        public Dictionary<String, Variant> Serialise()
+        {
+            Dictionary<String, Variant> data = _resource.Serialise();
+            data.Add("uid", UId);
+            data.Add("position", GlobalPosition);
+            return data;
+        }
+
+
+        /// <inheritdoc/>
+        public void Deserialise(Dictionary<String, Variant> data)
+        {
+            UId = (UInt64)data["uid"];
+            GlobalPosition = (Vector3)data["position"];
+            _resource.Deserialise(data);
+        }
     }
 }

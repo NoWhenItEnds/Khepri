@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3 uid="uid://rc2326u6agtf"]
 
-[ext_resource type="Script" uid="uid://djimvajqu34qh" path="res://Systems/Entities/Actors/Being.cs" id="1_igitp"]
+[ext_resource type="Script" uid="uid://djimvajqu34qh" path="res://Systems/Entities/Actors/ActorNode.cs" id="1_igitp"]
 [ext_resource type="Script" uid="uid://ddi4d3d10ao2u" path="res://Systems/Entities/Actors/Components/SpriteComponent.cs" id="2_oq4pe"]
 [ext_resource type="SpriteFrames" uid="uid://dx5orqkv03mqp" path="res://Content/Resources/SpriteFrames/Actors/HumanF/SpriteFrame_Actor_HumanF_Base.tres" id="3_2si40"]
 [ext_resource type="Script" uid="uid://cd2hrmpbnnupp" path="res://Systems/Entities/Actors/Components/Sensors/SightSensor.cs" id="4_8qol3"]
@@ -13,7 +13,7 @@ height = 0.45
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_jo3tn"]
 radius = 10.0
 
-[node name="Being" type="CharacterBody3D" node_paths=PackedStringArray("_collisionShape", "NavigationAgent", "CameraPosition", "VisibilityNotifier", "Sprite", "Sensors")]
+[node name="Actor" type="CharacterBody3D" node_paths=PackedStringArray("_collisionShape", "NavigationAgent", "CameraPosition", "VisibilityNotifier", "Sprite", "Sensors")]
 axis_lock_angular_x = true
 axis_lock_angular_y = true
 axis_lock_angular_z = true

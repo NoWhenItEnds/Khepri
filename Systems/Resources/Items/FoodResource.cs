@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using Godot.Collections;
 using Khepri.Entities.Actors;
 using Khepri.Resources.Actors;
 
@@ -10,7 +11,7 @@ namespace Khepri.Resources.Items
     public partial class FoodResource : ItemResource
     {
         /// <summary> The amount of a unit's health the item recovers. </summary>
-        [ExportGroup("Statistics")]
+        [ExportGroup("Settings")]
         [Export] public Single HealthRecovery { get; private set; }
 
         /// <summary> The amount of a unit's hunger the item recovers. </summary>
@@ -22,7 +23,9 @@ namespace Khepri.Resources.Items
         /// <summary> The amount of a unit's entertainment the item recovers. </summary>
         [Export] public Single EntertainmentRecovery { get; private set; }
 
+
         /// <summary> The number of portions the item has remaining. </summary>
+        [ExportGroup("State")]
         [Export] public Int32 Portions { get; private set; }
 
 
@@ -31,22 +34,33 @@ namespace Khepri.Resources.Items
 
 
         /// <inheritdoc/>
-        public override void Examine(Being activatingEntity)
+        public override void Use(ActorNode activatingEntity)
         {
-            throw new NotImplementedException();
+            BeingResource resource = activatingEntity.GetResource<BeingResource>();
+            resource.UpdateHealth(HealthRecovery);
+            resource.UpdateHunger(HungerRecovery);
+            resource.UpdateFatigue(FatigueRecovery);
+            resource.UpdateEntertainment(EntertainmentRecovery);
+
+            Portions -= 1;  // TODO - It should queue free.
         }
 
 
         /// <inheritdoc/>
-        public override void Use(Being activatingEntity)
+        public override Dictionary<String, Variant> Serialise()
         {
-            BeingNeedsResource needs = activatingEntity.GetResource<BeingResource>().Needs;
-            needs.UpdateHealth(HealthRecovery);
-            needs.UpdateHunger(HungerRecovery);
-            needs.UpdateFatigue(FatigueRecovery);
-            needs.UpdateEntertainment(EntertainmentRecovery);
+            return new Dictionary<String, Variant>()
+            {
+                { "id", Id },
+                { "portions", Portions }
+            };
+        }
 
-            Portions -= 1;  // TODO - It should queue free.
+
+        /// <inheritdoc/>
+        public override void Deserialise(Dictionary<String, Variant> data)
+        {
+            Portions = (Int32)data["portions"];
         }
     }
 }

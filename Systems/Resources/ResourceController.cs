@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Godot;
 using Khepri.Nodes.Singletons;
+using Khepri.Types.Exceptions;
 
 namespace Khepri.Resources
 {
@@ -68,12 +69,16 @@ namespace Khepri.Resources
         /// <summary> Create an instance of an entity resource of the given kind. </summary>
         /// <typeparam name="T"> The type of resource to generate. </typeparam>
         /// <param name="id"> The specific id or common name of the resource. </param>
-        /// <returns> The generated resource, or a null if one couldn't be found. </returns>
-        public T? CreateResource<T>(String id) where T : EntityResource
+        /// <returns> The generated resource. </returns>
+        /// <exception cref="ResourceException"> If the given id couldn't be found. </exception>
+        public T CreateResource<T>(String id) where T : EntityResource
         {
             Resource? resource = _resources.FirstOrDefault(x => x is T entity && entity.Id == id) ?? null;
-            if (resource != null) { return (T)resource.DuplicateDeep(); }
-            else { return null; }
+            if(resource == null)
+            {
+                throw new ResourceException($"Unable to create a new instance of the resource with the id {id}.");
+            }
+            return (T)resource.DuplicateDeep();
         }
     }
 }

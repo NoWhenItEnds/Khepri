@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Godot;
 using Khepri.Entities.Items;
 
-namespace Khepri.Entities.Actors.Components.States
+namespace Khepri.Entities.Actors.States
 {
     /// <summary> An event that triggers a transition in the state machine. </summary>
     public enum StateEvent
@@ -17,29 +16,25 @@ namespace Khepri.Entities.Actors.Components.States
 
 
     /// <summary> A state machine for being states. </summary>
-    public partial class BeingStateMachine : Resource
+    public class ActorStateMachine
     {
         /// <summary> A reference to the being controlled by the state. </summary>
-        private Being _being;
+        private ActorNode _being;
 
         /// <summary> The current state of the state machine. </summary>
-        public BeingState CurrentState { get; private set; }
+        public ActorState CurrentState { get; private set; }
 
 
         /// <summary> The default state to transition to if the state machine finds an invalid value. </summary>
-        private BeingState _defaultState;
+        private ActorState _defaultState;
 
         /// <summary> All the possible states the state machine can transition to. </summary>
-        private HashSet<BeingState> _states = new HashSet<BeingState>();
+        private HashSet<ActorState> _states = new HashSet<ActorState>();
 
 
         /// <summary> A state machine for being states. </summary>
-        public BeingStateMachine() { }
-
-
-        /// <summary> Initialise the resource. </summary>
         /// <param name="being"> A reference to the being controlled by the state. </param>
-        public void Initialise(Being being)
+        public ActorStateMachine(ActorNode being)
         {
             _being = being;
 

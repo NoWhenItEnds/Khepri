@@ -1,20 +1,11 @@
 using Godot;
-using System;
+using Khepri.Entities.Actors;
 
 namespace Khepri.Resources.Devices
 {
     /// <summary> The data component of a device entity. </summary>
-    [GlobalClass]
-    public partial class DeviceResource : EntityResource
+    public abstract partial class DeviceResource : EntityResource
     {
-        /// <summary> An array of descriptions for the given device. </summary>
-        [ExportGroup("General")]
-        [Export] public String[] Descriptions { get; private set; }
-
-        /// <summary> The prefab used to spawn this device. </summary>
-        [Export] public PackedScene Prefab { get; private set; }
-
-
         /// <summary> A reference to the sprites the device uses in the world. </summary>
         [ExportGroup("Sprites")]
         [Export] public SpriteFrames WorldSprites { get; private set; }
@@ -22,5 +13,10 @@ namespace Khepri.Resources.Devices
 
         /// <summary> The data component of a device entity. </summary>
         public DeviceResource() { }
+
+
+        /// <summary> Use the device. </summary>
+        /// <param name="activatingBeing"> The being activating the action. </param>
+        public abstract void Use(ActorNode activatingBeing);
     }
 }

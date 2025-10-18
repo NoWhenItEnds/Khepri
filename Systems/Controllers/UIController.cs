@@ -1,7 +1,9 @@
 using System;
 using Godot;
-using Khepri.Entities.Devices;
+using Khepri.Entities.Actors;
 using Khepri.Nodes.Singletons;
+using Khepri.Resources.Actors;
+using Khepri.Resources.Devices;
 using Khepri.UI.HUD;
 using Khepri.UI.HUD.Interaction;
 using Khepri.UI.HUD.SpeechBubbles;
@@ -39,15 +41,9 @@ namespace Khepri.Controllers
         public Boolean IsWindowOpen { get; private set; } = false;
 
 
-        /// <summary> A reference to the player controller. </summary>
-        private PlayerController _playerController;
-
-
         /// <inheritdoc/>
         public override void _Ready()
         {
-            _playerController = PlayerController.Instance;
-
             ShowWindow(WindowType.NONE);
         }
 
@@ -61,7 +57,7 @@ namespace Khepri.Controllers
                 case WindowType.INVENTORY:
                     ToggleHUD(false);
                     _inventoryWindow.Visible = true;
-                    _inventoryWindow.Initialise(_playerController.PlayerBeing.Inventory);
+                    _inventoryWindow.Initialise(ActorController.Instance.GetPlayer().GetResource<BeingResource>().Inventory);
                     break;
                 default:
                     ToggleHUD(true);
@@ -74,7 +70,7 @@ namespace Khepri.Controllers
 
         /// <summary> Show the telescope window to represent the view of a telescope. </summary>
         /// <param name="telescope"> A reference to the triggering telescope. </param>
-        public void ShowTelescope(Telescope telescope)
+        public void ShowTelescope(TelescopeResource telescope)
         {
             ToggleHUD(false);
             _telescopeWindow.Visible = true;

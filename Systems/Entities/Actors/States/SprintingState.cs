@@ -3,10 +3,10 @@ using Godot;
 using Khepri.Resources.Actors;
 using Khepri.Types;
 
-namespace Khepri.Entities.Actors.Components.States
+namespace Khepri.Entities.Actors.States
 {
     /// <summary> The being is moving quickly along the ground. </summary>
-    public class SprintingState : BeingState
+    public class SprintingState : ActorState
     {
         /// <inheritdoc/>
         public override String AnimationPrefix { get; } = "Walk_";  // TODO - Make sprinting animations.
@@ -14,7 +14,7 @@ namespace Khepri.Entities.Actors.Components.States
 
         /// <summary> The being is moving quickly along the ground. </summary>
         /// <param name="being"> A reference to the being. </param>
-        public SprintingState(Being being) : base(being) { }
+        public SprintingState(ActorNode being) : base(being) { }
 
 
         /// <inheritdoc/>
@@ -22,8 +22,8 @@ namespace Khepri.Entities.Actors.Components.States
         {
             if (input is MoveInput move)
             {
-                BeingNeedsResource needs = _being.GetResource<BeingResource>().Needs;
-                _being.Velocity = move.Direction * needs.BaseSpeed * needs.SprintModifier;
+                BeingResource resource = _being.GetResource<BeingResource>();
+                _being.Velocity = move.Direction * resource.BaseSpeed * resource.SprintModifier;
                 _being.Sprite.TransitionAnimation(this, move.Direction.ToDirection());
             }
         }

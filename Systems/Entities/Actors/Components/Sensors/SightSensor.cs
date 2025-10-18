@@ -81,7 +81,7 @@ namespace Khepri.Entities.Actors.Components.Sensors
                         }
 
                         trackedObject?.SetIsVisible(true);
-                        trackedObject?.UpdateLastKnownPosition();
+                        trackedObject?.UpdateLastKnownPosition(current.GetWorldPosition());
                     }
                     else    // If the entity is hidden.
                     {

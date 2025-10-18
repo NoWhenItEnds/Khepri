@@ -1,5 +1,6 @@
 using Godot;
 using Khepri.Entities.Actors;
+using Khepri.Resources.Actors;
 using Khepri.Resources.Items;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace Khepri.GOAP
     public class BeliefFactory
     {
         /// <summary> A reference to the unit who the beliefs are associated with. </summary>
-        private readonly Being _unit;
+        private readonly ActorNode _unit;
 
         /// <summary> The array of current beliefs. </summary>
         private readonly Dictionary<String, AgentBelief> _beliefs;
@@ -20,7 +21,7 @@ namespace Khepri.GOAP
         /// <summary> Construct beliefs on an industrial scale. </summary>
         /// <param name="unit"> A reference to the decision-making agent. </param>
         /// <param name="beliefs"> The array of current beliefs. </param>
-        public BeliefFactory(Being unit, Dictionary<String, AgentBelief> beliefs)
+        public BeliefFactory(ActorNode unit, Dictionary<String, AgentBelief> beliefs)
         {
             _unit = unit;
             _beliefs = beliefs;
@@ -66,7 +67,7 @@ namespace Khepri.GOAP
         public void AddInventoryBelief(String key, String kind)
         {
             _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => _unit.Inventory.HasItem(kind) > 0)
+                .WithCondition(() => _unit.GetResource<BeingResource>().Inventory.HasItem(kind) > 0)
                 .Build());
         }
 
@@ -77,7 +78,7 @@ namespace Khepri.GOAP
         public void AddInventoryBelief(String key, ItemResource resource)
         {
             _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => _unit.Inventory.HasItem(resource))
+                .WithCondition(() => _unit.GetResource<BeingResource>().Inventory.HasItem(resource))
                 .Build());
         }
 
