@@ -81,7 +81,7 @@ namespace Khepri.UI.Windows.Components
         public Vector2I CalculatePosition(Vector2 position)
         {
             Vector2 relativePosition = (position - GlobalPosition) / CELL_SIZE;
-            return new Vector2I((Int32)Mathf.Clamp(relativePosition.X, 0, GridSize.X - 1), (Int32)Mathf.Clamp(relativePosition.Y, 0, GridSize.Y - 1));
+            return new Vector2I((Int32)relativePosition.X, (Int32)relativePosition.Y);
         }
     }
 }

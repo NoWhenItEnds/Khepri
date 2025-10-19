@@ -3,7 +3,6 @@ using Khepri.Entities.Actors;
 using Khepri.Entities.Items;
 using Khepri.Resources.Items;
 using Khepri.Types;
-using Khepri.Types.Exceptions;
 using Khepri.UI.Windows.Components;
 using System;
 using System.Collections.Generic;
@@ -148,9 +147,11 @@ namespace Khepri.UI.Windows
                         {
                             _currentSelection += direction;
                         }
-                        _currentSelection = _currentSelection.Clamp(Vector2I.Zero, _inventoryGrid.GridSize - Vector2I.One);
                     }
                 }
+
+                // Clamp the selection to the grid.
+                _currentSelection = _currentSelection.Clamp(Vector2I.Zero, _inventoryGrid.GridSize - Vector2I.One);
 
                 // Check if we've landed on an object, and need to move to its top left corner.
                 InventoryItem? currentItem = _inventoryGrid.GetInventoryItem(_currentSelection);

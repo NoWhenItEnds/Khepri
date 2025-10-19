@@ -124,6 +124,76 @@ namespace Khepri.UI.Windows
         }
 
 
+        /// <inheritdoc/>
+        public override void _Input(InputEvent @event)
+        {
+            if (Visible && _currentGrid != null)
+            {
+                if (@event is InputEventMouseMotion mouseEvent) // Allow the mouse to move / override the current selection.
+                {
+                    _currentSelection = _currentGrid.CalculatePosition(mouseEvent.GlobalPosition);
+                }
+                else
+                {
+                    if (Input.IsActionJustPressed("action_ui_accept"))
+                    {
+                        PickupItem(_currentGrid.GetInventoryItem(_currentSelection));
+                    }
+                    else if (@event.IsActionReleased("action_ui_cancel"))
+                    {
+                        DropItem(_currentGrid.GetInventoryItem(_currentSelection));
+                    }
+
+                    // Move the cursor.
+                    Int32 moveHorizontal =
+                        (@event.IsActionPressed("action_ui_left") ? -1 : 0) +
+                        (@event.IsActionPressed("action_ui_right") ? 1 : 0);
+                    Int32 moveVertical =
+                        (@event.IsActionPressed("action_ui_up") ? -1 : 0) +
+                        (@event.IsActionPressed("action_ui_down") ? 1 : 0);
+                    Vector2I direction = new Vector2I(moveHorizontal, moveVertical);
+                    if (direction != Vector2I.Zero)
+                    {
+                        // Check how far to move from the current position.
+                        InventoryItem? item = _currentGrid.GetInventoryItem(_currentSelection);
+                        if (item != null)
+                        {
+                            Vector2I itemSize = item.GetResource<ItemResource>().GetSize();  // We only need to apply the size if we're going 'forwards', not 'backwards' as the position for a large object will be the top-left.
+                            _currentSelection += direction * new Vector2I(direction.X > 0 ? itemSize.X : 1, direction.Y > 0 ? itemSize.Y : 1);
+                        }
+                        else
+                        {
+                            _currentSelection += direction;
+                        }
+                    }
+                }
+
+                // Allow to move between inventory grids.
+                if (_currentGrid == _playerGrid && _currentSelection.X >= _playerGrid.GridSize.X)
+                {
+                    _currentGrid = _storageGrid;
+                    _currentSelection = new Vector2I(0, _currentSelection.Y);
+                }
+                else if (_currentGrid == _storageGrid && _currentSelection.X < 0)
+                {
+                    _currentGrid = _playerGrid;
+                    _currentSelection = new Vector2I(_playerGrid.GridSize.X - 1, _currentSelection.Y);
+                }
+
+                // Clamp the selection to the grid.
+                _currentSelection = _currentSelection.Clamp(Vector2I.Zero, _currentGrid.GridSize - Vector2I.One);
+
+                // Check if we've landed on an object, and need to move to its top left corner.
+                InventoryItem? currentItem = _currentGrid.GetInventoryItem(_currentSelection);
+                if (currentItem != null)
+                {
+                    _currentSelection = currentItem.CellPosition;
+                }
+                QueueRedraw();
+            }
+        }
+
+
         /// <summary> Pickup / place the given item. </summary>
         /// <param name="item"> The item to manipulate, or null if an empty position was selected. </param>
         private void PickupItem(InventoryItem? item)
@@ -154,6 +224,40 @@ namespace Khepri.UI.Windows
                 Vector3 playerPosition = ActorController.Instance.GetPlayer().GlobalPosition;
                 ItemController.Instance.CreateItem(item.GetResource<ItemResource>(), playerPosition);
                 item.FreeObject();
+            }
+        }
+
+
+        /// <inheritdoc/>
+        public override void _Draw()
+        {
+            if (Visible && _currentGrid != null)
+            {
+                Int32 cellSize = InventoryGrid.CELL_SIZE;
+
+                // This relies upon the sort order of this and the grid texture being manually set.
+                Vector2 start = _currentGrid.Position + (_currentSelection * cellSize);
+
+                Vector2 size = Vector2.One * cellSize;
+                ItemResource? currentItem = _currentGrid.Inventory?.GetItem(_currentSelection);
+                if (currentItem != null)
+                {
+                    size = currentItem.GetSize() * cellSize;
+                }
+
+                Rect2 selectionRect = new Rect2(start.X, start.Y, size.X, size.Y);
+                DrawRect(selectionRect, Colors.BlueViolet, false, 8f);
+            }
+        }
+
+
+        /// <inheritdoc/>
+        public override void _PhysicsProcess(Double delta)
+        {
+            // If we have a held object, update its position.
+            if (_currentHeldItem != null && _currentGrid != null)
+            {
+                _currentHeldItem.GlobalPosition = _currentGrid.CalculatePosition(_currentSelection);
             }
         }
 

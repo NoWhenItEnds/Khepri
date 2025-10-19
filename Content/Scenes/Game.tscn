@@ -832,6 +832,7 @@ layout_mode = 1
 anchors_preset = 8
 
 [node name="Storage Transfer" type="Control" parent="UI/Windows" node_paths=PackedStringArray("_playerGrid", "_storageGrid")]
+z_index = 1
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
