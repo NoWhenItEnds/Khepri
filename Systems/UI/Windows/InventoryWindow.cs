@@ -1,4 +1,5 @@
 using Godot;
+using Khepri.Entities.Actors;
 using Khepri.Entities.Items;
 using Khepri.Resources.Items;
 using Khepri.Types;
@@ -41,7 +42,7 @@ namespace Khepri.UI.Windows
             ItemPool = new ObjectPool<InventoryItem>(this, _inventoryItemPrefab);
             foreach (InventoryItem item in ItemPool.GetAllObjects())
             {
-                item.Spawn(this);
+                item.Spawn(ItemPool);
                 item.ItemPressed += PickupItem;
             }
 
@@ -67,7 +68,8 @@ namespace Khepri.UI.Windows
             //  Return a held item back to its position.
             if (_currentHeldItem != null)
             {
-                _currentHeldItem.PlaceItem(_currentHeldItem.CellPosition);
+                Boolean isAdded = _currentHeldItem.TryPlaceItem(_inventoryGrid, _currentHeldItem.CellPosition);
+                if(!isAdded) { DropItem(_currentHeldItem); }
                 _currentHeldItem = null;
             }
 
@@ -107,7 +109,7 @@ namespace Khepri.UI.Windows
             }
 
             InventoryItem item = ItemPool.GetAvailableObject();
-            item.Initialise(resource, _inventoryGrid.Inventory, position);
+            item.Initialise(_inventoryGrid, resource, position);
             return item;
         }
 
@@ -146,7 +148,7 @@ namespace Khepri.UI.Windows
                     }
                     else if (@event.IsActionReleased("action_ui_cancel"))
                     {
-                        DropItem();
+                        DropItem(_inventoryGrid.GetInventoryItem(_currentSelection));
                     }
 
                     // Move the cursor.
@@ -185,12 +187,13 @@ namespace Khepri.UI.Windows
         }
 
 
-        /// <summary> Pickup / place the currently selected item. </summary>
+        /// <summary> Pickup / place the given item. </summary>
+        /// <param name="item"> The item to manipulate, or null if an empty position was selected. </param>
         private void PickupItem(InventoryItem? item)
         {
             if (_currentHeldItem == null)
             {
-                if(item != null)
+                if (item != null)
                 {
                     _currentHeldItem = item;
                     _currentHeldItem.GrabItem();
@@ -198,27 +201,22 @@ namespace Khepri.UI.Windows
             }
             else
             {
-                _currentHeldItem.PlaceItem(_currentSelection);
+                Boolean isAdded = _currentHeldItem.TryPlaceItem(_inventoryGrid, _currentSelection);
+                if (!isAdded) { DropItem(_currentHeldItem); }
                 _currentHeldItem = null;
             }
         }
 
 
-        /// <summary> Drop / cancel the grab of the currently held item. </summary>
-        private void DropItem()
+        /// <summary> Drop / cancel the grab of the given item. </summary>
+        /// <param name="item"> The item to manipulate, or null if an empty position was selected. </param>
+        private void DropItem(InventoryItem? item)
         {
-            if (_currentHeldItem != null)   // Return the item back to its previous position in the inventory.
+            if(item != null)
             {
-                _currentHeldItem.PlaceItem(_currentHeldItem.CellPosition);
-                _currentHeldItem = null;
-            }
-            else                            // Drop the item from the inventory.
-            {
-                InventoryItem? item = _inventoryGrid.GetInventoryItem(_currentSelection);
-                if (item != null)
-                {
-                    item.DropItem();
-                }
+                Vector3 playerPosition = ActorController.Instance.GetPlayer().GlobalPosition;
+                ItemController.Instance.CreateItem(item.GetResource<ItemResource>(), playerPosition);
+                item.FreeObject();
             }
         }
 

@@ -13,10 +13,10 @@ namespace Khepri.UI.Windows.Components
     {
         /// <summary> A reference to the entity's inventory this grid represents. </summary>
         /// <remarks> A null indicates that one isn't currently set. </remarks>
-        public EntityInventory? Inventory = null;
+        public EntityInventory? Inventory { get; private set; } = null;
 
         /// <summary> The number of cells in the inventory. </summary>
-        public Vector2I GridSize = Vector2I.One;
+        public Vector2I GridSize { get; private set; } = Vector2I.One;
 
 
         /// <summary> A reference to the window's item pool. </summary>

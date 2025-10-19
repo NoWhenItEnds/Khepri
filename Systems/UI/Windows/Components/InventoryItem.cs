@@ -1,9 +1,8 @@
 using Godot;
-using Khepri.Entities.Actors;
-using Khepri.Entities.Items;
 using Khepri.Resources;
 using Khepri.Resources.Items;
 using Khepri.Types;
+using Khepri.Types.Exceptions;
 using System;
 
 namespace Khepri.UI.Windows.Components
@@ -22,23 +21,20 @@ namespace Khepri.UI.Windows.Components
         /// <inheritdoc/>
         private ItemResource _resource;
 
-        /// <summary> A reference to the window this item is parented to. </summary>
-        private InventoryWindow _window;
+        /// <summary> A reference to the item pool the entity is a part of. </summary>
+        private ObjectPool<InventoryItem> _itemPool;
 
-        /// <summary> A reference to the inventory this item is a part of. </summary>
-        private EntityInventory _inventory;
-
-
-        /// <summary> If the item it currently being held. </summary>
-        private Boolean _isGrabbed = false;
+        /// <summary> A reference to the inventory grid this item represents. </summary>
+        /// <remarks> A null means that it is dangling. </remarks>
+        private InventoryGrid? _grid = null;
 
 
-        /// <summary> Called when the entity is first spawned. Handles its initial setup. </summary>
-        /// <param name="window"> A reference to the parent window. </param>
-        public void Spawn(InventoryWindow window)
+        /// <summary> Spawn the item and set its initial values. </summary>
+        /// <param name="itemPool"> A reference to the item pool the entity is a part of. </param>
+        public void Spawn(ObjectPool<InventoryItem> itemPool)
         {
+            _itemPool = itemPool;
             ButtonDown += OnButtonDown;
-            _window = window;
         }
 
 
@@ -48,15 +44,15 @@ namespace Khepri.UI.Windows.Components
 
         /// <summary> Create the inventory item by settings its internal variables. </summary>
         /// <param name="resource"> The raw item data used to build the item. </param>
-        /// <param name="inventory"> The inventory the item is currently in. </param>
+        /// <param name="grid"> A reference to the inventory grid this item represents. </param>
         /// <param name="cellPosition"> The position of the item's top-left position. </param>
-        public void Initialise(ItemResource resource, EntityInventory inventory, Vector2I cellPosition)
+        public void Initialise(InventoryGrid grid, ItemResource resource, Vector2I cellPosition)
         {
+            SetGrid(grid);
             _resource = resource;
             CellPosition = cellPosition;
-            SetInventory(inventory);
 
-            GlobalPosition = _window.CalculatePosition(cellPosition);
+            GlobalPosition = grid.CalculatePosition(cellPosition);
             SetSprite(resource);
             Modulate = Colors.White;
             TextureClickMask = BuildClickMask(resource);
@@ -64,70 +60,52 @@ namespace Khepri.UI.Windows.Components
         }
 
 
-        /// <summary> Set which inventory the item represents. </summary>
-        /// <param name="inventory"> The inventory the item is currently in. </param>
-        public void SetInventory(EntityInventory inventory)
+        /// <summary> Set which grid the item represents. </summary>
+        /// <param name="grid"> A reference to the inventory grid this item represents. </param>
+        public void SetGrid(InventoryGrid grid)
         {
-            _inventory = inventory;
+            _grid = grid;
         }
 
 
         /// <summary> Pick the item up in the inventory. </summary>
+        /// <exception cref="UIException"> If the set grid is invalid. </exception>
         public void GrabItem()
         {
-            _isGrabbed = true;
-            _inventory.RemoveItem(_resource);
+            if (_grid == null || _grid.Inventory == null)
+            {
+                throw new UIException("When calling this method, it should have a reference to a grid and an inventory.");
+            }
+
+            _grid.Inventory.RemoveItem(_resource);
             Modulate = new Color(1, 1, 1, 0.5f);    // Make it transparent to easily see the object being grabbed.
+            _grid = null;   // As the item has been removed from the inventory, it no longer has a grid.
         }
 
 
-        /// <summary> Return a grabbed item to the inventory. </summary>
+        /// <summary> Attempt to return a grabbed item to AN inventory. </summary>
+        /// <param name="grid"> A reference to the inventory grid to add this item to. </param>
         /// <param name="cellPosition"> The position to put the item. </param>
-        public void PlaceItem(Vector2I cellPosition)
+        /// <returns> Whether the item was added to the inventory. </returns>
+        /// <exception cref="UIException"> If the given grid is invalid. </exception>
+        public Boolean TryPlaceItem(InventoryGrid grid, Vector2I cellPosition)
         {
-            _isGrabbed = false;
-            Modulate = Colors.White;  // Fix the object's transparency.
+            if (grid.Inventory == null)
+            {
+                throw new UIException("When calling this method, the given grid should have a reference to an inventory.");
+            }
 
-            Boolean isAdded = _inventory.TryAddItem(_resource, cellPosition);
+            Boolean isAdded = grid.Inventory.TryAddItem(_resource, cellPosition);
 
             // If the item was added, update its position.
             if (isAdded)
             {
+                _grid = grid;
+                Modulate = Colors.White;  // Fix the object's transparency.
                 CellPosition = cellPosition;
-                GlobalPosition = _window.CalculatePosition(cellPosition);
+                GlobalPosition = _grid.CalculatePosition(cellPosition);
             }
-            else    // Snap it back to its previous position.
-            {
-                Boolean isReturned = _inventory.TryAddItem(_resource, CellPosition);
-                if (isReturned)
-                {
-                    GlobalPosition = _window.CalculatePosition(CellPosition);   // Use the previously remembered cell position.
-                }
-                else    // If it couldn't be returned, for whatever reason, drop it.
-                {
-                    DropItem();
-                }
-            }
-        }
-
-
-        /// <summary> Drop the item at the player's feet. </summary>
-        public void DropItem()
-        {
-            _inventory.RemoveItem(_resource);
-            Vector3 playerPosition = ActorController.Instance.GetPlayer().GlobalPosition;
-            ItemController.Instance.CreateItem(_resource, playerPosition);
-            FreeObject();
-        }
-
-
-        /// <inheritdoc/>
-        public override void _PhysicsProcess(Double delta)
-        {
-            if (_isGrabbed) // Move the item to follow the current selection.
-            {
-                GlobalPosition = _window.SelectionPosition;
-            }
+            return isAdded;
         }
 
 
@@ -182,6 +160,6 @@ namespace Khepri.UI.Windows.Components
 
 
         /// <inheritdoc/>
-        public void FreeObject() => _window.ItemPool.FreeObject(this);
+        public void FreeObject() => _itemPool.FreeObject(this);
     }
 }
