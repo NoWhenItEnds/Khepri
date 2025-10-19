@@ -1,4 +1,4 @@
-[gd_scene load_steps=49 format=3 uid="uid://ko6nvcupfcf4"]
+[gd_scene load_steps=50 format=3 uid="uid://ko6nvcupfcf4"]
 
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="Script" uid="uid://cgujt8yhxbsew" path="res://Systems/Controllers/WorldController.cs" id="1_8fov1"]
@@ -40,6 +40,7 @@
 [ext_resource type="Material" uid="uid://b3aob0eitxdfa" path="res://Content/Materials/Celestial/Material_Celestial_Starfield.tres" id="28_5lwn5"]
 [ext_resource type="Material" uid="uid://cxosp5fguv4vd" path="res://Content/Materials/Material_Telescope_Vignette.tres" id="28_dt3xa"]
 [ext_resource type="Material" uid="uid://c1uwl4bmhj4bd" path="res://Content/Materials/Material_Telescope_Crosshair.tres" id="33_4buj1"]
+[ext_resource type="Script" uid="uid://dgcvqfi1l4hf6" path="res://Systems/UI/Windows/Components/InventoryGrid.cs" id="35_1ohqm"]
 
 [sub_resource type="Environment" id="Environment_gh1u3"]
 
@@ -841,8 +842,15 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("20_pt5vb")
 stretch_mode = 1
+script = ExtResource("35_1ohqm")
+
+[node name="Storage Transfer" type="Control" parent="UI/Windows"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
 
 [node name="Telescope" type="Control" parent="UI/Windows" node_paths=PackedStringArray("_helperCamera", "_lookAzimuth", "_lookAltitude", "_lookRightAscension", "_lookDeclination", "_starId", "_starProperName", "_starRightAscension", "_starDeclination")]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

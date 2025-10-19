@@ -11,12 +11,16 @@ namespace Khepri.UI.Windows.Components
     /// <summary> An inventory item in an inventory grid. </summary>
     public partial class InventoryItem : TextureButton, IPoolable
     {
+        /// <summary> An event that is triggered when the item is interacted with. </summary>
+        public event Action<InventoryItem> ItemPressed;
+
+
         /// <summary> The position of the item's top-left position. </summary>
         public Vector2I CellPosition { get; private set; }
 
+
         /// <inheritdoc/>
         private ItemResource _resource;
-
 
         /// <summary> A reference to the window this item is parented to. </summary>
         private InventoryWindow _window;
@@ -29,23 +33,42 @@ namespace Khepri.UI.Windows.Components
         private Boolean _isGrabbed = false;
 
 
+        /// <summary> Called when the entity is first spawned. Handles its initial setup. </summary>
+        /// <param name="window"> A reference to the parent window. </param>
+        public void Spawn(InventoryWindow window)
+        {
+            ButtonDown += OnButtonDown;
+            _window = window;
+        }
+
+
+        /// <summary> When the button is interacted with, let the window know. </summary>
+        private void OnButtonDown() => ItemPressed?.Invoke(this);
+
+
         /// <summary> Create the inventory item by settings its internal variables. </summary>
-        /// <param name="window"> A reference to the window this item is parented to. </param>
         /// <param name="resource"> The raw item data used to build the item. </param>
         /// <param name="inventory"> The inventory the item is currently in. </param>
         /// <param name="cellPosition"> The position of the item's top-left position. </param>
-        public void Initialise(InventoryWindow window, ItemResource resource, EntityInventory inventory, Vector2I cellPosition)
+        public void Initialise(ItemResource resource, EntityInventory inventory, Vector2I cellPosition)
         {
             _resource = resource;
             CellPosition = cellPosition;
-            _window = window;
-            _inventory = inventory;
+            SetInventory(inventory);
 
-            GlobalPosition = window.CalculatePosition(cellPosition);
+            GlobalPosition = _window.CalculatePosition(cellPosition);
             SetSprite(resource);
             Modulate = Colors.White;
             TextureClickMask = BuildClickMask(resource);
             Name = resource.Id;
+        }
+
+
+        /// <summary> Set which inventory the item represents. </summary>
+        /// <param name="inventory"> The inventory the item is currently in. </param>
+        public void SetInventory(EntityInventory inventory)
+        {
+            _inventory = inventory;
         }
 
 
@@ -113,7 +136,7 @@ namespace Khepri.UI.Windows.Components
         private void SetSprite(ItemResource resource)
         {
             TextureNormal = resource.InventorySprite;
-            Size = resource.GetSize() * InventoryWindow.CELL_SIZE;
+            Size = resource.GetSize() * InventoryGrid.CELL_SIZE;
         }
 
 
@@ -125,7 +148,7 @@ namespace Khepri.UI.Windows.Components
             Bitmap mask = new Bitmap();
             mask.Create((Vector2I)Size);
 
-            Int32 cellSize = InventoryWindow.CELL_SIZE;
+            Int32 cellSize = InventoryGrid.CELL_SIZE;
             foreach (Vector2I point in resource.InventoryCells)
             {
                 for (Int32 x = point.X * cellSize; x < (point.X + 1) * cellSize; x++)
