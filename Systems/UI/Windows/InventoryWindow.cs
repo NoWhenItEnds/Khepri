@@ -25,9 +25,6 @@ namespace Khepri.UI.Windows
         /// <summary> A pool of instantiated items to pull from first. </summary>
         public ObjectPool<InventoryItem> ItemPool { get; private set; }
 
-        /// <summary> Get the current selection's position on the screen. </summary>
-        public Vector2 SelectionPosition => _inventoryGrid.CalculatePosition(_currentSelection);
-
 
         /// <summary> The currently selected grid cell. </summary>
         private Vector2I _currentSelection = Vector2I.Zero;
@@ -92,43 +89,22 @@ namespace Khepri.UI.Windows
             Dictionary<ItemResource, Vector2I> items = playerInventory.GetItems();
             foreach (KeyValuePair<ItemResource, Vector2I> item in items)
             {
-                CreateItem(item.Key, item.Value);
+                CreateItem(_inventoryGrid, item.Key, item.Value);
             }
         }
 
 
         /// <summary> Initialise a new item by pulling from the pool. </summary>
+        /// <param name="grid"> The grid to spawn the item into. </param>
         /// <param name="resource"> The data to initialise the item with. </param>
         /// <param name="position"> The cell position to create the object at. This is the object's top-left corner. </param>
         /// <returns> The initialised item. </returns>
-        private InventoryItem CreateItem(ItemResource resource, Vector2I position)
+        private InventoryItem CreateItem(InventoryGrid grid, ItemResource resource, Vector2I position)
         {
-            if(_inventoryGrid == null || _inventoryGrid.Inventory == null)
-            {
-                throw new UIException("The inventory should have been initialised before calling this method.");
-            }
-
             InventoryItem item = ItemPool.GetAvailableObject();
-            item.Initialise(_inventoryGrid, resource, position);
+            item.Initialise(grid, resource, position);
             return item;
         }
-
-
-        /// <summary> Dispose of an item, returning it back to the item pool. </summary>
-        /// <param name="item"> The item to dispose. </param>
-        public void RemoveItem(InventoryItem item) => ItemPool.FreeObject(item);
-
-
-        /// <summary> Calculate the screen position of a given cell coordinate. </summary>
-        /// <param name="position"> The cell coordinate. </param>
-        /// <returns> The screen position of the cell's top left corner.</returns>
-        public Vector2 CalculatePosition(Vector2I position) => _inventoryGrid.CalculatePosition(position);
-
-
-        /// <summary> Calculate the grid coordinate a given screen position. </summary>
-        /// <param name="position"> The screen coordinate. </param>
-        /// <returns> The cell coordinate of the cell's top left corner.</returns>
-        public Vector2I CalculatePosition(Vector2 position) => _inventoryGrid.CalculatePosition(position);
 
 
         /// <inheritdoc/>

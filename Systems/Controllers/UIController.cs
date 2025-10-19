@@ -1,6 +1,7 @@
 using System;
 using Godot;
 using Khepri.Entities.Actors;
+using Khepri.Entities.Items;
 using Khepri.Nodes.Singletons;
 using Khepri.Resources.Actors;
 using Khepri.Resources.Devices;
@@ -33,6 +34,9 @@ namespace Khepri.Controllers
         [ExportSubgroup("Windows")]
         [Export] private InventoryWindow _inventoryWindow;
 
+        /// <summary> A reference to the inventory to storage transfer window element. </summary>
+        [Export] private StorageTransferWindow _storageWindow;
+
         /// <summary> A window used to show the telescope's view. </summary>
         [Export] private TelescopeWindow _telescopeWindow;
 
@@ -62,9 +66,20 @@ namespace Khepri.Controllers
                 default:
                     ToggleHUD(true);
                     _inventoryWindow.Visible = false;
+                    _storageWindow.Visible = false;
                     _telescopeWindow.Visible = false;
                     break;
             }
+        }
+
+
+        /// <summary> Show the storage transfer window to allow the player to transfer items. </summary>
+        /// <param name="storageInventory"> A reference to the triggering storage inventory. </param>
+        public void ShowInventoryTransfer(EntityInventory storageInventory)
+        {
+            ToggleHUD(false);
+            _storageWindow.Visible = true;
+            _storageWindow.Initialise(ActorController.Instance.GetPlayer().GetResource<BeingResource>().Inventory, storageInventory);
         }
 
 

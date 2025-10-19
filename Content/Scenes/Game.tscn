@@ -31,7 +31,6 @@
 [ext_resource type="Resource" uid="uid://dipd2ay6fla8a" path="res://Data/Actors/Actor_Being_Human.tres" id="19_ckrvs"]
 [ext_resource type="PackedScene" uid="uid://dg53cc06rwfo5" path="res://Content/Prefabs/UI/HUD/Components/SpeechBubbleItem.tscn" id="19_kx5lk"]
 [ext_resource type="Script" uid="uid://vuqou0rktkpf" path="res://Systems/UI/Windows/InventoryWindow.cs" id="20_dulfu"]
-[ext_resource type="Texture2D" uid="uid://cykmv0wmfypeq" path="res://Content/Textures/UI/Windows/Inventory/Inventory_Grid_Tile.png" id="20_pt5vb"]
 [ext_resource type="Script" uid="uid://0jc0v8s8grx2" path="res://Systems/UI/HUD/Interaction/InteractionMenu.cs" id="21_gl22v"]
 [ext_resource type="PackedScene" uid="uid://bu7yeu1aonvto" path="res://Content/Prefabs/UI/Windows/Components/InventoryItem.tscn" id="22_0itj2"]
 [ext_resource type="Script" uid="uid://d3kcgr1eohghu" path="res://Systems/UI/Debug/Units/DebugUnitWindow.cs" id="25_rvbhf"]
@@ -40,7 +39,8 @@
 [ext_resource type="Material" uid="uid://b3aob0eitxdfa" path="res://Content/Materials/Celestial/Material_Celestial_Starfield.tres" id="28_5lwn5"]
 [ext_resource type="Material" uid="uid://cxosp5fguv4vd" path="res://Content/Materials/Material_Telescope_Vignette.tres" id="28_dt3xa"]
 [ext_resource type="Material" uid="uid://c1uwl4bmhj4bd" path="res://Content/Materials/Material_Telescope_Crosshair.tres" id="33_4buj1"]
-[ext_resource type="Script" uid="uid://dgcvqfi1l4hf6" path="res://Systems/UI/Windows/Components/InventoryGrid.cs" id="35_1ohqm"]
+[ext_resource type="PackedScene" uid="uid://cdc3b2m6hwqss" path="res://Content/Prefabs/UI/Windows/Components/InventoryGrid.tscn" id="34_xoxxo"]
+[ext_resource type="Script" uid="uid://ff1v5y2vre5a" path="res://Systems/UI/Windows/StorageTransferWindow.cs" id="35_1ohqm"]
 
 [sub_resource type="Environment" id="Environment_gh1u3"]
 
@@ -608,7 +608,7 @@ _resource = ExtResource("19_ckrvs")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.065, 0, -0.318)
 _resource = ExtResource("19_ckrvs")
 
-[node name="UI" type="Control" parent="." node_paths=PackedStringArray("_speechBubbles", "_astrolabe", "_statusBars", "_interactionMenu", "_inventoryWindow", "_telescopeWindow")]
+[node name="UI" type="Control" parent="." node_paths=PackedStringArray("_speechBubbles", "_astrolabe", "_statusBars", "_interactionMenu", "_inventoryWindow", "_storageWindow", "_telescopeWindow")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -621,6 +621,7 @@ _astrolabe = NodePath("HUD/Astrolabe")
 _statusBars = NodePath("HUD/Status Bars")
 _interactionMenu = NodePath("HUD/Interaction Menu")
 _inventoryWindow = NodePath("Windows/Inventory")
+_storageWindow = NodePath("Windows/Storage Transfer")
 _telescopeWindow = NodePath("Windows/Telescope")
 
 [node name="HUD" type="Control" parent="UI"]
@@ -826,28 +827,33 @@ script = ExtResource("20_dulfu")
 _inventoryItemPrefab = ExtResource("22_0itj2")
 _inventoryGrid = NodePath("InventoryGrid")
 
-[node name="InventoryGrid" type="TextureRect" parent="UI/Windows/Inventory"]
-z_as_relative = false
+[node name="InventoryGrid" parent="UI/Windows/Inventory" instance=ExtResource("34_xoxxo")]
 layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -16.0
-offset_top = -16.0
-offset_right = 16.00003
-offset_bottom = 16.0
+anchors_preset = 8
+
+[node name="Storage Transfer" type="Control" parent="UI/Windows" node_paths=PackedStringArray("_playerGrid", "_storageGrid")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("20_pt5vb")
-stretch_mode = 1
 script = ExtResource("35_1ohqm")
+_inventoryItemPrefab = ExtResource("22_0itj2")
+_playerGrid = NodePath("Player Grid")
+_storageGrid = NodePath("Storage Grid")
 
-[node name="Storage Transfer" type="Control" parent="UI/Windows"]
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="Player Grid" parent="UI/Windows/Storage Transfer" instance=ExtResource("34_xoxxo")]
+layout_mode = 1
+anchor_left = 0.25
+anchor_right = 0.25
+grow_horizontal = 1
+
+[node name="Storage Grid" parent="UI/Windows/Storage Transfer" instance=ExtResource("34_xoxxo")]
+layout_mode = 1
+anchor_left = 0.75
+anchor_right = 0.75
+grow_horizontal = 0
 
 [node name="Telescope" type="Control" parent="UI/Windows" node_paths=PackedStringArray("_helperCamera", "_lookAzimuth", "_lookAltitude", "_lookRightAscension", "_lookDeclination", "_starId", "_starProperName", "_starRightAscension", "_starDeclination")]
 visible = false

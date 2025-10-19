@@ -1,5 +1,6 @@
 using Godot;
 using Godot.Collections;
+using Khepri.Controllers;
 using Khepri.Entities.Actors;
 using Khepri.Entities.Items;
 using System;
@@ -29,7 +30,14 @@ namespace Khepri.Resources.Devices
         /// <inheritdoc/>
         public override void Use(ActorNode activatingBeing)
         {
-            throw new NotImplementedException();
+            if (activatingBeing == ActorController.Instance.GetPlayer())
+            {
+                UIController.Instance.ShowInventoryTransfer(Inventory);
+            }
+            else
+            {
+                // TODO - Let AI get items out.
+            }
         }
 
 
