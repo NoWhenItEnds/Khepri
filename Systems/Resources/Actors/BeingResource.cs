@@ -56,11 +56,15 @@ namespace Khepri.Resources.Actors
         /// <summary> A reference to the actor's inventory component. </summary>
         public EntityInventory Inventory { get; private set; }
 
+        /// <summary> A reference to the actor's equipment component. </summary>
+        public EntityEquipment Equipment { get; private set; }
+
 
         /// <summary> The data component for a living creature within the game world. </summary>
         public BeingResource()
         {
             Inventory = new EntityInventory(InventorySize);
+            Equipment = new EntityEquipment();
         }
 
 
