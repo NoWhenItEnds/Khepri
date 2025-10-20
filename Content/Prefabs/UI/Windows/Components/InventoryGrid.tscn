@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://cdc3b2m6hwqss"]
+
+[ext_resource type="Texture2D" uid="uid://cykmv0wmfypeq" path="res://Content/Textures/UI/Windows/Inventory/Inventory_Grid_Tile.png" id="1_i6jvm"]
+[ext_resource type="Script" uid="uid://dgcvqfi1l4hf6" path="res://Systems/UI/Windows/Components/InventoryGrid.cs" id="2_y25h2"]
+
+[node name="InventoryGrid" type="TextureRect"]
+z_as_relative = false
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.00003
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_i6jvm")
+stretch_mode = 1
+script = ExtResource("2_y25h2")

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="StorageResource" load_steps=3 format=3 uid="uid://dnbfvjmqsoiai"]
+
+[ext_resource type="SpriteFrames" uid="uid://dx5orqkv03mqp" path="res://Content/Resources/SpriteFrames/Actors/HumanF/SpriteFrame_Actor_HumanF_Base.tres" id="1_323mx"]
+[ext_resource type="Script" uid="uid://c6dgo0xfi2nlh" path="res://Systems/Resources/Devices/StorageResource.cs" id="1_gi2j3"]
+
+[resource]
+script = ExtResource("1_gi2j3")
+WorldSprites = ExtResource("1_323mx")
+Id = "device_storage_chest"
+metadata/_custom_type_script = "uid://c6dgo0xfi2nlh"

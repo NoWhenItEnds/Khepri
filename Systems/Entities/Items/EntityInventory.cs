@@ -14,9 +14,6 @@ namespace Khepri.Entities.Items
         /// <summary> The dimensions of the inventory's grid. </summary>
         public readonly Vector2I InventorySize;
 
-        /// <summary> An event that is triggered when the inventory has been altered. </summary>
-        public event Action InventoryUpdated;
-
 
         /// <summary> The items being stored in the entity's inventory. </summary>
         private ItemResource[,] _storedItems;
@@ -119,7 +116,6 @@ namespace Khepri.Entities.Items
                     if (GetItem(x, y) == item)
                     {
                         _storedItems[x, y] = null;
-                        InventoryUpdated?.Invoke();
                     }
                 }
             }

@@ -56,11 +56,15 @@ namespace Khepri.Resources.Actors
         /// <summary> A reference to the actor's inventory component. </summary>
         public EntityInventory Inventory { get; private set; }
 
+        /// <summary> A reference to the actor's equipment component. </summary>
+        public EntityEquipment Equipment { get; private set; }
+
 
         /// <summary> The data component for a living creature within the game world. </summary>
         public BeingResource()
         {
             Inventory = new EntityInventory(InventorySize);
+            Equipment = new EntityEquipment();
         }
 
 
@@ -124,6 +128,7 @@ namespace Khepri.Resources.Actors
         public override Dictionary<String, Variant> Serialise()
         {
             Dictionary<Vector2I, Dictionary<String, Variant>> inventory = Inventory.Serialise();
+            Dictionary<String, Dictionary<String, Variant>> equipment = Equipment.Serialise();
             return new Dictionary<String, Variant>()
             {
                 { "id", Id },
@@ -132,7 +137,8 @@ namespace Khepri.Resources.Actors
                 { "fatigue", CurrentFatigue },
                 { "entertainment", CurrentEntertainment },
                 { "stamina", CurrentStamina },
-                { "inventory", inventory }
+                { "inventory", inventory },
+                { "equipment", equipment }
             };
         }
 
@@ -146,6 +152,7 @@ namespace Khepri.Resources.Actors
             CurrentEntertainment = (Single)data["entertainment"];
             CurrentStamina = (Single)data["stamina"];
             Inventory.Deserialise((Dictionary<Vector2I, Dictionary<String, Variant>>)data["inventory"]);
+            Equipment.Deserialise((Dictionary<String, Dictionary<String, Variant>>)data["equipment"]);
         }
     }
 }

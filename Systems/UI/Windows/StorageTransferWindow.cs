@@ -9,8 +9,8 @@ using System.Collections.Generic;
 
 namespace Khepri.UI.Windows
 {
-    /// <summary> A window allowing access to an entity's inventory. </summary>
-    public partial class InventoryWindow : Control
+    /// <summary> The window used for transferring items from one inventory to another. </summary>
+    public partial class StorageTransferWindow : Control
     {
         /// <summary> The prefab to use when spawning item buttons. </summary>
         [ExportGroup("Prefabs")]
@@ -18,7 +18,10 @@ namespace Khepri.UI.Windows
 
         /// <summary> A reference to the player's inventory grid. </summary>
         [ExportGroup("Nodes")]
-        [Export] private InventoryGrid _inventoryGrid;
+        [Export] private InventoryGrid _playerGrid;
+
+        /// <summary> A reference to the grid of the storage object the player is interacting with. </summary>
+        [Export] private InventoryGrid _storageGrid;
 
 
         /// <summary> A pool of instantiated items to pull from first. </summary>
@@ -27,6 +30,9 @@ namespace Khepri.UI.Windows
 
         /// <summary> The currently selected grid cell. </summary>
         private Vector2I _currentSelection = Vector2I.Zero;
+
+        /// <summary> The grid the player is currently interacting with. </summary>
+        private InventoryGrid? _currentGrid = null;
 
         /// <summary> A reference to the currently grabbed item. </summary>
         private InventoryItem? _currentHeldItem = null;
@@ -50,10 +56,13 @@ namespace Khepri.UI.Windows
         /// <summary> Update the window when the size changes. </summary>
         private void OnSizeChanged()
         {
-            InventoryItem[] activeItems = ItemPool.GetActiveObjects();
-            foreach (InventoryItem item in activeItems)
+            if(_currentGrid != null)
             {
-                item.GlobalPosition = _inventoryGrid.CalculatePosition(item.CellPosition);
+                InventoryItem[] activeItems = ItemPool.GetActiveObjects();
+                foreach (InventoryItem item in activeItems)
+                {
+                    item.GlobalPosition = _currentGrid.CalculatePosition(item.CellPosition);
+                }
             }
         }
 
@@ -64,8 +73,8 @@ namespace Khepri.UI.Windows
             //  Return a held item back to its position.
             if (_currentHeldItem != null)
             {
-                Boolean isAdded = _currentHeldItem.TryPlaceItem(_inventoryGrid, _currentHeldItem.CellPosition);
-                if(!isAdded) { DropItem(_currentHeldItem); }
+                Boolean isAdded = _currentHeldItem.TryPlaceItem(_currentGrid, _currentHeldItem.CellPosition);
+                if (!isAdded) { DropItem(_currentHeldItem); }
                 _currentHeldItem = null;
             }
 
@@ -79,16 +88,25 @@ namespace Khepri.UI.Windows
 
         /// <summary> Initialise the window by referencing an entity's inventory. </summary>
         /// <param name="playerInventory"> The controlled entity's inventory. </param>
-        public void Initialise(EntityInventory playerInventory)
+        public void Initialise(EntityInventory playerInventory, EntityInventory storageInventory)
         {
-            _inventoryGrid.Initialise(playerInventory, ItemPool);
+            _playerGrid.Initialise(playerInventory, ItemPool);
+            _storageGrid.Initialise(storageInventory, ItemPool);
+            _currentGrid = _playerGrid;
             _currentSelection = Vector2I.Zero;
 
-            // Get the items. We need to do this as a 'unique' check as a single item takes up multiple slots.
-            Dictionary<ItemResource, Vector2I> items = playerInventory.GetItems();
-            foreach (KeyValuePair<ItemResource, Vector2I> item in items)
+            // Get the items in the player inventory.
+            Dictionary<ItemResource, Vector2I> playerItems = playerInventory.GetItems();
+            foreach (KeyValuePair<ItemResource, Vector2I> item in playerItems)
             {
-                CreateItem(_inventoryGrid, item.Key, item.Value);
+                CreateItem(_playerGrid, item.Key, item.Value);
+            }
+
+            // Get the items in the storage inventory.
+            Dictionary<ItemResource, Vector2I> storageItems = storageInventory.GetItems();
+            foreach (KeyValuePair<ItemResource, Vector2I> item in storageItems)
+            {
+                CreateItem(_storageGrid, item.Key, item.Value);
             }
         }
 
@@ -109,21 +127,21 @@ namespace Khepri.UI.Windows
         /// <inheritdoc/>
         public override void _Input(InputEvent @event)
         {
-            if (Visible)
+            if (Visible && _currentGrid != null)
             {
                 if (@event is InputEventMouseMotion mouseEvent) // Allow the mouse to move / override the current selection.
                 {
-                    _currentSelection = _inventoryGrid.CalculatePosition(mouseEvent.GlobalPosition);
+                    _currentSelection = _currentGrid.CalculatePosition(mouseEvent.GlobalPosition);
                 }
                 else
                 {
                     if (Input.IsActionJustPressed("action_ui_accept"))
                     {
-                        PickupItem(_inventoryGrid.GetInventoryItem(_currentSelection));
+                        PickupItem(_currentGrid.GetInventoryItem(_currentSelection));
                     }
                     else if (@event.IsActionReleased("action_ui_cancel"))
                     {
-                        DropItem(_inventoryGrid.GetInventoryItem(_currentSelection));
+                        DropItem(_currentGrid.GetInventoryItem(_currentSelection));
                     }
 
                     // Move the cursor.
@@ -137,7 +155,7 @@ namespace Khepri.UI.Windows
                     if (direction != Vector2I.Zero)
                     {
                         // Check how far to move from the current position.
-                        InventoryItem? item = _inventoryGrid.GetInventoryItem(_currentSelection);
+                        InventoryItem? item = _currentGrid.GetInventoryItem(_currentSelection);
                         if (item != null)
                         {
                             Vector2I itemSize = item.GetResource<ItemResource>().GetSize();  // We only need to apply the size if we're going 'forwards', not 'backwards' as the position for a large object will be the top-left.
@@ -150,11 +168,23 @@ namespace Khepri.UI.Windows
                     }
                 }
 
+                // Allow to move between inventory grids.
+                if (_currentGrid == _playerGrid && _currentSelection.X >= _playerGrid.GridSize.X)
+                {
+                    _currentGrid = _storageGrid;
+                    _currentSelection = new Vector2I(0, _currentSelection.Y);
+                }
+                else if (_currentGrid == _storageGrid && _currentSelection.X < 0)
+                {
+                    _currentGrid = _playerGrid;
+                    _currentSelection = new Vector2I(_playerGrid.GridSize.X - 1, _currentSelection.Y);
+                }
+
                 // Clamp the selection to the grid.
-                _currentSelection = _currentSelection.Clamp(Vector2I.Zero, _inventoryGrid.GridSize - Vector2I.One);
+                _currentSelection = _currentSelection.Clamp(Vector2I.Zero, _currentGrid.GridSize - Vector2I.One);
 
                 // Check if we've landed on an object, and need to move to its top left corner.
-                InventoryItem? currentItem = _inventoryGrid.GetInventoryItem(_currentSelection);
+                InventoryItem? currentItem = _currentGrid.GetInventoryItem(_currentSelection);
                 if (currentItem != null)
                 {
                     _currentSelection = currentItem.CellPosition;
@@ -178,7 +208,7 @@ namespace Khepri.UI.Windows
             }
             else
             {
-                Boolean isAdded = _currentHeldItem.TryPlaceItem(_inventoryGrid, _currentSelection);
+                Boolean isAdded = _currentHeldItem.TryPlaceItem(_currentGrid, _currentSelection);
                 if (!isAdded) { DropItem(_currentHeldItem); }
                 _currentHeldItem = null;
             }
@@ -189,7 +219,7 @@ namespace Khepri.UI.Windows
         /// <param name="item"> The item to manipulate, or null if an empty position was selected. </param>
         private void DropItem(InventoryItem? item)
         {
-            if(item != null)
+            if (item != null)
             {
                 Vector3 playerPosition = ActorController.Instance.GetPlayer().GlobalPosition;
                 ItemController.Instance.CreateItem(item.GetResource<ItemResource>(), playerPosition);
@@ -201,15 +231,15 @@ namespace Khepri.UI.Windows
         /// <inheritdoc/>
         public override void _Draw()
         {
-            if (Visible)
+            if (Visible && _currentGrid != null)
             {
                 Int32 cellSize = InventoryGrid.CELL_SIZE;
 
                 // This relies upon the sort order of this and the grid texture being manually set.
-                Vector2 start = _inventoryGrid.Position + (_currentSelection * cellSize);
+                Vector2 start = _currentGrid.Position + (_currentSelection * cellSize);
 
                 Vector2 size = Vector2.One * cellSize;
-                ItemResource? currentItem = _inventoryGrid.Inventory?.GetItem(_currentSelection);
+                ItemResource? currentItem = _currentGrid.Inventory?.GetItem(_currentSelection);
                 if (currentItem != null)
                 {
                     size = currentItem.GetSize() * cellSize;
@@ -225,9 +255,9 @@ namespace Khepri.UI.Windows
         public override void _PhysicsProcess(Double delta)
         {
             // If we have a held object, update its position.
-            if (_currentHeldItem != null)
+            if (_currentHeldItem != null && _currentGrid != null)
             {
-                _currentHeldItem.GlobalPosition = _inventoryGrid.CalculatePosition(_currentSelection);
+                _currentHeldItem.GlobalPosition = _currentGrid.CalculatePosition(_currentSelection);
             }
         }
 
