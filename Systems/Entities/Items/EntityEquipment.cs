@@ -1,5 +1,9 @@
+using Godot;
+using Khepri.Resources;
 using Khepri.Resources.Items;
+using Khepri.Types.Exceptions;
 using System;
+using System.Collections.Generic;
 
 namespace Khepri.Entities.Items
 {
@@ -147,5 +151,79 @@ namespace Khepri.Entities.Items
         /// <summary> Get the tool that is currently equipped. </summary>
         /// <returns> Returns a reference to the current tool. A null indicates open hands. </returns>
         public ToolResource? GetCurrentTool() => Tools[_currentToolIndex];
+
+
+        /// <summary> Package the equipment's state for saving. </summary>
+        /// <returns> The state packaged as key value pairs. </returns>
+        public Godot.Collections.Dictionary<String, Godot.Collections.Dictionary<String, Variant>> Serialise()
+        {
+            Godot.Collections.Dictionary<String, Godot.Collections.Dictionary<String, Variant>> data = new Godot.Collections.Dictionary<String, Godot.Collections.Dictionary<String, Variant>>();
+            if (Outfit != null)
+            {
+                data.Add("outfit", Outfit.Serialise());
+            }
+
+            for (Int32 i = 0; i < Accessories.Length; i++)
+            {
+                AccessoryResource? accessory = Accessories[i];
+                if (accessory != null)
+                {
+                    data.Add($"accessory_{i}", accessory.Serialise());
+                }
+            }
+
+            for (Int32 i = 0; i < Tools.Length; i++)
+            {
+                ToolResource? tool = Tools[i];
+                if (tool != null)
+                {
+                    data.Add($"tool_{i}", tool.Serialise());
+                }
+            }
+
+            return data;
+        }
+
+
+        /// <summary> Unpackage the stored data to reconstruct the equipment. </summary>
+        /// <param name="data"> The packed data needing unpacking. </param>
+        public void Deserialise(Godot.Collections.Dictionary<String, Godot.Collections.Dictionary<String, Variant>> data)
+        {
+            ResourceController resourceController = ResourceController.Instance;
+            foreach (KeyValuePair<String, Godot.Collections.Dictionary<String, Variant>> item in data)
+            {
+                if (item.Value.TryGetValue("id", out Variant id))
+                {
+                    String[] key = item.Key.Split('_', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    if(Int32.TryParse(key[1], out Int32 index))
+                    {
+                        switch(key[0])
+                        {
+                            case "outfit":
+                                OutfitResource outfit = resourceController.CreateResource<OutfitResource>((String)id);
+                                outfit.Deserialise(item.Value);
+                                SetOutfit(outfit);
+                                break;
+                            case "accessory":
+                                AccessoryResource accessory = resourceController.CreateResource<AccessoryResource>((String)id);
+                                accessory.Deserialise(item.Value);
+                                SetAccessory(accessory, index);
+                                break;
+                            case "tool":
+                                ToolResource tool = resourceController.CreateResource<ToolResource>((String)id);
+                                tool.Deserialise(item.Value);
+                                SetTool(tool, index);
+                                break;
+                            default:
+                                throw new ItemException($"The equipment could not deserialise an item with the key prefix '{key[0]}'.");
+                        }
+                    }
+                }
+                else
+                {
+                    throw new ItemException("Every item needs an 'id' field. I just tried to deserialise an equipment item without one.");
+                }
+            }
+        }
     }
 }

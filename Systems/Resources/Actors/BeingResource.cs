@@ -128,6 +128,7 @@ namespace Khepri.Resources.Actors
         public override Dictionary<String, Variant> Serialise()
         {
             Dictionary<Vector2I, Dictionary<String, Variant>> inventory = Inventory.Serialise();
+            Dictionary<String, Dictionary<String, Variant>> equipment = Equipment.Serialise();
             return new Dictionary<String, Variant>()
             {
                 { "id", Id },
@@ -136,7 +137,8 @@ namespace Khepri.Resources.Actors
                 { "fatigue", CurrentFatigue },
                 { "entertainment", CurrentEntertainment },
                 { "stamina", CurrentStamina },
-                { "inventory", inventory }
+                { "inventory", inventory },
+                { "equipment", equipment }
             };
         }
 
@@ -150,6 +152,7 @@ namespace Khepri.Resources.Actors
             CurrentEntertainment = (Single)data["entertainment"];
             CurrentStamina = (Single)data["stamina"];
             Inventory.Deserialise((Dictionary<Vector2I, Dictionary<String, Variant>>)data["inventory"]);
+            Equipment.Deserialise((Dictionary<String, Dictionary<String, Variant>>)data["equipment"]);
         }
     }
 }
