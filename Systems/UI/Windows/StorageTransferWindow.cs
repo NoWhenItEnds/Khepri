@@ -1,7 +1,7 @@
 using Godot;
+using Khepri.Data.Items;
 using Khepri.Entities.Actors;
 using Khepri.Entities.Items;
-using Khepri.Resources.Items;
 using Khepri.Types;
 using Khepri.UI.Windows.Components;
 using System;
@@ -96,15 +96,15 @@ namespace Khepri.UI.Windows
             _currentSelection = Vector2I.Zero;
 
             // Get the items in the player inventory.
-            Dictionary<ItemResource, Vector2I> playerItems = playerInventory.GetItems();
-            foreach (KeyValuePair<ItemResource, Vector2I> item in playerItems)
+            Dictionary<ItemData, Vector2I> playerItems = playerInventory.GetItems();
+            foreach (KeyValuePair<ItemData, Vector2I> item in playerItems)
             {
                 CreateItem(_playerGrid, item.Key, item.Value);
             }
 
             // Get the items in the storage inventory.
-            Dictionary<ItemResource, Vector2I> storageItems = storageInventory.GetItems();
-            foreach (KeyValuePair<ItemResource, Vector2I> item in storageItems)
+            Dictionary<ItemData, Vector2I> storageItems = storageInventory.GetItems();
+            foreach (KeyValuePair<ItemData, Vector2I> item in storageItems)
             {
                 CreateItem(_storageGrid, item.Key, item.Value);
             }
@@ -116,7 +116,7 @@ namespace Khepri.UI.Windows
         /// <param name="resource"> The data to initialise the item with. </param>
         /// <param name="position"> The cell position to create the object at. This is the object's top-left corner. </param>
         /// <returns> The initialised item. </returns>
-        private InventoryItem CreateItem(InventoryGrid grid, ItemResource resource, Vector2I position)
+        private InventoryItem CreateItem(InventoryGrid grid, ItemData resource, Vector2I position)
         {
             InventoryItem item = ItemPool.GetAvailableObject();
             item.Initialise(grid, resource, position);
@@ -158,7 +158,7 @@ namespace Khepri.UI.Windows
                         InventoryItem? item = _currentGrid.GetInventoryItem(_currentSelection);
                         if (item != null)
                         {
-                            Vector2I itemSize = item.GetResource<ItemResource>().GetSize();  // We only need to apply the size if we're going 'forwards', not 'backwards' as the position for a large object will be the top-left.
+                            Vector2I itemSize = item.GetData<ItemData>().GetSize();  // We only need to apply the size if we're going 'forwards', not 'backwards' as the position for a large object will be the top-left.
                             _currentSelection += direction * new Vector2I(direction.X > 0 ? itemSize.X : 1, direction.Y > 0 ? itemSize.Y : 1);
                         }
                         else
@@ -222,7 +222,7 @@ namespace Khepri.UI.Windows
             if (item != null)
             {
                 Vector3 playerPosition = ActorController.Instance.GetPlayer().GlobalPosition;
-                ItemController.Instance.CreateItem(item.GetResource<ItemResource>(), playerPosition);
+                ItemController.Instance.CreateItem(item.GetData<ItemData>(), playerPosition);
                 item.FreeObject();
             }
         }
@@ -239,7 +239,7 @@ namespace Khepri.UI.Windows
                 Vector2 start = _currentGrid.Position + (_currentSelection * cellSize);
 
                 Vector2 size = Vector2.One * cellSize;
-                ItemResource? currentItem = _currentGrid.Inventory?.GetItem(_currentSelection);
+                ItemData? currentItem = _currentGrid.Inventory?.GetItem(_currentSelection);
                 if (currentItem != null)
                 {
                     size = currentItem.GetSize() * cellSize;

@@ -1,5 +1,5 @@
+using Khepri.Data.Actors;
 using Khepri.Entities.Actors;
-using Khepri.Resources.Actors;
 using System;
 
 namespace Khepri.GOAP.ActionStrategies
@@ -8,7 +8,7 @@ namespace Khepri.GOAP.ActionStrategies
     public partial class UseDeviceNodeActionStrategy : IActionStrategy
     {
         /// <inheritdoc/>
-        public Boolean IsValid => _unit.GetResource<BeingResource>().Inventory.HasItem(_deviceKind) > 0;
+        public Boolean IsValid => _unit.GetData<BeingData>().Inventory.HasItem(_deviceKind) > 0;
 
         /// <inheritdoc/>
         public Boolean IsComplete { get; private set; } = false;

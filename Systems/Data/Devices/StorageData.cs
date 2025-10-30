@@ -1,19 +1,18 @@
 using Godot;
-using Godot.Collections;
 using Khepri.Controllers;
 using Khepri.Entities.Actors;
 using Khepri.Entities.Items;
-using System;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
-namespace Khepri.Resources.Devices
+namespace Khepri.Data.Devices
 {
     /// <summary> The data component of a chest or chest-adjacent object. </summary>
-    [GlobalClass]
-    public partial class StorageResource : DeviceResource
+    public class StorageData : DeviceData
     {
         /// <summary> The grid size of the entity's inventory. </summary>
-        [ExportGroup("Settings")]
-        [Export] public Vector2I InventorySize { get; private set; } = new Vector2I(10, 10);
+        [JsonPropertyName("inventory_size"), Required]
+        public required Vector2I InventorySize { get; init; } = new Vector2I(10, 10);
 
 
         /// <summary> A reference to the entity's inventory component. </summary>
@@ -21,7 +20,7 @@ namespace Khepri.Resources.Devices
 
 
         /// <summary> The data component of a chest or chest-adjacent object. </summary>
-        public StorageResource()
+        public StorageData() : base()
         {
             Inventory = new EntityInventory(InventorySize);
         }
@@ -38,20 +37,6 @@ namespace Khepri.Resources.Devices
             {
                 // TODO - Let AI get items out.
             }
-        }
-
-
-        /// <inheritdoc/>
-        public override void Deserialise(Dictionary<String, Variant> data)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        /// <inheritdoc/>
-        public override Dictionary<String, Variant> Serialise()
-        {
-            throw new NotImplementedException();
         }
     }
 }

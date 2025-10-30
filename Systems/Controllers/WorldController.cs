@@ -58,62 +58,10 @@ namespace Khepri.Controllers
         }
 
 
-        /// <summary> Save all the entities within the world to the persistent data. </summary>
-        /// <exception cref="System.IO.FileLoadException"> If a file is unable to be opened. </exception>
-        public void Save()
-        {
-            FileAccess? file = FileAccess.Open("user://save_game.dat", FileAccess.ModeFlags.Write);
-            if (file == null)
-            {
-                throw new System.IO.FileLoadException(FileAccess.GetOpenError().ToString());
-            }
-
-            Array<Dictionary<String, Variant>> data = new Array<Dictionary<string, Variant>>();
-            data.AddRange(ActorController.Instance.Serialise());
-            data.AddRange(DeviceController.Instance.Serialise());
-            data.AddRange(ItemController.Instance.Serialise());
-            file.StoreVar(data);
-            file.Close();
-        }
-
-
-        /// <summary> Load all the entities within the world from the persistent data. </summary>
-        /// <param name="filepath"> The filepath of the save data to load. </param>
-        /// <exception cref="System.IO.FileLoadException"> If a file or item is unable to be loaded. </exception>
-        public void Load(String filepath)
-        {
-            FileAccess? file = FileAccess.Open(filepath, FileAccess.ModeFlags.Read);
-            if (file == null)
-            {
-                throw new System.IO.FileLoadException(FileAccess.GetOpenError().ToString());
-            }
-
-            Array<Dictionary<String, Variant>> data = (Array<Dictionary<String, Variant>>)file.GetVar();
-            Dictionary<String, Array<Dictionary<String, Variant>>> filteredEntities = FilterEntities(data);
-
-            if (filteredEntities.TryGetValue("celestial", out Array<Dictionary<String, Variant>>? celestials) && celestials != null)
-            {
-                // TODO - Pass to celestial controller.
-            }
-            if (filteredEntities.TryGetValue("item", out Array<Dictionary<String, Variant>>? items) && items != null)
-            {
-                ItemController.Instance.Deserialise(items);
-            }
-            if (filteredEntities.TryGetValue("device", out Array<Dictionary<String, Variant>>? devices) && devices != null)
-            {
-                DeviceController.Instance.Deserialise(devices);
-            }
-            if (filteredEntities.TryGetValue("actor", out Array<Dictionary<String, Variant>>? actors) && actors != null)
-            {
-                ActorController.Instance.Deserialise(actors);
-            }
-        }
-
-
         /// <summary> Filter the unstructured data into categories of types, so that they can be given to the correct controller. </summary>
         /// <param name="data"> The unstructured data. </param>
         /// <returns> The data filtered by the resource type. </returns>
-        /// <exception cref="ResourceException"> If a resource hasn't been formatted correctly. </exception>
+        /// <exception cref="DataException"> If a resource hasn't been formatted correctly. </exception>
         private Dictionary<String, Array<Dictionary<String, Variant>>> FilterEntities(Array<Dictionary<String, Variant>> data)
         {
             Dictionary<String, Array<Dictionary<String, Variant>>> results = new Dictionary<String, Array<Dictionary<String, Variant>>>()
@@ -138,7 +86,7 @@ namespace Khepri.Controllers
                 }
                 else
                 {
-                    throw new ResourceException("Every resource needs an 'id' field to help identify its type. I just tried to load one without one.");
+                    throw new DataException("Every resource needs an 'id' field to help identify its type. I just tried to load one without one.");
                 }
             }
 

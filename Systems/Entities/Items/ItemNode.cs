@@ -1,9 +1,8 @@
 using Godot;
-using Godot.Collections;
+using Khepri.Data;
+using Khepri.Data.Actors;
+using Khepri.Data.Items;
 using Khepri.Entities.Actors;
-using Khepri.Resources;
-using Khepri.Resources.Actors;
-using Khepri.Resources.Items;
 using Khepri.Types;
 using System;
 
@@ -13,7 +12,10 @@ namespace Khepri.Entities.Items
     public partial class ItemNode : StaticBody3D, IEntity, IPoolable
     {
         /// <inheritdoc/>
-        public UInt64 UId { get; private set; }
+        public Guid DataUId => _data.UId;
+
+        /// <inheritdoc/>
+        public String DataKind => _data.Kind;
 
         /// <summary> The item's bounding shape. </summary>
         [ExportGroup("Nodes")]
@@ -26,9 +28,8 @@ namespace Khepri.Entities.Items
         [Export] private Area3D _interactionArea;
 
 
-        /// <summary> The data resource representing the device. </summary>
-        [ExportGroup("Settings")]
-        [Export] private ItemResource _resource;
+        /// <summary> The item's data component. </summary>
+        private ItemData _data;
 
 
         /// <summary> A reference to the item controller. </summary>
@@ -68,13 +69,13 @@ namespace Khepri.Entities.Items
 
 
         /// <summary> Initialise the node with new data values. </summary>
-        /// <param name="resource"> The data resource to associate with this node. </param>
+        /// <param name="data"> The data resource to associate with this node. </param>
         /// <param name="position"> The position to create the object at. </param>
-        public void Initialise(ItemResource resource, Vector3 position)
+        public void Initialise(ItemData data, Vector3 position)
         {
-            _resource = resource;
+            _data = data;
             GlobalPosition = position;
-            _sprite.Texture = resource.WorldSprite;
+            _sprite.Texture = data.GetInventorySprite();
         }
 
 
@@ -97,11 +98,11 @@ namespace Khepri.Entities.Items
 
 
         /// <inheritdoc/>
-        public T GetResource<T>() where T : EntityResource
+        public T GetData<T>() where T : EntityData
         {
-            if (_resource is T resource)
+            if (_data is T data)
             {
-                return resource;
+                return data;
             }
             else
             {
@@ -111,16 +112,16 @@ namespace Khepri.Entities.Items
 
 
         /// <inheritdoc/>
-        public void Examine(ActorNode activatingEntity) => _resource.Examine(activatingEntity);
+        public void Examine(ActorNode activatingEntity) => _data.Examine(activatingEntity);
 
 
         /// <inheritdoc/>
         public void Use(ActorNode activatingEntity)
         {
-            _resource.Use(activatingEntity);
+            _data.Use(activatingEntity);
 
             // If the resource has been consumed.
-            if (_resource is FoodResource foodResource && foodResource.Portions <= 0)
+            if (_data is FoodData foodResource && foodResource.CurrentPortions <= 0)
             {
                 FreeObject();
             }
@@ -131,7 +132,7 @@ namespace Khepri.Entities.Items
         /// <param name="activatingEntity"> The unit attempting to grab the item. </param>
         public void Grab(ActorNode activatingEntity)
         {
-            Boolean isSuccessful = activatingEntity.GetResource<BeingResource>().Inventory.TryAddItem(_resource);
+            Boolean isSuccessful = activatingEntity.GetData<BeingData>().Inventory.TryAddItem(_data);
             if (isSuccessful)   // If the item was added, free it back to the pool.
             {
                 FreeObject();
@@ -141,24 +142,5 @@ namespace Khepri.Entities.Items
 
         /// <inheritdoc/>
         public void FreeObject() => _itemController.ItemPool.FreeObject(this);
-
-
-        /// <inheritdoc/>
-        public Dictionary<String, Variant> Serialise()
-        {
-            Dictionary<String, Variant> data = _resource.Serialise();
-            data.Add("uid", UId);
-            data.Add("position", GlobalPosition);
-            return data;
-        }
-
-
-        /// <inheritdoc/>
-        public void Deserialise(Dictionary<String, Variant> data)
-        {
-            UId = (UInt64)data["uid"];
-            GlobalPosition = (Vector3)data["position"];
-            _resource.Deserialise(data);
-        }
     }
 }

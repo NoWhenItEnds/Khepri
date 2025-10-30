@@ -1,12 +1,10 @@
 using Godot;
-using Godot.Collections;
 using Khepri.Controllers;
+using Khepri.Data;
+using Khepri.Data.Actors;
 using Khepri.Nodes.Singletons;
-using Khepri.Resources;
-using Khepri.Resources.Actors;
 using Khepri.Types;
 using System;
-using System.Linq;
 
 namespace Khepri.Entities.Actors
 {
@@ -33,14 +31,14 @@ namespace Khepri.Entities.Actors
         public ObjectPool<ActorNode> ActorPool { get; private set; }
 
 
-        /// <summary> A reference to the resource controller. </summary>
-        private ResourceController _resourceController;
+        /// <summary> A reference to the data controller. </summary>
+        private DataController _dataController;
 
 
         /// <inheritdoc/>
         public override void _Ready()
         {
-            _resourceController = ResourceController.Instance;
+            _dataController = DataController.Instance;
             ActorPool = new ObjectPool<ActorNode>(_actorParent, _actorPrefab, 0);
         }
 
@@ -51,57 +49,20 @@ namespace Khepri.Entities.Actors
         /// <returns> The initialised actor. </returns>
         public ActorNode CreateActor(String kind, Vector3 position)
         {
-            ActorResource resource = _resourceController.CreateResource<ActorResource>(kind);
-            return CreateActor(resource, position);
+            ActorData data = _dataController.CreateEntityData<ActorData>(kind);
+            return CreateActor(data, position);
         }
 
 
         /// <summary> Initialise a new actor. </summary>
-        /// <param name="resource"> The data resource to associate with this node. </param>
+        /// <param name="data"> The data resource to associate with this node. </param>
         /// <param name="position"> The position to create the object at. </param>
         /// <returns> The initialised actor. </returns>
-        public ActorNode CreateActor(ActorResource resource, Vector3 position)
+        public ActorNode CreateActor(ActorData data, Vector3 position)
         {
             ActorNode actor = ActorPool.GetAvailableObject();
-            actor.Initialise(resource, position);
+            actor.Initialise(data, position);
             return actor;
-        }
-
-
-        /// <summary> Package the world state for saving. </summary>
-        /// <returns> An array of the actors representing the current world state. </returns>
-        public Array<Dictionary<String, Variant>> Serialise()
-        {
-            ActorNode[] activeObjects = ActorPool.GetActiveObjects();
-            Array<Dictionary<String, Variant>> data = new Array<Dictionary<String, Variant>>();
-            foreach (ActorNode item in activeObjects)
-            {
-                data.Add(item.Serialise());
-            }
-            return data;
-        }
-
-
-        /// <summary> Unpack the given data and instantiate the world state. </summary>
-        /// <param name="data"> Data that has the 'actor' type to unpack. </param>
-        public void Deserialise(Array<Dictionary<String, Variant>> data)
-        {
-            ActorNode[] activeObjects = ActorPool.GetActiveObjects();
-
-            foreach (Dictionary<String, Variant> item in data)
-            {
-                UInt64 uid = (UInt64)item["uid"];
-                String id = (String)item["id"];
-                Vector3 position = (Vector3)item["position"];
-
-                ActorNode? newActor = activeObjects.FirstOrDefault(x => x.UId == uid) ?? null;
-                if (newActor == null)
-                {
-                    newActor = CreateActor(id, position);
-                }
-
-                newActor.Deserialise(item);
-            }
         }
 
 

@@ -1,10 +1,10 @@
 using System;
 using Godot;
+using Khepri.Data.Actors;
+using Khepri.Data.Devices;
 using Khepri.Entities.Actors;
 using Khepri.Entities.Items;
 using Khepri.Nodes.Singletons;
-using Khepri.Resources.Actors;
-using Khepri.Resources.Devices;
 using Khepri.UI.HUD;
 using Khepri.UI.HUD.Interaction;
 using Khepri.UI.HUD.SpeechBubbles;
@@ -61,7 +61,7 @@ namespace Khepri.Controllers
                 case WindowType.INVENTORY:
                     ToggleHUD(false);
                     _inventoryWindow.Visible = true;
-                    _inventoryWindow.Initialise(ActorController.Instance.GetPlayer().GetResource<BeingResource>().Inventory);
+                    _inventoryWindow.Initialise(ActorController.Instance.GetPlayer().GetData<BeingData>().Inventory);
                     break;
                 default:
                     ToggleHUD(true);
@@ -79,13 +79,13 @@ namespace Khepri.Controllers
         {
             ToggleHUD(false);
             _storageWindow.Visible = true;
-            _storageWindow.Initialise(ActorController.Instance.GetPlayer().GetResource<BeingResource>().Inventory, storageInventory);
+            _storageWindow.Initialise(ActorController.Instance.GetPlayer().GetData<BeingData>().Inventory, storageInventory);
         }
 
 
         /// <summary> Show the telescope window to represent the view of a telescope. </summary>
         /// <param name="telescope"> A reference to the triggering telescope. </param>
-        public void ShowTelescope(TelescopeResource telescope)
+        public void ShowTelescope(TelescopeData telescope)
         {
             ToggleHUD(false);
             _telescopeWindow.Visible = true;

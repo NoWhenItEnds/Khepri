@@ -1,7 +1,7 @@
 using Godot;
+using Khepri.Data.Actors;
+using Khepri.Entities;
 using Khepri.Entities.Actors;
-using Khepri.Resources.Actors;
-using Khepri.Resources.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,19 +11,19 @@ namespace Khepri.GOAP
     /// <summary> Construct beliefs on an industrial scale. </summary>
     public class BeliefFactory
     {
-        /// <summary> A reference to the unit who the beliefs are associated with. </summary>
-        private readonly ActorNode _unit;
+        /// <summary> A reference to the being who the beliefs are associated with. </summary>
+        private readonly ActorNode _being;
 
         /// <summary> The array of current beliefs. </summary>
         private readonly Dictionary<String, AgentBelief> _beliefs;
 
 
         /// <summary> Construct beliefs on an industrial scale. </summary>
-        /// <param name="unit"> A reference to the decision-making agent. </param>
+        /// <param name="being"> A reference to the decision-making agent. </param>
         /// <param name="beliefs"> The array of current beliefs. </param>
-        public BeliefFactory(ActorNode unit, Dictionary<String, AgentBelief> beliefs)
+        public BeliefFactory(ActorNode being, Dictionary<String, AgentBelief> beliefs)
         {
-            _unit = unit;
+            _being = being;
             _beliefs = beliefs;
         }
 
@@ -39,74 +39,29 @@ namespace Khepri.GOAP
         }
 
 
-        /// <summary> Adds a belief about a kind of item stored in the unit's sensors. </summary>
+        /// <summary> Adds a belief about a kind of entity stored in the being's sensors. </summary>
+        /// <typeparam name="T"> The kind of node to search for. </typeparam>
         /// <param name="key"> The name of belief. </param>
-        /// <param name="itemKey"> The unique identifying name or key of the item. </param>
-        public void AddKnownItemBelief(String key, String itemKey)
+        /// <param name="kind"> The common identifying name or key of the entity. </param>
+        public void AddEntityBelief<T>(String key, String kind) where T : IEntity
         {
             _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => _unit.Sensors.TryGetItem(itemKey).Length > 0)
+                .WithCondition(() => _being.Sensors.TryGetEntity<T>()
+                    .FirstOrDefault(x => x.Entity.DataKind == kind) != null)
                 .Build());
         }
 
 
-        /// <summary> Adds a belief about a specific of item stored in the unit's sensors. </summary>
+        /// <summary> Adds a belief about whether the agent is currently within interaction range of a kind of node. </summary>
+        /// <typeparam name="T"> The kind of node to search for. </typeparam>
         /// <param name="key"> The name of belief. </param>
-        /// <param name="resource"> The unique instance of the item. </param>
-        public void AddKnownItemBelief(String key, ItemResource resource)
-        {
-            _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => _unit.Sensors.TryGetItem(resource) != null)
-                .Build());
-        }
-
-
-        /// <summary> Adds a belief about a kind of item stored in the unit's inventory. </summary>
-        /// <param name="key"> The name of belief. </param>
-        /// <param name="kind"> The unique identifying name or key of the item. </param>
-        public void AddInventoryBelief(String key, String kind)
-        {
-            _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => _unit.GetResource<BeingResource>().Inventory.HasItem(kind) > 0)
-                .Build());
-        }
-
-
-        /// <summary> Adds a belief about a specific item stored in the unit's inventory. </summary>
-        /// <param name="key"> The name of belief. </param>
-        /// <param name="resource"> The unique instance of the item. </param>
-        public void AddInventoryBelief(String key, ItemResource resource)
-        {
-            _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => _unit.GetResource<BeingResource>().Inventory.HasItem(resource))
-                .Build());
-        }
-
-
-        /// <summary> Adds a belief about whether the agent is currently within interaction range of a kind of item. </summary>
-        /// <param name="key"> The name of belief. </param>
-        /// <param name="itemKey"> The unique identifying name or key of the item. </param>
+        /// <param name="kind"> The common identifying name or key of the entity. </param>
         /// <param name="distance"> The acceptable distance or range from the location. </param>
-        public void AddItemLocationBelief(String key, String itemKey, Single distance)
+        public void AddNodeLocationBelief<T>(String key, String kind, Single distance) where T : IEntity
         {
-            // TODO - Is this the best way? Probably not.
             _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => _unit.Sensors.TryGetItem(itemKey).Length > 0)
-                .WithCondition(() => InRangeOf(_unit.Sensors.TryGetItem(itemKey).FirstOrDefault()?.LastKnownPosition, distance))
-                .Build());
-        }
-
-
-        /// <summary> Adds a belief about whether the agent is currently within interaction range of a specific item. </summary>
-        /// <param name="key"> The name of belief. </param>
-        /// <param name="resource"> The unique instance of the item. </param>
-        /// <param name="distance"> The acceptable distance or range from the location. </param>
-        public void AddItemLocationBelief(String key, ItemResource resource, Single distance)
-        {
-            // TODO - Is this the best way? Probably not.
-            _beliefs.Add(key, new AgentBelief.Builder(key)
-                .WithCondition(() => _unit.Sensors.TryGetItem(resource) != null)
-                .WithCondition(() => InRangeOf(_unit.Sensors.TryGetItem(resource)?.LastKnownPosition, distance))
+                .WithCondition(() => InRangeOf(_being.Sensors.TryGetEntity<T>()
+                    .FirstOrDefault(x => x.Entity.DataKind == kind)?.LastKnownPosition, distance))
                 .Build());
         }
 
@@ -123,11 +78,22 @@ namespace Khepri.GOAP
         }
 
 
+        /// <summary> Adds a belief about a kind of item stored in the being's inventory. </summary>
+        /// <param name="key"> The name of belief. </param>
+        /// <param name="kind"> The unique identifying name or key of the item. </param>
+        public void AddInventoryBelief(String key, String kind)
+        {
+            _beliefs.Add(key, new AgentBelief.Builder(key)
+                .WithCondition(() => _being.GetData<BeingData>().Inventory.HasItem(kind) > 0)
+                .Build());
+        }
+
+
         /// <summary> Checks whether the given target location is within range of the unit. </summary>
         /// <param name="target"> The target position. </param>
         /// <param name="range"> The acceptable range. </param>
         /// <returns> If the unit is within acceptable range of the target location. </returns>
-        private Boolean InRangeOf(Vector3? target, Single range) => target != null ? _unit.GlobalPosition.DistanceTo(target.Value) < range : false;
+        private Boolean InRangeOf(Vector3? target, Single range) => target != null ? _being.GlobalPosition.DistanceTo(target.Value) < range : false;
     }
 
 

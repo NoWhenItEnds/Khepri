@@ -3,71 +3,76 @@ using CsvHelper.Configuration;
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using System.Text.Json.Serialization;
 
-namespace Khepri.Resources.Celestial
+namespace Khepri.Data.Celestial
 {
-    /// <summary> The data component of a star entity. </summary>
-    [GlobalClass]
-    public partial class StarResource : EntityResource, IComparable<StarResource>
+    /// <summary> An data object representing distant stars. </summary>
+    public class StarData : CelestialData, IComparable<StarData>
     {
-        /// <summary> A common name for the star, such as "Barnard's Star" or "Sirius". These are taken from the International Astronomical Union (https://www.iau.org/public/themes/naming_stars/, specifically, the formatted version from https://github.com/mirandadam/iau-starnames). </summary>
-        [ExportGroup("Settings")]
-        [Export] public String ProperName { get; set; }
+        /// <summary> The star's common name. </summary>
+        [JsonPropertyName("name"), Required]
+        public required String ProperName { get; init; }
 
         /// <summary> The star's ID in the Hipparcos catalog, if known. </summary>
-        [Export] public Int32 HipId { get; set; }
+        [JsonPropertyName("hip"), Required]
+        public required Int32 HipId { get; init; }
 
         /// <summary> The star's ID in the Henry Draper catalog, if known. </summary>
-        [Export] public Int32 HDId { get; set; }
+        [JsonPropertyName("hd"), Required]
+        public required Int32 HDId { get; init; }
 
         /// <summary> The star's ID in the Harvard Revised catalog, which is the same as its number in the Yale Bright Star Catalog. </summary>
-        [Export] public Int32 HRId { get; set; }
+        [JsonPropertyName("hr"), Required]
+        public required Int32 HRId { get; init; }
 
         /// <summary> The star's ID in the third edition of the Gliese Catalog of Nearby Stars. </summary>
-        [Export] public String GLId { get; set; }
+        [JsonPropertyName("gl"), Required]
+        public required String GLId { get; init; }
 
         /// <summary> The Bayer / Flamsteed designation, primarily from the Fifth Edition of the Yale Bright Star Catalog. </summary>
         /// <remarks> This is a combination of the two designations. The Flamsteed number, if present, is given first; then a three-letter abbreviation for the Bayer Greek letter; the Bayer superscript number, if present; and finally, the three-letter constellation abbreviation. Thus Alpha Andromedae has the field value "21Alp And", and Kappa1 Sculptoris (no Flamsteed number) has "Kap1Scl". </remarks>
-        [Export] public String BayerFlamsteed { get; set; }
+        [JsonPropertyName("bf"), Required]
+        public required String BayerFlamsteed { get; init; }
 
         /// <summary> The star's right ascension for epoch and equinox 2000.0. </summary>
         /// <remarks> In radians. </remarks>
-        [Export] public Double RightAscension { get; set; }
+        [JsonPropertyName("ra"), Required]
+        public required Double RightAscension { get; init; }
 
         /// <summary> The star's declination for epoch and equinox 2000.0. </summary>
         /// <remarks> In radians. </remarks>
-        [Export] public Double Declination { get; set; }
+        [JsonPropertyName("dec"), Required]
+        public required Double Declination { get; init; }
 
         /// <summary> The star's distance in parsecs, the most common unit in astrometry. To convert parsecs to light years, multiply by 3.262. A value >= 100000 indicates missing or dubious (e.g., negative) parallax data in Hipparcos. </summary>
-        [Export] public Single Distance { get; set; }
+        [JsonPropertyName("dis"), Required]
+        public required Single Distance { get; init; }
 
         /// <summary> The star's proper motion, its 'drift', right ascension in milliarcseconds per year. </summary>
         /// <remarks> In radians. </remarks>
-        [Export] public Double ProperMotionRightAscension { get; set; }
+        [JsonPropertyName("pmra"), Required]
+        public required Double ProperMotionRightAscension { get; init; }
 
         /// <summary> The star's proper motion, its 'drift', declination in milliarcseconds per year. </summary>
         /// <remarks> In radians. </remarks>
-        [Export] public Double ProperMotionDeclination { get; set; }
+        [JsonPropertyName("pmdec"), Required]
+        public required Double ProperMotionDeclination { get; init; }
 
         /// <summary> The star's radial velocity in km/sec, where known. </summary>
-        [Export] public Single RadialVelocity { get; set; }
+        [JsonPropertyName("rv"), Required]
+        public required Single RadialVelocity { get; init; }
 
         /// <summary> The visual or apparent magnitude. </summary>
-        [Export] public Single Magnitude { get; set; }
+        [JsonPropertyName("mag"), Required]
+        public required Single Magnitude { get; init; }
 
         /// <summary> The star's color index (blue magnitude - visual magnitude), where known. </summary>
-        [Export] public Single ColourIndex { get; set; }
-
-
-        /// <summary> Whether the player has observed the star. </summary>
-        [ExportGroup("State")]
-        public Boolean HasBeenObserved { get; set; }
-
-
-        /// <summary> The data component of a star entity. </summary>
-        public StarResource() { }
+        [JsonPropertyName("ci"), Required]
+        public required Single ColourIndex { get; init; }
 
 
         /// <summary> Get the most appropriate identifier to represent the object. </summary>
@@ -163,25 +168,7 @@ namespace Khepri.Resources.Celestial
 
 
         /// <inheritdoc/>
-        public override Godot.Collections.Dictionary<String, Variant> Serialise()
-        {
-            return new Godot.Collections.Dictionary<String, Variant>()
-            {
-                { "id", Id },
-                { "observed", HasBeenObserved }
-            };
-        }
-
-
-        /// <inheritdoc/>
-        public override void Deserialise(Godot.Collections.Dictionary<String, Variant> data)
-        {
-            HasBeenObserved = (Boolean)data["observed"];
-        }
-
-
-        /// <inheritdoc/>
-        public Int32 CompareTo(StarResource? other)
+        public Int32 CompareTo(StarData? other)
         {
             return RightAscension.CompareTo(other?.RightAscension);
         }
@@ -190,7 +177,7 @@ namespace Khepri.Resources.Celestial
         /// <summary> Generate the data from the HTG data file. </summary>
         /// <returns> An array of generated data. </returns>
         /// <remarks> https://codeberg.org/astronexus/hyg - v42 @ 2025-08-09 </remarks>
-        public static StarResource[] LoadFromHYG()
+        public static StarData[] LoadFromHYG()
         {
             String csvPath = ProjectSettings.GlobalizePath("res://Data/HYGData/hygdata_v42.csv");
             using (StreamReader reader = new StreamReader(csvPath))
@@ -198,13 +185,14 @@ namespace Khepri.Resources.Celestial
             {
                 csv.Configuration.RegisterClassMap<StarDataMap>();
                 StarData[] records = csv.GetRecords<StarData>().ToArray();
-                StarResource[] resources = new StarResource[records.Length];
+                StarData[] resources = new StarData[records.Length];
                 for (Int32 i = 0; i < resources.Length; i++)
                 {
                     StarData record = records[i];
-                    resources[i] = new StarResource
+                    resources[i] = new StarData
                     {
-                        Id = record.Id.ToString(),
+                        Kind = "celestial_star",
+                        Descriptions = Array.Empty<String>(),
                         ProperName = record.ProperName,
                         HipId = record.HipId,
                         HDId = record.HDId,
@@ -227,67 +215,11 @@ namespace Khepri.Resources.Celestial
     }
 
 
-    /// <summary> An intermediary class for converting star data from an external CSV into a Godot Resource. </summary>
-    public record StarData
-    {
-        /// <summary> The resource's id in the dataset. </summary>
-        public required Int32 Id { get; init; }
-
-        /// <summary> The star's common name. </summary>
-        public required String ProperName { get; init; }
-
-        /// <summary> The star's ID in the Hipparcos catalog, if known. </summary>
-        public required Int32 HipId { get; init; }
-
-        /// <summary> The star's ID in the Henry Draper catalog, if known. </summary>
-        public required Int32 HDId { get; init; }
-
-        /// <summary> The star's ID in the Harvard Revised catalog, which is the same as its number in the Yale Bright Star Catalog. </summary>
-        public required Int32 HRId { get; init; }
-
-        /// <summary> The star's ID in the third edition of the Gliese Catalog of Nearby Stars. </summary>
-        public required String GLId { get; init; }
-
-        /// <summary> The Bayer / Flamsteed designation, primarily from the Fifth Edition of the Yale Bright Star Catalog. </summary>
-        /// <remarks> This is a combination of the two designations. The Flamsteed number, if present, is given first; then a three-letter abbreviation for the Bayer Greek letter; the Bayer superscript number, if present; and finally, the three-letter constellation abbreviation. Thus Alpha Andromedae has the field value "21Alp And", and Kappa1 Sculptoris (no Flamsteed number) has "Kap1Scl". </remarks>
-        public required String BayerFlamsteed { get; init; }
-
-        /// <summary> The star's right ascension for epoch and equinox 2000.0. </summary>
-        /// <remarks> In radians. </remarks>
-        public required Double RightAscension { get; init; }
-
-        /// <summary> The star's declination for epoch and equinox 2000.0. </summary>
-        /// <remarks> In radians. </remarks>
-        public required Double Declination { get; init; }
-
-        /// <summary> The star's distance in parsecs, the most common unit in astrometry. To convert parsecs to light years, multiply by 3.262. A value >= 100000 indicates missing or dubious (e.g., negative) parallax data in Hipparcos. </summary>
-        public required Single Distance { get; init; }
-
-        /// <summary> The star's proper motion, its 'drift', right ascension in milliarcseconds per year. </summary>
-        /// <remarks> In radians. </remarks>
-        public required Double ProperMotionRightAscension { get; init; }
-
-        /// <summary> The star's proper motion, its 'drift', declination in milliarcseconds per year. </summary>
-        /// <remarks> In radians. </remarks>
-        public required Double ProperMotionDeclination { get; init; }
-
-        /// <summary> The star's radial velocity in km/sec, where known. </summary>
-        public required Single RadialVelocity { get; init; }
-
-        /// <summary> The visual or apparent magnitude. </summary>
-        public required Single Magnitude { get; init; }
-
-        /// <summary> The star's color index (blue magnitude - visual magnitude), where known. </summary>
-        public required Single ColourIndex { get; init; }
-    }
-
-
     /// <summary> The maps used by CsvHelper to map csv data to StarData. </summary>
     public sealed class StarDataMap : CsvClassMap<StarData>
     {
         public StarDataMap()
         {
-            Map(m => m.Id).Name("id").Default(-1);
             Map(m => m.ProperName).Name("proper").Default(String.Empty);
             Map(m => m.HipId).Name("hip").Default(-1);
             Map(m => m.HDId).Name("hd").Default(-1);
@@ -309,28 +241,28 @@ namespace Khepri.Resources.Celestial
     /// <summary> Extensions for working with StarData. </summary>
     public static class StarDataExtensions
     {
-        public static StarResource[][] Load2DArrayFromFile(Single segmentSize)
+        public static StarData[][] Load2DArrayFromFile(Single segmentSize)
         {
             // Setup map.
             Int32 length = (Int32)Math.Round(180f / segmentSize); // How many segements are in the declination range.
-            List<StarResource>[] array = new List<StarResource>[length];
+            List<StarData>[] array = new List<StarData>[length];
             for (Int32 i = 0; i < length; i++)
             {
-                array[i] = new List<StarResource>();
+                array[i] = new List<StarData>();
             }
 
             // Sort data.
-            StarResource[] initial = StarResource.LoadFromHYG();
+            StarData[] initial = StarData.LoadFromHYG();
             Array.Sort(initial);    // Sort initially by RA.
             Single segmentRad = Mathf.DegToRad(segmentSize);
-            foreach (StarResource star in initial)
+            foreach (StarData star in initial)
             {
                 Int32 pos = (Int32)((star.Declination + 1.5707964) / segmentRad);   // Min is -90, so it needs to be offset so -90 == 0.
                 array[pos].Add(star);
             }
 
             // Format results.
-            StarResource[][] result = new StarResource[length][];
+            StarData[][] result = new StarData[length][];
             for (Int32 i = 0; i < length; i++)
             {
                 result[i] = array[i].ToArray();
@@ -343,13 +275,13 @@ namespace Khepri.Resources.Celestial
         /// <param name="data"> The original star data object, sorted first by right ascension then declination. </param>
         /// <param name="declination"> The desired declination. </param>
         /// <returns> A list of stars with declinations nearby the provided value. </returns>
-        public static StarResource[] FilterData(this StarResource[][] data, Single declination)
+        public static StarData[] FilterData(this StarData[][] data, Single declination)
         {
             Single dec = Mathf.DegToRad(declination);
             Double weight = (dec + 1.5707964) / Mathf.Pi;
             Int32 index = (Int32)Mathf.Lerp(0, data.Length - 1, weight);
 
-            StarResource[] result = data[index];
+            StarData[] result = data[index];
             if (index > 0)
             {
                 result = result.Union(data[index - 1]).ToArray();

@@ -1,9 +1,9 @@
 using Godot;
 using Khepri.Controllers;
+using Khepri.Data.Actors;
 using Khepri.Entities.Actors;
+using Khepri.Entities.Items;
 using Khepri.GOAP.ActionStrategies;
-using Khepri.Resources;
-using Khepri.Resources.Actors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,7 +71,7 @@ namespace Khepri.GOAP
             factory.AddBelief("IsIdle", () => _controlledEntity.NavigationAgent.IsNavigationFinished());
             factory.AddBelief("IsMoving", () => !_controlledEntity.NavigationAgent.IsNavigationFinished());
 
-            BeingResource resource = _controlledEntity.GetResource<BeingResource>();
+            BeingData resource = _controlledEntity.GetData<BeingData>();
             factory.AddBelief("IsHealthy", () => resource.CurrentHealth >= 90f);
             factory.AddBelief("IsHurt", () => resource.CurrentHealth < 50);
             factory.AddBelief("IsFed", () => resource.CurrentHunger >= 90f);
@@ -82,9 +82,9 @@ namespace Khepri.GOAP
             factory.AddBelief("IsBored", () => resource.CurrentEntertainment < 50f);
 
             // TODO - Add belief packages. Such as food beliefs that contains both the Knows and Sees for the item.
-            factory.AddKnownItemBelief("KnowsApple", "apple");
-            factory.AddItemLocationBelief("AtApple", "apple", 1f); // TODO - This should be based upon something.
-            factory.AddInventoryBelief("HasApple", "apple");
+            factory.AddEntityBelief<ItemNode>("KnowsApple", "item_food_apple");
+            factory.AddNodeLocationBelief<ItemNode>("AtApple", "item_food_apple", 1f); // TODO - This should be based upon something.
+            factory.AddInventoryBelief("HasApple", "item_food_apple");
 
             //factory.AddSensorBelief("AgentKnowsPlayer", _controlledEntity.Sensors, _playerController.PlayerUnit);
             //factory.AddBelief("AgentSeesPlayer", () => _controlledEntity.Sensors.TryGetEntity(_playerController.PlayerUnit).IsVisible);

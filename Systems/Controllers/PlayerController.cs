@@ -2,8 +2,6 @@ using Godot;
 using Khepri.Entities;
 using Khepri.Entities.Actors;
 using Khepri.Nodes;
-using Khepri.Resources;
-using Khepri.Resources.Actors;
 using Khepri.Types.Extensions;
 using System;
 using System.Linq;
@@ -130,14 +128,6 @@ namespace Khepri.Controllers
                 else if (@event.IsActionReleased("action_ui_down"))
                 {
                     _currentInteractableIndex = (Int32)MathExtensions.WrapValue(_currentInteractableIndex - 1, PlayerBeing.UsableEntities.Count);
-                }
-                else if (@event.IsActionReleased("action_quicksave"))
-                {
-                    WorldController.Instance.Save();
-                }
-                else if (@event.IsActionReleased("action_quickload"))
-                {
-                    WorldController.Instance.Load("user://save_game.dat");
                 }
             }
         }

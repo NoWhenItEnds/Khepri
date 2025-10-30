@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="FoodResource" load_steps=4 format=3 uid="uid://cep0e4e4k7c3w"]
 
-[ext_resource type="Script" uid="uid://b4xss154foxdd" path="res://Systems/Resources/Items/FoodResource.cs" id="1_lglo3"]
+[ext_resource type="Script" uid="uid://b4xss154foxdd" path="res://Systems/Data/Items/FoodData.cs" id="1_lglo3"]
 [ext_resource type="Texture2D" uid="uid://cthd2jn8xvpul" path="res://Content/Textures/Tilesets/Items/Food/Inventory/Item_Food_Inventory_Apple.png" id="1_yekgs"]
 [ext_resource type="Texture2D" uid="uid://bnc480lxnrf0o" path="res://Content/Textures/Tilesets/Items/Food/Nodes/Item_Food_Node_Apple.png" id="2_yekgs"]
 

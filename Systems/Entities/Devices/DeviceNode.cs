@@ -1,8 +1,7 @@
 using Godot;
-using Godot.Collections;
+using Khepri.Data;
+using Khepri.Data.Devices;
 using Khepri.Entities.Actors;
-using Khepri.Resources;
-using Khepri.Resources.Devices;
 using Khepri.Types;
 using System;
 
@@ -12,7 +11,10 @@ namespace Khepri.Entities.Devices
     public partial class DeviceNode : StaticBody3D, IEntity, IPoolable
     {
         /// <inheritdoc/>
-        public UInt64 UId { get; private set; }
+        public Guid DataUId => _data.UId;
+
+        /// <inheritdoc/>
+        public String DataKind => _data.Kind;
 
         /// <summary> The device's bounding shape. </summary>
         [ExportGroup("Nodes")]
@@ -25,9 +27,8 @@ namespace Khepri.Entities.Devices
         [Export] private Area3D _interactionArea;
 
 
-        /// <summary> The data resource representing the device. </summary>
-        [ExportGroup("Statistics")]
-        [Export] private DeviceResource _resource;
+        /// <summary> The device's data component. </summary>
+        private DeviceData _data;
 
 
         /// <inheritdoc/>
@@ -61,25 +62,25 @@ namespace Khepri.Entities.Devices
 
 
         /// <summary> Initialise the node with new data values. </summary>
-        /// <param name="resource"> The data resource to associate with this node. </param>
+        /// <param name="data"> The data resource to associate with this node. </param>
         /// <param name="position"> The position to create the object at. </param>
-        public void Initialise(DeviceResource resource, Vector3 position)
+        public void Initialise(DeviceData data, Vector3 position)
         {
-            _resource = resource;
+            _data = data;
             GlobalPosition = position;
-            _sprite.SpriteFrames = _resource.WorldSprites;
+            _sprite.SpriteFrames = _data.GetSprites();
             _sprite.Play();
         }
 
 
         /// <summary> The internal logic to use when the entity is examined. </summary>
         /// <param name="activatingBeing"> A reference to the unit activating the action. </param>
-        public void Examine(ActorNode activatingBeing) => _resource.Examine(activatingBeing);
+        public void Examine(ActorNode activatingBeing) => _data.Examine(activatingBeing);
 
 
         /// <summary> The internal logic to use when the entity is used. </summary>
         /// <param name="activatingBeing"> A reference to the unit activating the action. </param>
-        public void Use(ActorNode activatingBeing) => _resource.Use(activatingBeing);
+        public void Use(ActorNode activatingBeing) => _data.Use(activatingBeing);
 
 
         /// <inheritdoc/>
@@ -91,11 +92,11 @@ namespace Khepri.Entities.Devices
 
 
         /// <inheritdoc/>
-        public T GetResource<T>() where T : EntityResource
+        public T GetData<T>() where T : EntityData
         {
-            if (_resource is T resource)
+            if (_data is T data)
             {
-                return resource;
+                return data;
             }
             else
             {
@@ -106,24 +107,5 @@ namespace Khepri.Entities.Devices
 
         /// <inheritdoc/>
         public void FreeObject() => throw new NotImplementedException();    // TODO - Implements.
-
-
-        /// <inheritdoc/>
-        public Dictionary<String, Variant> Serialise()
-        {
-            Dictionary<String, Variant> data = _resource.Serialise();
-            data.Add("uid", UId);
-            data.Add("position", GlobalPosition);
-            return data;
-        }
-
-
-        /// <inheritdoc/>
-        public void Deserialise(Dictionary<String, Variant> data)
-        {
-            UId = (UInt64)data["uid"];
-            GlobalPosition = (Vector3)data["position"];
-            _resource.Deserialise(data);
-        }
     }
 }

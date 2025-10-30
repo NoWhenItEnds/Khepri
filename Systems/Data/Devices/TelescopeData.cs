@@ -1,32 +1,26 @@
-using Godot;
-using Godot.Collections;
 using Khepri.Controllers;
 using Khepri.Entities;
 using Khepri.Entities.Actors;
 using Khepri.Types.Extensions;
 using System;
+using System.Text.Json.Serialization;
 
-namespace Khepri.Resources.Devices
+namespace Khepri.Data.Devices
 {
     /// <summary> The data component of a telescope device. </summary>
-    [GlobalClass]
-    public partial class TelescopeResource : DeviceResource, IControllable
+    public class TelescopeData : DeviceData, IControllable
     {
         /// <summary> A modifier to increase the sensitivity of the input. </summary>
-        [ExportGroup("Settings")]
-        [Export] private Single _inputSensitivity = 0.1f;
+        private Single _inputSensitivity = 0.1f;   // TODO - Pull from config controller or something.
 
 
         /// <summary> The telescope's current altitude. It's up and down value. </summary>
-        [ExportGroup("State")]
-        [Export] public Single Altitude { get; private set; } = 0f;
+        [JsonPropertyName("altitude")]
+        public Single Altitude { get; private set; } = 0f;
 
         /// <summary> The telescope's current azimuth. It's right to left value. Starts from N and rotates cloak-wise. </summary>
-        [Export] public Single Azimuth { get; private set; } = 0f;
-
-
-        /// <summary> The data component of a telescope device. </summary>
-        public TelescopeResource() { }
+        [JsonPropertyName("azimuth")]
+        public Single Azimuth { get; private set; } = 0f;
 
 
         /// <inheritdoc/>
@@ -57,26 +51,6 @@ namespace Khepri.Resources.Devices
             {
                 throw new NotImplementedException();
             }
-        }
-
-
-        /// <inheritdoc/>
-        public override Dictionary<String, Variant> Serialise()
-        {
-            return new Dictionary<String, Variant>()
-            {
-                { "id", Id },
-                { "altitude", Altitude },
-                { "azimuth", Azimuth }
-            };
-        }
-
-
-        /// <inheritdoc/>
-        public override void Deserialise(Dictionary<String, Variant> data)
-        {
-            Altitude = (Single)data["altitude"];
-            Azimuth = (Single)data["azimuth"];
         }
     }
 }

@@ -1,8 +1,7 @@
 using Godot;
 using Khepri.Controllers;
+using Khepri.Data.Actors;
 using Khepri.Entities.Items;
-using Khepri.Resources.Actors;
-using Khepri.Resources.Items;
 using Khepri.Types.Extensions;
 using System;
 using System.Collections.Generic;
@@ -129,21 +128,12 @@ namespace Khepri.Entities.Actors.Components
         }
 
 
-        /// <summary> Attempts to get a kind of item from the unit's memory. </summary>
-        /// <param name="itemId"> The item's unique name or key. </param>
-        /// <returns> An array of all instances of the item the unit is aware of. </returns>
-        public KnownEntity[] TryGetItem(String itemId)
+        /// <summary> Attempts to get a kind of node the unit's memory. </summary>
+        /// <typeparam name="T"> The kind of node to search for. </typeparam>
+        /// <returns> An array of all instances of the entity the unit is aware of. </returns>
+        public KnownEntity[] TryGetEntity<T>() where T : IEntity
         {
-            return _knownEntities.Where(x => x.Entity is ItemNode item && item.GetResource<ItemResource>().Id == itemId).ToArray();
-        }
-
-
-        /// <summary> Attempts to get a specific item using its resource instance. </summary>
-        /// <param name="resource"> The item's internal data. </param>
-        /// <returns> A reference to the tracked entity. A null means that one wasn't found. </returns>
-        public KnownEntity? TryGetItem(ItemResource resource)
-        {
-            return _knownEntities.Where(x => x.Entity is ItemNode item && item.GetResource<ItemResource>() == resource).FirstOrDefault();
+            return _knownEntities.Where(x => x.Entity is T entity).ToArray();
         }
 
 
@@ -164,7 +154,7 @@ namespace Khepri.Entities.Actors.Components
             KnownPosition knownPosition = new KnownPosition(modifiedPosition, lastSeen);
             if (_knownPositions.Add(knownPosition))
             {
-                _unit.GetResource<BeingResource>().UpdateEntertainment(0.1f);
+                _unit.GetData<BeingData>().UpdateEntertainment(0.1f);
             }
             else
             {
@@ -224,65 +214,6 @@ namespace Khepri.Entities.Actors.Components
         /// <summary> Toggle whether the lights are active. </summary>
         /// <param name="isActive"> Whether the visibility lights should be active or not. </param>
         public void ToggleLights(Boolean isActive) => _lights.Visible = isActive;
-
-
-        /// <summary> Buddle the saved sensor information for the purpose of saving. </summary>
-        /// <returns> A keyed collection of entity and positions. </returns>
-        public Godot.Collections.Dictionary<String, Godot.Collections.Array<Godot.Collections.Dictionary<String, Variant>>> Serialise()
-        {
-            var entities = new Godot.Collections.Array<Godot.Collections.Dictionary<String, Variant>>();
-            foreach (KnownEntity entity in _knownEntities)
-            {
-                // Build a new dictionary to represent each item.
-                entities.Add(new Godot.Collections.Dictionary<string, Variant>()
-                {
-                    { "entity_uid" , entity.Entity.UId },
-                    { "is_visible" , entity.IsVisible },
-                    { "position" , entity.LastKnownPosition },
-                    { "timestamp" , entity.LastSeenTimestamp.ToUnixTimeSeconds() }
-                });
-            }
-
-            var positions = new Godot.Collections.Array<Godot.Collections.Dictionary<String, Variant>>();
-            foreach (KnownPosition position in _knownPositions)
-            {
-                // Build a new dictionary to represent each item.
-                positions.Add(new Godot.Collections.Dictionary<string, Variant>()
-                {
-                    { "position" , position.Position },
-                    { "timestamp" , position.LastSeenTimestamp.ToUnixTimeSeconds() }
-                });
-            }
-
-            return new Godot.Collections.Dictionary<String, Godot.Collections.Array<Godot.Collections.Dictionary<String, Variant>>>()
-            {
-                { "entities", entities },
-                { "positions", positions }
-            };
-        }
-
-
-        /// <summary> Unpack the saved data to represent a previous world state. </summary>
-        /// <param name="data"> The raw data. </param>
-        public void Deserialise(Godot.Collections.Dictionary<String, Godot.Collections.Array<Godot.Collections.Dictionary<String, Variant>>> data)
-        {
-            var entities = (Godot.Collections.Array<Godot.Collections.Dictionary<String, Variant>>)data["entities"];
-            foreach (Godot.Collections.Dictionary<String, Variant> entity in entities)
-            {
-                UInt64 uid = (UInt64)entity["entity_uid"];
-                Boolean isVisible = (Boolean)entity["is_visible"];
-                Vector3 position = (Vector3)entity["position"];
-                DateTimeOffset timestamp = DateTimeOffset.FromUnixTimeSeconds((Int64)entity["timestamp"]);
-                //RememberEntity();
-                // TODO - Find a way to get the entity.
-            }
-
-            var positions = (Godot.Collections.Array<Godot.Collections.Dictionary<String, Variant>>)data["positions"];
-            foreach (Godot.Collections.Dictionary<String, Variant> position in positions)
-            {
-                RememberPosition((Vector3)position["position"], DateTimeOffset.FromUnixTimeSeconds((Int64)position["timestamp"]));
-            }
-        }
     }
 
 

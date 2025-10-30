@@ -1,6 +1,6 @@
 using Godot;
-using Khepri.Resources;
-using Khepri.Resources.Items;
+using Khepri.Data;
+using Khepri.Data.Items;
 using Khepri.Types;
 using Khepri.Types.Exceptions;
 using System;
@@ -18,8 +18,8 @@ namespace Khepri.UI.Windows.Components
         public Vector2I CellPosition { get; private set; }
 
 
-        /// <inheritdoc/>
-        private ItemResource _resource;
+        /// <summary> The item's data component. </summary>
+        private ItemData _data;
 
         /// <summary> A reference to the item pool the entity is a part of. </summary>
         private ObjectPool<InventoryItem> _itemPool;
@@ -43,20 +43,20 @@ namespace Khepri.UI.Windows.Components
 
 
         /// <summary> Create the inventory item by settings its internal variables. </summary>
-        /// <param name="resource"> The raw item data used to build the item. </param>
+        /// <param name="data"> The raw item data used to build the item. </param>
         /// <param name="grid"> A reference to the inventory grid this item represents. </param>
         /// <param name="cellPosition"> The position of the item's top-left position. </param>
-        public void Initialise(InventoryGrid grid, ItemResource resource, Vector2I cellPosition)
+        public void Initialise(InventoryGrid grid, ItemData data, Vector2I cellPosition)
         {
             SetGrid(grid);
-            _resource = resource;
+            _data = data;
             CellPosition = cellPosition;
 
             GlobalPosition = grid.CalculatePosition(cellPosition);
-            SetSprite(resource);
+            SetSprite(data);
             Modulate = Colors.White;
-            TextureClickMask = BuildClickMask(resource);
-            Name = resource.Id;
+            TextureClickMask = BuildClickMask(data);
+            Name = data.Kind;
         }
 
 
@@ -77,7 +77,7 @@ namespace Khepri.UI.Windows.Components
                 throw new UIException("When calling this method, it should have a reference to a grid and an inventory.");
             }
 
-            _grid.Inventory.RemoveItem(_resource);
+            _grid.Inventory.RemoveItem(_data);
             Modulate = new Color(1, 1, 1, 0.5f);    // Make it transparent to easily see the object being grabbed.
             _grid = null;   // As the item has been removed from the inventory, it no longer has a grid.
         }
@@ -95,7 +95,7 @@ namespace Khepri.UI.Windows.Components
                 throw new UIException("When calling this method, the given grid should have a reference to an inventory.");
             }
 
-            Boolean isAdded = grid.Inventory.TryAddItem(_resource, cellPosition);
+            Boolean isAdded = grid.Inventory.TryAddItem(_data, cellPosition);
 
             // If the item was added, update its position.
             if (isAdded)
@@ -111,9 +111,9 @@ namespace Khepri.UI.Windows.Components
 
         /// <summary> Set the item's sprite based upon the information in the data object. </summary>
         /// <param name="resource"> The raw data to build the item. </param>
-        private void SetSprite(ItemResource resource)
+        private void SetSprite(ItemData resource)
         {
-            TextureNormal = resource.InventorySprite;
+            TextureNormal = resource.GetInventorySprite();
             Size = resource.GetSize() * InventoryGrid.CELL_SIZE;
         }
 
@@ -121,7 +121,7 @@ namespace Khepri.UI.Windows.Components
         /// <summary> Build the item's click mask based upon the inventory points. </summary>
         /// <param name="resource"> The raw data to build the item. </param>
         /// <returns> The constructed click mask. </returns>
-        private Bitmap BuildClickMask(ItemResource resource)
+        private Bitmap BuildClickMask(ItemData resource)
         {
             Bitmap mask = new Bitmap();
             mask.Create((Vector2I)Size);
@@ -146,11 +146,11 @@ namespace Khepri.UI.Windows.Components
 
 
         /// <inheritdoc/>
-        public T GetResource<T>() where T : EntityResource
+        public T GetData<T>() where T : EntityData
         {
-            if (_resource is T resource)
+            if (_data is T data)
             {
-                return resource;
+                return data;
             }
             else
             {

@@ -1,10 +1,8 @@
 using System;
-using System.Linq;
 using Godot;
-using Godot.Collections;
+using Khepri.Data;
+using Khepri.Data.Items;
 using Khepri.Nodes.Singletons;
-using Khepri.Resources;
-using Khepri.Resources.Items;
 using Khepri.Types;
 
 namespace Khepri.Entities.Items
@@ -21,14 +19,14 @@ namespace Khepri.Entities.Items
         public ObjectPool<ItemNode> ItemPool { get; private set; }
 
 
-        /// <summary> A reference to the resource controller. </summary>
-        private ResourceController _resourceController;
+        /// <summary> A reference to the data controller. </summary>
+        private DataController _dataController;
 
 
         /// <inheritdoc/>
         public override void _Ready()
         {
-            _resourceController = ResourceController.Instance;
+            _dataController = DataController.Instance;
             ItemPool = new ObjectPool<ItemNode>(this, _itemPrefab);
         }
 
@@ -39,7 +37,7 @@ namespace Khepri.Entities.Items
         /// <returns> The initialised item. </returns>
         public ItemNode CreateItem(String kind, Vector3 position)
         {
-            ItemResource resource = _resourceController.CreateResource<ItemResource>(kind);
+            ItemData resource = _dataController.CreateEntityData<ItemData>(kind);
             return CreateItem(resource, position);
         }
 
@@ -48,48 +46,11 @@ namespace Khepri.Entities.Items
         /// <param name="resource"> The data resource to associate with this node. </param>
         /// <param name="position"> The position to create the object at. </param>
         /// <returns> The initialised item. </returns>
-        public ItemNode CreateItem(ItemResource resource, Vector3 position)
+        public ItemNode CreateItem(ItemData resource, Vector3 position)
         {
             ItemNode item = ItemPool.GetAvailableObject();
             item.Initialise(resource, position);
             return item;
-        }
-
-
-        /// <summary> Package the world state for saving. </summary>
-        /// <returns> An array of the items representing the current world state. </returns>
-        public Array<Dictionary<String, Variant>> Serialise()
-        {
-            ItemNode[] activeObjects = ItemPool.GetActiveObjects();
-            Array<Dictionary<String, Variant>> data = new Array<Dictionary<String, Variant>>();
-            foreach (ItemNode item in activeObjects)
-            {
-                data.Add(item.Serialise());
-            }
-            return data;
-        }
-
-
-        /// <summary> Unpack the given data and instantiate the world state. </summary>
-        /// <param name="data"> Data that has the 'item' type to unpack. </param>
-        public void Deserialise(Array<Dictionary<String, Variant>> data)
-        {
-            ItemNode[] activeObjects = ItemPool.GetActiveObjects();
-
-            foreach (Dictionary<String, Variant> item in data)
-            {
-                UInt64 uid = (UInt64)item["uid"];
-                String id = (String)item["id"];
-                Vector3 position = (Vector3)item["position"];
-
-                ItemNode? newItem = activeObjects.FirstOrDefault(x => x.UId == uid) ?? null;
-                if (newItem == null)
-                {
-                    newItem = CreateItem(id, position);
-                }
-
-                newItem.Deserialise(item);
-            }
         }
     }
 }

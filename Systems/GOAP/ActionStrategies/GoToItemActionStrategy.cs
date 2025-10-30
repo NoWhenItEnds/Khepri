@@ -1,7 +1,9 @@
 using Godot;
+using Khepri.Data.Items;
 using Khepri.Entities;
 using Khepri.Entities.Actors;
 using Khepri.Entities.Actors.Components;
+using Khepri.Entities.Items;
 using System;
 using System.Linq;
 
@@ -11,7 +13,7 @@ namespace Khepri.GOAP.ActionStrategies
     public partial class GoToItemActionStrategy : IActionStrategy
     {
         /// <inheritdoc/>
-        public Boolean IsValid => _unit.Sensors.TryGetItem(_itemKind).Length > 0;
+        public Boolean IsValid => _unit.Sensors.TryGetEntity<ItemNode>().FirstOrDefault(x => x.Entity.DataKind == _itemKind) != null;
 
         /// <inheritdoc/>
         public Boolean IsComplete => _unit.NavigationAgent.IsNavigationFinished();
@@ -20,13 +22,13 @@ namespace Khepri.GOAP.ActionStrategies
         /// <summary> A reference to the unit being manipulated. </summary>
         private readonly ActorNode _unit;
 
-        /// <summary> The desired item's name or kind. </summary>
+        /// <summary> The desired item's common type or kind. </summary>
         private readonly String _itemKind;
 
 
         /// <summary> Go to the know location of an item. </summary>
         /// <param name="unit"> A reference to the unit being manipulated. </param>
-        /// <param name="itemKind"> The desired item's name or kind. </param>
+        /// <param name="itemKind"> The desired item's common type or kind. </param>
         public GoToItemActionStrategy(ActorNode unit, String itemKind)
         {
             _unit = unit;
@@ -37,7 +39,7 @@ namespace Khepri.GOAP.ActionStrategies
         /// <inheritdoc/>
         public void Start()
         {
-            KnownEntity[] items = _unit.Sensors.TryGetItem(_itemKind);
+            KnownEntity[] items = _unit.Sensors.TryGetEntity<ItemNode>().Where(x => x.Entity.DataKind == _itemKind).ToArray();
             if (items.Length > 0)
             {
                 KnownEntity? entity = items.OrderBy(x => _unit.GlobalPosition.DistanceTo(x.LastKnownPosition)).FirstOrDefault();

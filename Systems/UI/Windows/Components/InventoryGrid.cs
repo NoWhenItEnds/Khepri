@@ -1,6 +1,6 @@
 using Godot;
+using Khepri.Data.Items;
 using Khepri.Entities.Items;
-using Khepri.Resources.Items;
 using Khepri.Types;
 using Khepri.Types.Exceptions;
 using System;
@@ -55,13 +55,13 @@ namespace Khepri.UI.Windows.Components
                 throw new UIException("The inventory and item pool should have been set before trying to call this method.");
             }
 
-            ItemResource? item = Inventory.GetItem(position);
+            ItemData? item = Inventory.GetItem(position);
             if (item == null)
             {
                 return null;
             }
 
-            return _itemPool.GetActiveObjects().Where(x => x.GetResource<ItemResource>() == item).FirstOrDefault() ?? null;
+            return _itemPool.GetActiveObjects().Where(x => x.GetData<ItemData>() == item).FirstOrDefault() ?? null;
         }
 
 

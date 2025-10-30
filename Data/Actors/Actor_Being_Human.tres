@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="BeingResource" load_steps=3 format=3 uid="uid://dipd2ay6fla8a"]
 
 [ext_resource type="SpriteFrames" uid="uid://dx5orqkv03mqp" path="res://Content/Resources/SpriteFrames/Actors/HumanF/SpriteFrame_Actor_HumanF_Base.tres" id="1_pnxye"]
-[ext_resource type="Script" uid="uid://beb6huw33t0c0" path="res://Systems/Resources/Actors/BeingResource.cs" id="2_3v5fx"]
+[ext_resource type="Script" uid="uid://beb6huw33t0c0" path="res://Systems/Data/Actors/BeingData.cs" id="2_3v5fx"]
 
 [resource]
 script = ExtResource("2_3v5fx")

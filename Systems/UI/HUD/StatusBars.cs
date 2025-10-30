@@ -1,7 +1,6 @@
 using Godot;
-using Khepri.Controllers;
+using Khepri.Data.Actors;
 using Khepri.Entities.Actors;
-using Khepri.Resources.Actors;
 using Khepri.Types.Exceptions;
 using Khepri.Types.Extensions;
 using System;
@@ -49,7 +48,7 @@ namespace Khepri.UI.HUD
         /// <inheritdoc/>
         public override void _PhysicsProcess(Double delta)
         {
-            BeingResource resource = _actorController.GetPlayer().GetResource<BeingResource>();
+            BeingData resource = _actorController.GetPlayer().GetData<BeingData>();
             _staminaBar.Value = resource.CurrentStamina;
             _healthBar.Value = resource.CurrentHealth;
             _hungerBar.Value = resource.CurrentHunger;

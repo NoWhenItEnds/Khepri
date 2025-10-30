@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dyy33wjvp17nk" path="res://Systems/Controllers/PlayerController.cs" id="1_5p3x2"]
 [ext_resource type="Script" uid="uid://cgujt8yhxbsew" path="res://Systems/Controllers/WorldController.cs" id="1_8fov1"]
 [ext_resource type="PackedScene" uid="uid://rc2326u6agtf" path="res://Content/Prefabs/Entities/Actor.tscn" id="2_5p3x2"]
-[ext_resource type="Script" uid="uid://cp43wylajjm3x" path="res://Systems/Resources/ResourceController.cs" id="2_nskmx"]
+[ext_resource type="Script" uid="uid://cp43wylajjm3x" path="res://Systems/Data/DataController.cs" id="2_nskmx"]
 [ext_resource type="Script" uid="uid://d1dxnpil1ufxm" path="res://Systems/GOAP/AgentController.cs" id="3_md4fn"]
 [ext_resource type="PackedScene" uid="uid://dm4tu3i0sn5s4" path="res://Content/Tiles/MountKosciuszko/MK_Terrain.tscn" id="4_5p3x2"]
 [ext_resource type="PackedScene" uid="uid://dbsl418re8pu4" path="res://Content/Tiles/MountKosciuszko/MK_Wall.tscn" id="5_sa7mi"]
@@ -1015,3 +1015,4 @@ script = ExtResource("25_rvbhf")
 _unitMenuPrefab = ExtResource("26_1mywo")
 _enemyController = NodePath("../../../Controllers/Agent Controller")
 _enemyUnit = NodePath("../../../World/Actors/Actors/Enemy Unit")
+_showDebug = true

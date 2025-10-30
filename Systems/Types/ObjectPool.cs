@@ -1,5 +1,5 @@
 using Godot;
-using Khepri.Resources;
+using Khepri.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -183,7 +183,7 @@ namespace Khepri.Types
         /// <typeparam name="T"> The type of resource desired. </typeparam>
         /// <returns> The internal resource cast to the given type. </returns>
         /// <exception cref="InvalidCastException"></exception>
-        public T GetResource<T>() where T : EntityResource;
+        public T GetData<T>() where T : EntityData;
 
 
         /// <summary> Free the object back to the object pool. </summary>

@@ -1,10 +1,8 @@
 using System;
-using System.Linq;
 using Godot;
-using Godot.Collections;
+using Khepri.Data;
+using Khepri.Data.Devices;
 using Khepri.Nodes.Singletons;
-using Khepri.Resources;
-using Khepri.Resources.Devices;
 using Khepri.Types;
 
 namespace Khepri.Entities.Devices
@@ -21,14 +19,14 @@ namespace Khepri.Entities.Devices
         public ObjectPool<DeviceNode> DevicePool { get; private set; }
 
 
-        /// <summary> A reference to the resource controller. </summary>
-        private ResourceController _resourceController;
+        /// <summary> A reference to the data controller. </summary>
+        private DataController _dataController;
 
 
         /// <inheritdoc/>
         public override void _Ready()
         {
-            _resourceController = ResourceController.Instance;
+            _dataController = DataController.Instance;
             DevicePool = new ObjectPool<DeviceNode>(this, _itemPrefab);
         }
 
@@ -39,57 +37,20 @@ namespace Khepri.Entities.Devices
         /// <returns> The initialised device. </returns>
         public DeviceNode CreateDevice(String kind, Vector3 position)
         {
-            DeviceResource resource = _resourceController.CreateResource<DeviceResource>(kind);
-            return CreateDevice(resource, position);
+            DeviceData data = _dataController.CreateEntityData<DeviceData>(kind);
+            return CreateDevice(data, position);
         }
 
 
         /// <summary> Initialise a new device. </summary>
-        /// <param name="resource"> The data resource to associate with this node. </param>
+        /// <param name="data"> The data resource to associate with this node. </param>
         /// <param name="position"> The position to create the object at. </param>
         /// <returns> The initialised item. </returns>
-        public DeviceNode CreateDevice(DeviceResource resource, Vector3 position)
+        public DeviceNode CreateDevice(DeviceData data, Vector3 position)
         {
             DeviceNode device = DevicePool.GetAvailableObject();
-            device.Initialise(resource, position);
+            device.Initialise(data, position);
             return device;
-        }
-
-
-        /// <summary> Package the world state for saving. </summary>
-        /// <returns> An array of the devices representing the current world state. </returns>
-        public Array<Dictionary<String, Variant>> Serialise()
-        {
-            DeviceNode[] activeObjects = DevicePool.GetActiveObjects();
-            Array<Dictionary<String, Variant>> data = new Array<Dictionary<String, Variant>>();
-            foreach (DeviceNode item in activeObjects)
-            {
-                data.Add(item.Serialise());
-            }
-            return data;
-        }
-
-
-        /// <summary> Unpack the given data and instantiate the world state. </summary>
-        /// <param name="data"> Data that has the 'device' type to unpack. </param>
-        public void Deserialise(Array<Dictionary<String, Variant>> data)
-        {
-            DeviceNode[] activeObjects = DevicePool.GetActiveObjects();
-
-            foreach (Dictionary<String, Variant> item in data)
-            {
-                UInt64 uid = (UInt64)item["uid"];
-                String id = (String)item["id"];
-                Vector3 position = (Vector3)item["position"];
-
-                DeviceNode? newDevice = activeObjects.FirstOrDefault(x => x.UId == uid) ?? null;
-                if (newDevice == null)
-                {
-                    newDevice = CreateDevice(id, position);
-                }
-
-                newDevice.Deserialise(item);
-            }
         }
     }
 }

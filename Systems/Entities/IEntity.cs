@@ -1,15 +1,18 @@
 using System;
 using Godot;
+using Khepri.Data;
 using Khepri.Entities.Actors;
-using Khepri.Resources;
 
 namespace Khepri.Entities
 {
     /// <summary> The entity is persistent, meaning that its information should be remembered between game sessions. </summary>
     public interface IEntity
     {
-        /// <summary> The entity's unique identifier in the game world. </summary>
-        public UInt64 UId { get; }
+        /// <summary> The resource's unique identifier. </summary>
+        public Guid DataUId { get; }
+
+        /// <summary> The common name or kind of the associated data object. </summary>
+        public String DataKind { get; }
 
         /// <summary> Get the entity's current position within the game world. </summary>
         public Vector3 GetWorldPosition();
@@ -23,7 +26,7 @@ namespace Khepri.Entities
         /// <typeparam name="T"> The type of resource desired. </typeparam>
         /// <returns> The internal resource cast to the given type. </returns>
         /// <exception cref="InvalidCastException"></exception>
-        public T GetResource<T>() where T : EntityResource;
+        public T GetData<T>() where T : EntityData;
 
 
         /// <summary> The internal logic to use when the entity is examined. </summary>
@@ -34,15 +37,5 @@ namespace Khepri.Entities
         /// <summary> The internal logic to use when the entity is used. </summary>
         /// <param name="activatingEntity"> A reference to the unit activating the action. </param>
         public void Use(ActorNode activatingEntity);
-
-
-        /// <summary> Package the entity into a serialised object. </summary>
-        /// <returns> A dictionary containing the key, value pairs that represent the entity's state. </returns>
-        public Godot.Collections.Dictionary<String, Variant> Serialise();
-
-
-        /// <summary> Rebuild the entity using the serialised object. </summary>
-        /// <param name="data"> A dictionary containing the key, value pairs that represent the entity's state. </param>
-        public void Deserialise(Godot.Collections.Dictionary<String, Variant> data);
     }
 }

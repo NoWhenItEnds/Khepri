@@ -1,9 +1,9 @@
 using Godot;
 using Khepri.Controllers;
+using Khepri.Data;
+using Khepri.Data.Actors;
 using Khepri.Entities.Actors.Components;
 using Khepri.Entities.Actors.States;
-using Khepri.Resources;
-using Khepri.Resources.Actors;
 using Khepri.Types;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,10 @@ namespace Khepri.Entities.Actors
     public partial class ActorNode : CharacterBody3D, IEntity, IControllable, IPoolable
     {
         /// <inheritdoc/>
-        public UInt64 UId { get; private set; }
+        public Guid DataUId => _data.UId;
+
+        /// <inheritdoc/>
+        public String DataKind => _data.Kind;
 
         /// <inheritdoc/>
         [ExportGroup("Nodes")]
@@ -36,11 +39,6 @@ namespace Khepri.Entities.Actors
         [Export] public SensorComponent Sensors { get; private set; }
 
 
-        /// <summary> The actor's data component. </summary>
-        [ExportGroup("Settings")]
-        [Export] private ActorResource _resource;
-
-
         /// <summary> The animation sheets to use for the actor's animations. </summary>
         [ExportGroup("Resources")]
         [Export] private Godot.Collections.Dictionary<UnitSpriteLayer, SpriteFrames> _spriteFrames;
@@ -57,6 +55,10 @@ namespace Khepri.Entities.Actors
         /// <summary> A list of entities that the actor is close enough to interact with. </summary>
         public HashSet<IEntity> UsableEntities = new HashSet<IEntity>();
 
+
+        /// <summary> The actor's data component. </summary>
+        private ActorData _data;
+
         /// <summary> A reference to the world controller. </summary>
         private WorldController _worldController;
 
@@ -67,7 +69,6 @@ namespace Khepri.Entities.Actors
         /// <inheritdoc/>
         public override void _Ready()
         {
-            UId = GetInstanceId();
             _worldController = WorldController.Instance;
             _actorController = ActorController.Instance;
             StateMachine = new ActorStateMachine(this);
@@ -83,12 +84,12 @@ namespace Khepri.Entities.Actors
 
 
         /// <summary> Initialise the actor with its starting values. </summary>
-        /// <param name="resource"> The actor's data component. </param>
+        /// <param name="data"> The actor's data component. </param>
         /// <param name="position"> The world position to set the actor at. </param>
-        public void Initialise(ActorResource resource, Vector3 position)
+        public void Initialise(ActorData data, Vector3 position)
         {
             GlobalPosition = position;
-            _resource = resource;
+            _data = data;
         }
 
 
@@ -117,11 +118,11 @@ namespace Khepri.Entities.Actors
 
 
         /// <inheritdoc/>
-        public T GetResource<T>() where T : EntityResource
+        public T GetData<T>() where T : EntityData
         {
-            if (_resource is T resource)
+            if (_data is T data)
             {
-                return resource;
+                return data;
             }
             else
             {
@@ -168,27 +169,6 @@ namespace Khepri.Entities.Actors
         public void Use(ActorNode activatingEntity)
         {
             throw new NotImplementedException();
-        }
-
-
-        /// <inheritdoc/>
-        public Godot.Collections.Dictionary<String, Variant> Serialise()
-        {
-            Godot.Collections.Dictionary<String, Variant> data = _resource.Serialise();
-            data.Add("uid", UId);
-            data.Add("position", GlobalPosition);
-            data.Add("sensor", Sensors.Serialise());
-            return data;
-        }
-
-
-        /// <inheritdoc/>
-        public void Deserialise(Godot.Collections.Dictionary<String, Variant> data)
-        {
-            UId = (UInt64)data["uid"];
-            GlobalPosition = (Vector3)data["position"];
-            _resource.Deserialise(data);
-            Sensors.Deserialise((Godot.Collections.Dictionary<String, Godot.Collections.Array<Godot.Collections.Dictionary<String, Variant>>>)data["sensor"]);
         }
     }
 }

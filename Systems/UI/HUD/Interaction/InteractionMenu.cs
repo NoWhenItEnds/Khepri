@@ -1,10 +1,10 @@
 using Godot;
+using Khepri.Data.Devices;
+using Khepri.Data.Items;
 using Khepri.Entities;
 using Khepri.Entities.Actors;
 using Khepri.Entities.Devices;
 using Khepri.Entities.Items;
-using Khepri.Resources.Devices;
-using Khepri.Resources.Items;
 using System;
 using System.Text;
 
@@ -36,10 +36,10 @@ namespace Khepri.UI.HUD.Interaction
                     switch (entity)
                     {
                         case ItemNode item:
-                            text = item.GetResource<ItemResource>().Id;
+                            text = item.GetData<ItemData>().Kind;
                             break;
                         case DeviceNode device:
-                            text = device.GetResource<DeviceResource>().Id;
+                            text = device.GetData<DeviceData>().Kind;
                             break;
                     }
 

@@ -1,12 +1,12 @@
 using Godot;
 using Khepri.Controllers;
+using Khepri.Data.Actors;
+using Khepri.Data.Items;
 using Khepri.Entities.Actors;
 using Khepri.Entities.Actors.Components;
 using Khepri.Entities.Devices;
 using Khepri.Entities.Items;
 using Khepri.GOAP;
-using Khepri.Resources.Actors;
-using Khepri.Resources.Items;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -74,7 +74,7 @@ namespace Khepri.UI.Debug.Units
             GlobalPosition = screenPosition;
 
             // Update information.
-            BeingResource resource = _being.GetResource<BeingResource>();
+            BeingData resource = _being.GetData<BeingData>();
             _needsLabel.Text = String.Format(NEEDS_FORMAT, resource.CurrentHealth, resource.CurrentHunger, resource.CurrentFatigue, resource.CurrentEntertainment, resource.CurrentStamina);
 
             // Update Beliefs.
@@ -100,7 +100,7 @@ namespace Khepri.UI.Debug.Units
                         sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, unit.Name, pos.X, pos.Y, pos.Z, minutes));
                         break;
                     case ItemNode item:
-                        sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, item.GetResource<ItemResource>().Id, pos.X, pos.Y, pos.Z, minutes));
+                        sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, item.GetData<ItemData>().Kind, pos.X, pos.Y, pos.Z, minutes));
                         break;
                     case DeviceNode device:
                         sensorBuilder.AppendLine(String.Format(SENSOR_FORMAT, device.Name, pos.X, pos.Y, pos.Z, minutes));

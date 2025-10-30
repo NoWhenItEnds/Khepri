@@ -1,6 +1,6 @@
+using Khepri.Data.Actors;
+using Khepri.Data.Items;
 using Khepri.Entities.Actors;
-using Khepri.Resources.Actors;
-using Khepri.Resources.Items;
 using Khepri.Types.Exceptions;
 using System;
 
@@ -10,7 +10,7 @@ namespace Khepri.GOAP.ActionStrategies
     public partial class UseInventoryItemActionStrategy : IActionStrategy
     {
         /// <inheritdoc/>
-        public Boolean IsValid => _unit.GetResource<BeingResource>().Inventory.HasItem(_itemKind) > 0;
+        public Boolean IsValid => _unit.GetData<BeingData>().Inventory.HasItem(_itemKind) > 0;
 
         /// <inheritdoc/>
         public Boolean IsComplete { get; private set; } = false;
@@ -36,10 +36,10 @@ namespace Khepri.GOAP.ActionStrategies
         /// <inheritdoc/>
         public void Start()
         {
-            ItemResource[] items = _unit.GetResource<BeingResource>().Inventory.GetItem(_itemKind);
+            ItemData[] items = _unit.GetData<BeingData>().Inventory.GetItem(_itemKind);
             if (items.Length > 0)
             {
-                ItemResource item = items[0];
+                ItemData item = items[0];
                 item.Use(_unit);   // TODO - Move to being used by state machine i.e. HandleInput(); Figure out how to use items that are not IEntities.
                 IsComplete = true;
             }

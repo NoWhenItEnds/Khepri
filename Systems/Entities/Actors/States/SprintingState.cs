@@ -1,6 +1,6 @@
 using System;
 using Godot;
-using Khepri.Resources.Actors;
+using Khepri.Data.Actors;
 using Khepri.Types;
 
 namespace Khepri.Entities.Actors.States
@@ -22,7 +22,7 @@ namespace Khepri.Entities.Actors.States
         {
             if (input is MoveInput move)
             {
-                BeingResource resource = _being.GetResource<BeingResource>();
+                BeingData resource = _being.GetData<BeingData>();
                 _being.Velocity = move.Direction * resource.BaseSpeed * resource.SprintModifier;
                 _being.Sprite.TransitionAnimation(this, move.Direction.ToDirection());
             }
