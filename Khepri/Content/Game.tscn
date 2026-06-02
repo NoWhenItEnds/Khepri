@@ -1,17 +1,24 @@
 [gd_scene format=3 uid="uid://hbqoxdwuv0ar"]
 
 [ext_resource type="Script" uid="uid://b3lads64wa673" path="res://Khepri/Systems/Managers/GameManager.cs" id="1_dycg1"]
+[ext_resource type="Script" uid="uid://pl2ebw306jyj" path="res://Khepri/Systems/Managers/UIManager.cs" id="2_ri25b"]
 
 [node name="Game" type="Node" unique_id=1801120431]
 script = ExtResource("1_dycg1")
 
-[node name="UI" type="Control" parent="." unique_id=939978527]
+[node name="UI" type="Control" parent="." unique_id=939978527 node_paths=PackedStringArray("_background", "_worldWindow", "_statusBar", "_textWindow", "_displayWindow")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("2_ri25b")
+_background = NodePath("Background")
+_worldWindow = NodePath("TabContainer/World Window")
+_statusBar = NodePath("TabContainer/World Window/Status Bar")
+_textWindow = NodePath("TabContainer/World Window/HBoxContainer/Text Window")
+_displayWindow = NodePath("TabContainer/World Window/HBoxContainer/Display Window")
 
 [node name="Background" type="TextureRect" parent="UI" unique_id=59822985]
 layout_mode = 1
@@ -21,29 +28,34 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI" unique_id=1611766729]
+[node name="TabContainer" type="TabContainer" parent="UI" unique_id=1023374034]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+current_tab = 0
 
-[node name="Status Bar" type="PanelContainer" parent="UI/VBoxContainer" unique_id=1313488816]
+[node name="World Window" type="VBoxContainer" parent="UI/TabContainer" unique_id=1611766729]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="Status Bar" type="PanelContainer" parent="UI/TabContainer/World Window" unique_id=1313488816]
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="UI/VBoxContainer/Status Bar" unique_id=1447167897]
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/TabContainer/World Window/Status Bar" unique_id=1447167897]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="UI/VBoxContainer" unique_id=1145008148]
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/TabContainer/World Window" unique_id=1145008148]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Text Window" type="Panel" parent="UI/VBoxContainer/HBoxContainer" unique_id=239364944]
+[node name="Text Window" type="Panel" parent="UI/TabContainer/World Window/HBoxContainer" unique_id=239364944]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Display Window" type="Control" parent="UI/VBoxContainer/HBoxContainer" unique_id=755384062]
+[node name="Display Window" type="Control" parent="UI/TabContainer/World Window/HBoxContainer" unique_id=755384062]
 layout_mode = 2
 size_flags_horizontal = 3
