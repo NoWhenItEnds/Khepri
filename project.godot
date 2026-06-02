@@ -25,6 +25,7 @@ folder_colors={
 "res://Jaypen/": "pink",
 "res://Khepri/": "purple",
 "res://Khepri/Content/": "teal",
+"res://Khepri/Data/": "green",
 "res://Khepri/Systems/": "blue"
 }
 

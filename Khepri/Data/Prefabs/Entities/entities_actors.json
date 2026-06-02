@@ -1,0 +1,9 @@
+{
+    "name": "goblin",
+    "components": [
+        {
+            "type": "Health",
+            "max": 30
+        }
+    ]
+}
