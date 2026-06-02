@@ -4,3 +4,46 @@
 
 [node name="Game" type="Node" unique_id=1801120431]
 script = ExtResource("1_dycg1")
+
+[node name="UI" type="Control" parent="." unique_id=939978527]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="TextureRect" parent="UI" unique_id=59822985]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI" unique_id=1611766729]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Status Bar" type="PanelContainer" parent="UI/VBoxContainer" unique_id=1313488816]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/VBoxContainer/Status Bar" unique_id=1447167897]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/VBoxContainer" unique_id=1145008148]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Text Window" type="Panel" parent="UI/VBoxContainer/HBoxContainer" unique_id=239364944]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Display Window" type="Control" parent="UI/VBoxContainer/HBoxContainer" unique_id=755384062]
+layout_mode = 2
+size_flags_horizontal = 3
