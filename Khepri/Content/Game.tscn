@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://hbqoxdwuv0ar"]
+
+[ext_resource type="Script" uid="uid://b3lads64wa673" path="res://Khepri/Systems/Managers/GameManager.cs" id="1_dycg1"]
+
+[node name="Game" type="Node" unique_id=1801120431]
+script = ExtResource("1_dycg1")
