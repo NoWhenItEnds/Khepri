@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://b3lads64wa673" path="res://Khepri/Systems/Managers/GameManager.cs" id="1_dycg1"]
 [ext_resource type="Script" uid="uid://bci17fk46gdy2" path="res://Khepri/Systems/Managers/EntityManager.cs" id="2_8saus"]
 [ext_resource type="Script" uid="uid://pl2ebw306jyj" path="res://Khepri/Systems/Managers/UIManager.cs" id="2_ri25b"]
+[ext_resource type="Script" uid="uid://cf3rog520qia5" path="res://Khepri/Systems/Managers/RoomManager.cs" id="3_vos0w"]
 [ext_resource type="Script" uid="uid://dlyccmqrg6rf0" path="res://Khepri/Systems/UI/World/WorldWindow.cs" id="4_40jd7"]
 [ext_resource type="Texture2D" uid="uid://d4j6cd0c7tlok" path="res://Khepri/Data/Textures/World/Backgrounds/background_placeholder.png" id="4_lwcp1"]
 [ext_resource type="Script" uid="uid://elr6gga1cvgg" path="res://Khepri/Systems/UI/World/StatusBar.cs" id="5_gnjms"]
@@ -16,6 +17,9 @@ script = ExtResource("1_dycg1")
 [node name="Entities" type="Node" parent="." unique_id=458040416]
 script = ExtResource("2_8saus")
 _prefabPaths = Array[String](["res://Khepri/Data/Prefabs/Entities"])
+
+[node name="Rooms" type="Node" parent="." unique_id=1764317755]
+script = ExtResource("3_vos0w")
 
 [node name="UI" type="Control" parent="." unique_id=939978527 node_paths=PackedStringArray("_background", "_worldWindow")]
 layout_mode = 3
