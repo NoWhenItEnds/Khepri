@@ -3,6 +3,10 @@
 [ext_resource type="Script" uid="uid://b3lads64wa673" path="res://Khepri/Systems/Managers/GameManager.cs" id="1_dycg1"]
 [ext_resource type="Script" uid="uid://bci17fk46gdy2" path="res://Khepri/Systems/Managers/EntityManager.cs" id="2_8saus"]
 [ext_resource type="Script" uid="uid://pl2ebw306jyj" path="res://Khepri/Systems/Managers/UIManager.cs" id="2_ri25b"]
+[ext_resource type="Script" uid="uid://dlyccmqrg6rf0" path="res://Khepri/Systems/UI/World/WorldWindow.cs" id="4_40jd7"]
+[ext_resource type="Script" uid="uid://elr6gga1cvgg" path="res://Khepri/Systems/UI/World/StatusBar.cs" id="5_gnjms"]
+[ext_resource type="Script" uid="uid://bfuti7ewauje3" path="res://Khepri/Systems/UI/World/TextWindow.cs" id="6_dqkud"]
+[ext_resource type="Script" uid="uid://csp0inj532x1g" path="res://Khepri/Systems/UI/World/DisplayWindow.cs" id="7_ryx0f"]
 
 [node name="Game" type="Node" unique_id=1801120431]
 script = ExtResource("1_dycg1")
@@ -11,7 +15,7 @@ script = ExtResource("1_dycg1")
 script = ExtResource("2_8saus")
 _prefabPaths = Array[String](["res://Khepri/Data/Prefabs/Entities"])
 
-[node name="UI" type="Control" parent="." unique_id=939978527 node_paths=PackedStringArray("_background", "_worldWindow", "_statusBar", "_textWindow", "_displayWindow")]
+[node name="UI" type="Control" parent="." unique_id=939978527 node_paths=PackedStringArray("_background", "_worldWindow")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -21,9 +25,6 @@ grow_vertical = 2
 script = ExtResource("2_ri25b")
 _background = NodePath("Background")
 _worldWindow = NodePath("TabContainer/World Window")
-_statusBar = NodePath("TabContainer/World Window/Status Bar")
-_textWindow = NodePath("TabContainer/World Window/HBoxContainer/Text Window")
-_displayWindow = NodePath("TabContainer/World Window/HBoxContainer/Display Window")
 
 [node name="Background" type="TextureRect" parent="UI" unique_id=59822985]
 layout_mode = 1
@@ -42,25 +43,59 @@ grow_horizontal = 2
 grow_vertical = 2
 current_tab = 0
 
-[node name="World Window" type="VBoxContainer" parent="UI/TabContainer" unique_id=1611766729]
+[node name="World Window" type="VBoxContainer" parent="UI/TabContainer" unique_id=1611766729 node_paths=PackedStringArray("_statusBar", "_textWindow", "_displayWindow")]
 layout_mode = 2
+script = ExtResource("4_40jd7")
+_statusBar = NodePath("Status Bar")
+_textWindow = NodePath("HBoxContainer/Text Window")
+_displayWindow = NodePath("HBoxContainer/Display Window")
 metadata/_tab_index = 0
 
-[node name="Status Bar" type="PanelContainer" parent="UI/TabContainer/World Window" unique_id=1313488816]
+[node name="Status Bar" type="PanelContainer" parent="UI/TabContainer/World Window" unique_id=1313488816 node_paths=PackedStringArray("_dateTimeLabel", "_weatherLabel")]
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
+script = ExtResource("5_gnjms")
+_dateTimeLabel = NodePath("HBoxContainer/DateTime Label")
+_weatherLabel = NodePath("HBoxContainer/Weather Label")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="UI/TabContainer/World Window/Status Bar" unique_id=1447167897]
 layout_mode = 2
+
+[node name="DateTime Label" type="RichTextLabel" parent="UI/TabContainer/World Window/Status Bar/HBoxContainer" unique_id=1837193243]
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+text = "Friday, 29 May 2015 05:50"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Weather Label" type="RichTextLabel" parent="UI/TabContainer/World Window/Status Bar/HBoxContainer" unique_id=1684546565]
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+text = "Dizzle"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="UI/TabContainer/World Window" unique_id=1145008148]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Text Window" type="Panel" parent="UI/TabContainer/World Window/HBoxContainer" unique_id=239364944]
+[node name="Text Window" type="PanelContainer" parent="UI/TabContainer/World Window/HBoxContainer" unique_id=1601855850 node_paths=PackedStringArray("_situationLabel")]
 layout_mode = 2
 size_flags_horizontal = 3
+script = ExtResource("6_dqkud")
+_situationLabel = NodePath("Situation Label")
 
-[node name="Display Window" type="Control" parent="UI/TabContainer/World Window/HBoxContainer" unique_id=755384062]
+[node name="Situation Label" type="RichTextLabel" parent="UI/TabContainer/World Window/HBoxContainer/Text Window" unique_id=1647581864]
+layout_mode = 2
+bbcode_enabled = true
+
+[node name="Display Window" type="AspectRatioContainer" parent="UI/TabContainer/World Window/HBoxContainer" unique_id=1517190859 node_paths=PackedStringArray("_situationTexture")]
 layout_mode = 2
 size_flags_horizontal = 3
+script = ExtResource("7_ryx0f")
+_situationTexture = NodePath("Situation Texture")
+
+[node name="Situation Texture" type="TextureRect" parent="UI/TabContainer/World Window/HBoxContainer/Display Window" unique_id=1460714512]
+layout_mode = 2
