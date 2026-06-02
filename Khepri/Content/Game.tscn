@@ -4,9 +4,11 @@
 [ext_resource type="Script" uid="uid://bci17fk46gdy2" path="res://Khepri/Systems/Managers/EntityManager.cs" id="2_8saus"]
 [ext_resource type="Script" uid="uid://pl2ebw306jyj" path="res://Khepri/Systems/Managers/UIManager.cs" id="2_ri25b"]
 [ext_resource type="Script" uid="uid://dlyccmqrg6rf0" path="res://Khepri/Systems/UI/World/WorldWindow.cs" id="4_40jd7"]
+[ext_resource type="Texture2D" uid="uid://d4j6cd0c7tlok" path="res://Khepri/Data/Textures/World/Backgrounds/background_placeholder.png" id="4_lwcp1"]
 [ext_resource type="Script" uid="uid://elr6gga1cvgg" path="res://Khepri/Systems/UI/World/StatusBar.cs" id="5_gnjms"]
 [ext_resource type="Script" uid="uid://bfuti7ewauje3" path="res://Khepri/Systems/UI/World/TextWindow.cs" id="6_dqkud"]
 [ext_resource type="Script" uid="uid://csp0inj532x1g" path="res://Khepri/Systems/UI/World/DisplayWindow.cs" id="7_ryx0f"]
+[ext_resource type="Texture2D" uid="uid://4q335xxs2p" path="res://icon.svg" id="9_vos0w"]
 
 [node name="Game" type="Node" unique_id=1801120431]
 script = ExtResource("1_dycg1")
@@ -33,6 +35,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+texture = ExtResource("4_lwcp1")
+expand_mode = 5
 
 [node name="TabContainer" type="TabContainer" parent="UI" unique_id=1023374034]
 layout_mode = 1
@@ -99,3 +103,4 @@ _situationTexture = NodePath("Situation Texture")
 
 [node name="Situation Texture" type="TextureRect" parent="UI/TabContainer/World Window/HBoxContainer/Display Window" unique_id=1460714512]
 layout_mode = 2
+texture = ExtResource("9_vos0w")
