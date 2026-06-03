@@ -1,18 +1,24 @@
 using System;
+using Khepri.Prefabs;
 
 namespace Khepri.Entities.Components
 {
     /// <summary> A single aspect of an entity. An entity's capabilities are defined by the components the construct it. </summary>
-    public abstract class Component : IEquatable<Component>
+    public abstract class Component : IEquatable<Component>, IPart<Entity>
     {
         /// <summary> The entity that this component is attached to. </summary>
-        protected readonly Entity _entity;
+        public readonly Entity ParentEntity;
+
+
+        /// <inheritdoc/>
+        Entity IPart<Entity>.Owner => ParentEntity;
+
 
         /// <summary> Initialises a new instance of the <see cref="Component"/> class. </summary>
-        /// <param name="entity"> The entity that this component is attached to. </param>
-        public Component(Entity entity)
+        /// <param name="parentEntity"> The entity that this component is attached to. </param>
+        public Component(Entity parentEntity)
         {
-            _entity = entity;
+            ParentEntity = parentEntity;
         }
 
 

@@ -1,0 +1,9 @@
+{
+    "name": "treasure_chest",
+    "components": [
+        {
+            "type": "Inventory",
+            "contents": ["goblin"]
+        }
+    ]
+}

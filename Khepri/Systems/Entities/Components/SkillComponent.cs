@@ -1,4 +1,6 @@
 using System;
+using Khepri.Entities.Prefabs;
+using Khepri.Prefabs;
 
 namespace Khepri.Entities.Components
 {
@@ -10,6 +12,17 @@ namespace Khepri.Entities.Components
         public SkillComponent(Entity entity) : base(entity)
         {
             // TODO - Create dictionary of skills and values.
+        }
+
+
+        /// <summary> Creates a <see cref="SkillComponent"/> from prefab data. </summary>
+        /// <param name="entity"> The entity the component will be attached to. </param>
+        /// <param name="data"> The component's parsed JSON data; no properties are consumed by this component. </param>
+        /// <returns> A fully constructed <see cref="SkillComponent"/>. </returns>
+        [ComponentFactory]
+        private static SkillComponent Create(Entity entity, PrefabData data)
+        {
+            return new SkillComponent(entity);
         }
     }
 

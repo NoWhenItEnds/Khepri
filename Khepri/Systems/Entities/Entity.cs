@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Khepri.Entities.Components;
+using Khepri.Prefabs;
 
 namespace Khepri.Entities
 {
     /// <summary> A thing or object that can exist within a room. All things, including players and items, are entities. </summary>
-    public class Entity : IEquatable<Entity>
+    public class Entity : IEquatable<Entity>, IPartContainer<Component>
     {
         /// <summary> The entity's unique identifier. Should be unique across all entities. </summary>
         public readonly Guid UId;
 
-        // TODO - This should have a dynamic description, like a room, and a generated texture...
 
         /// <summary> The set of all components currently attached to this entity. </summary>
         private readonly HashSet<Component> _components = new HashSet<Component>();
@@ -32,10 +32,25 @@ namespace Khepri.Entities
         public Boolean AddComponent(Component component) => _components.Add(component);
 
 
+        /// <inheritdoc/>
+        Boolean IPartContainer<Component>.Add(Component part) => AddComponent(part);
+
+
         /// <summary> Gets the first attached component of type <typeparamref name="T"/>. </summary>
         /// <typeparam name="T"> The kind of component to retrieve. </typeparam>
         /// <returns> The component instance, or <c>null</c> if none is attached. </returns>
         public T? GetComponent<T>() where T : Component => _components.OfType<T>().FirstOrDefault();
+
+
+        /// <summary> Returns all components currently attached to this entity, in unspecified order. </summary>
+        /// <remarks> The returned collection is a snapshot — mutations to it do not affect the entity's internal component set. Required by serialisation (see <c>EntitySerialiser</c>), which must visit every component to build a self-describing save payload. Can be generalised to a <c>TOwner</c>/<c>TPart</c> pair when room persistence is added. </remarks>
+        /// <returns> A read-only snapshot of every attached component. </returns>
+        public IReadOnlyCollection<Component> GetComponents() => _components.ToList();
+
+
+        /// <summary> Returns only the components that implement <see cref="IEntityContainer"/>, allowing callers to walk the containment hierarchy without exposing the full component set. </summary>
+        /// <returns> The subset of attached components that act as entity containers, in unspecified order. </returns>
+        public IReadOnlyCollection<IEntityContainer> GetContainers() => _components.OfType<IEntityContainer>().ToList();
 
 
         /// <summary> Removes all attached components whose runtime type is exactly <typeparamref name="T"/>. </summary>

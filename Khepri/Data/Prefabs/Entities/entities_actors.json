@@ -3,7 +3,8 @@
     "components": [
         {
             "type": "Health",
-            "max": 30
+            "min": 20,
+            "max": 40
         }
     ]
 }

@@ -23,11 +23,11 @@ namespace Khepri.UI.World
         /// <summary> Force the window to update. </summary>
         public void ForceUpdate()
         {
-            Entity player = GameManager.Instance!.PlayerEntity;
-            Room room = RoomManager.Instance!.GetCurrentRoom(player);
+            //Entity player = GameManager.Instance!.PlayerEntity;
+            //Room room = RoomManager.Instance!.GetCurrentRoom(player);
 
             _statusBar.ForceUpdate();
-            _textWindow.ForceUpdate(room);
+            //_textWindow.ForceUpdate(room);
             _displayWindow.ForceUpdate();   // TODO - How do we know which entity to display? Do we even have the display update here?
         }
     }
