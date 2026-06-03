@@ -1,26 +1,24 @@
 using System;
+using Godot;
 
 namespace Khepri.Rooms.Features
 {
     /// <summary> A feature that supplies a fixed textual description for a room, backing <see cref="Room.BuildDescription"/>. </summary>
-    public sealed class DescriptionFeature : Feature
+    [GlobalClass]
+    public partial class DescriptionFeature : Feature
     {
-        /// <summary> The description text returned to callers of <see cref="Room.BuildDescription"/>. </summary>
-        public readonly String Text;
+        /// <summary> The description text returned to callers of <see cref="Room.BuildDescription"/>. Must not be blank. </summary>
+        [Export(PropertyHint.MultilineText)] public String Text { get; set; } = String.Empty;
 
 
-        /// <summary> Initialises a new description feature attached to the given room. </summary>
-        /// <param name="room"> The room that this feature belongs to. </param>
-        /// <param name="text"> The description text to expose. Must not be null or whitespace. </param>
-        /// <exception cref="ArgumentException"> Thrown when <paramref name="text"/> is null or whitespace. </exception>
-        public DescriptionFeature(Room room, String text) : base(room)
+        /// <inheritdoc/>
+        /// <exception cref="InvalidOperationException"> Thrown when <see cref="Text"/> was left blank in the authored resource. </exception>
+        public override void OnInstantiate()
         {
-            if (String.IsNullOrWhiteSpace(text))
+            if (String.IsNullOrWhiteSpace(Text))
             {
-                throw new ArgumentException("Description text must not be null or whitespace.", nameof(text));
+                throw new InvalidOperationException($"{nameof(DescriptionFeature)} on room '{Owner.UId}' has blank Text.");
             }
-
-            Text = text;
         }
     }
 }

@@ -23,8 +23,8 @@ namespace Khepri.Rooms
         /// <summary> The entities directly in the current room, not those nested within container components. </summary>
         private readonly HashSet<Entity> _entities = new HashSet<Entity>();
 
-        /// <summary> The features that define the characteristics of this room. Features are aspects of the room itself; entities are its contents — they are separate collections. </summary>
-        private readonly HashSet<Feature> _features = new HashSet<Feature>();
+        /// <summary> The features that define the characteristics of this room, keyed by exact runtime type — a room holds at most one feature of each concrete type. Features are aspects of the room itself; entities are its contents — they are separate collections. </summary>
+        private readonly Dictionary<Type, Feature> _features = new Dictionary<Type, Feature>();
 
 
         /// <summary> Initialises a new instance of the <see cref="Room"/> class. </summary>
@@ -51,16 +51,16 @@ namespace Khepri.Rooms
         }
 
 
-        /// <summary> Adds a pre-constructed feature instance to this room. </summary>
+        /// <summary> Adds a feature instance to this room. </summary>
         /// <param name="feature"> The feature being added. </param>
-        /// <returns> <c>true</c> if the feature was added; <c>false</c> if an equal feature already exists. </returns>
-        public Boolean AddFeature(Feature feature) => _features.Add(feature);
+        /// <returns> <c>true</c> if the feature was added; <c>false</c> if a feature of the same concrete type already exists. </returns>
+        public Boolean AddFeature(Feature feature) => _features.TryAdd(feature.GetType(), feature);
 
 
-        /// <summary> Gets the first attached feature of type <typeparamref name="T"/>. </summary>
+        /// <summary> Gets the first attached feature assignable to <typeparamref name="T"/>. </summary>
         /// <typeparam name="T"> The kind of feature to retrieve. </typeparam>
         /// <returns> The feature instance, or <c>null</c> if none is attached. </returns>
-        public T? GetFeature<T>() where T : Feature => _features.OfType<T>().FirstOrDefault();
+        public T? GetFeature<T>() where T : Feature => _features.Values.OfType<T>().FirstOrDefault();
 
 
         /// <summary> Registers a pre-constructed connection on this room. </summary>

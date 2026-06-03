@@ -1,32 +1,30 @@
-using System;
+using Godot;
 
 namespace Khepri.Rooms.Features
 {
     /// <summary> A single aspect or characteristic of a room. A room's properties are defined by the features attached to it. </summary>
-    /// <remarks> Equality is type-based — a room can hold at most one feature of each concrete type. </remarks>
-    public abstract class Feature : IEquatable<Feature>
+    /// <remarks>
+    /// A feature is a Godot <see cref="Resource"/>: the same class is the designer-authored template, the live runtime instance, and the save payload.
+    /// <c>RoomPrefab</c> instantiates a room by <see cref="Resource.Duplicate(bool)"/>-ing each template feature, calling <see cref="Bind"/>, then <see cref="OnInstantiate"/>. A room holds at most one feature of each concrete type.
+    /// </remarks>
+    [GlobalClass]
+    public abstract partial class Feature : Resource
     {
-        /// <summary> The room that this feature is attached to. </summary>
-        public readonly Room ParentRoom;
+        /// <summary> The room this feature is attached to. Wired by <see cref="Bind"/> at instantiation; not exported, so neither authored nor serialised. </summary>
+        public Room Owner { get; private set; } = null!;
 
 
-        /// <summary> Initialises a new instance attached to the given room. </summary>
-        /// <param name="parentRoom"> The room that this feature belongs to. </param>
-        public Feature(Room parentRoom)
+        /// <summary> Attaches this feature to its owning room. Called once immediately after duplication and before <see cref="OnInstantiate"/>. </summary>
+        /// <param name="owner"> The room that owns this feature. </param>
+        internal void Bind(Room owner)
         {
-            ParentRoom = parentRoom;
+            Owner = owner;
         }
 
 
-        /// <inheritdoc/>
-        public override Int32 GetHashCode() => GetType().GetHashCode();
-
-
-        /// <inheritdoc/>
-        public override Boolean Equals(Object? obj) => obj is Feature other && Equals(other);
-
-
-        /// <inheritdoc/>
-        public Boolean Equals(Feature? other) => other is not null && GetType().Equals(other.GetType());
+        /// <summary> Resolves any spawn-time state once the feature has been duplicated onto a fresh room. The default is a no-op. </summary>
+        public virtual void OnInstantiate()
+        {
+        }
     }
 }

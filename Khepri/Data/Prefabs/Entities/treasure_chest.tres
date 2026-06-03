@@ -1,14 +1,14 @@
 [gd_resource type="Resource" script_class="EntityPrefab" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://Khepri/Systems/Entities/Definitions/EntityPrefab.cs" id="1_entityprefab"]
-[ext_resource type="Script" path="res://Khepri/Systems/Entities/Definitions/InventoryDef.cs" id="2_inventorydef"]
+[ext_resource type="Script" path="res://Khepri/Systems/Entities/Components/InventoryComponent.cs" id="2_inventory"]
 [ext_resource type="Resource" path="res://Khepri/Data/Prefabs/Entities/goblin.tres" id="3_goblin"]
 
-[sub_resource type="Resource" id="InventoryDef_chest"]
-script = ExtResource("2_inventorydef")
+[sub_resource type="Resource" id="Inventory_chest"]
+script = ExtResource("2_inventory")
 Contents = [ExtResource("3_goblin")]
 
 [resource]
 script = ExtResource("1_entityprefab")
 Name = "treasure_chest"
-Components = [SubResource("InventoryDef_chest")]
+Components = [SubResource("Inventory_chest")]

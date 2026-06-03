@@ -13,8 +13,9 @@ namespace Khepri.Entities
         public readonly Guid UId;
 
 
-        /// <summary> The set of all components currently attached to this entity. </summary>
-        private readonly HashSet<Component> _components = new HashSet<Component>();
+        /// <summary> All components currently attached to this entity, keyed by their exact runtime type — an entity holds at most one component of each concrete type. </summary>
+        /// <remarks> Keying by <see cref="Type"/> rather than relying on component equality keeps the uniqueness rule explicit and avoids overriding equality on the Godot <c>Resource</c> base. </remarks>
+        private readonly Dictionary<Type, Component> _components = new Dictionary<Type, Component>();
 
 
         /// <summary> Initialises a new instance of the <see cref="Entity"/> class. </summary>
@@ -25,49 +26,43 @@ namespace Khepri.Entities
         }
 
 
-        /// <summary> Adds a pre-constructed component instance to this entity. </summary>
+        /// <summary> Adds a component instance to this entity. </summary>
         /// <param name="component"> The component being added. </param>
-        /// <returns> <c>true</c> if the component was added; <c>false</c> if an equal component already exists. </returns>
-        public Boolean AddComponent(Component component) => _components.Add(component);
+        /// <returns> <c>true</c> if the component was added; <c>false</c> if a component of the same concrete type is already attached. </returns>
+        public Boolean AddComponent(Component component) => _components.TryAdd(component.GetType(), component);
 
 
-        /// <summary> Gets the first attached component of type <typeparamref name="T"/>. </summary>
+        /// <summary> Gets the first attached component assignable to <typeparamref name="T"/>. </summary>
         /// <typeparam name="T"> The kind of component to retrieve. </typeparam>
         /// <returns> The component instance, or <c>null</c> if none is attached. </returns>
-        public T? GetComponent<T>() where T : Component => _components.OfType<T>().FirstOrDefault();
+        public T? GetComponent<T>() where T : Component => _components.Values.OfType<T>().FirstOrDefault();
 
 
         /// <summary> Returns all components currently attached to this entity, in unspecified order. </summary>
-        /// <remarks> The returned collection is a snapshot — mutations to it do not affect the entity's internal component set. Required by serialisation (see <c>EntitySerialiser</c>), which must visit every component to build a self-describing save payload. Can be generalised to a <c>TOwner</c>/<c>TPart</c> pair when room persistence is added. </remarks>
+        /// <remarks> The returned collection is a snapshot — mutations to it do not affect the entity's internal component set. </remarks>
         /// <returns> A read-only snapshot of every attached component. </returns>
-        public IReadOnlyCollection<Component> GetComponents() => _components.ToList();
+        public IReadOnlyCollection<Component> GetComponents() => _components.Values.ToList();
 
 
         /// <summary> Returns only the components that implement <see cref="IEntityContainer"/>, allowing callers to walk the containment hierarchy without exposing the full component set. </summary>
         /// <returns> The subset of attached components that act as entity containers, in unspecified order. </returns>
-        public IReadOnlyCollection<IEntityContainer> GetContainers() => _components.OfType<IEntityContainer>().ToList();
+        public IReadOnlyCollection<IEntityContainer> GetContainers() => _components.Values.OfType<IEntityContainer>().ToList();
 
 
-        /// <summary> Removes all attached components whose runtime type is exactly <typeparamref name="T"/>. </summary>
+        /// <summary> Removes the attached component whose runtime type is exactly <typeparamref name="T"/>. </summary>
         /// <typeparam name="T"> The type of component to remove. </typeparam>
-        /// <returns> <c>true</c> if at least one component was removed; <c>false</c> if none were found. </returns>
-        public Boolean RemoveComponent<T>() where T : Component
-        {
-            List<Component> matches = _components.Where(x => x.GetType().Equals(typeof(T))).ToList();
-
-            foreach (Component match in matches)
-            {
-                _components.Remove(match);
-            }
-
-            return matches.Count > 0;
-        }
+        /// <returns> <c>true</c> if a component was removed; <c>false</c> if none was found. </returns>
+        public Boolean RemoveComponent<T>() where T : Component => _components.Remove(typeof(T));
 
 
         /// <summary> Removes a specific component instance from this entity. </summary>
         /// <param name="component"> The component to remove. </param>
         /// <returns> <c>true</c> if the component was removed; <c>false</c> if it was not attached. </returns>
-        public Boolean RemoveComponent(Component component) => _components.Remove(component);
+        public Boolean RemoveComponent(Component component)
+        {
+            Boolean present = _components.TryGetValue(component.GetType(), out Component? attached) && ReferenceEquals(attached, component);
+            return present && _components.Remove(component.GetType());
+        }
 
 
         /// <summary> Build a dynamic description of the entity's current state to display to the player. </summary>
