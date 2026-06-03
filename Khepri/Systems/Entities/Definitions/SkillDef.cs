@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 using Khepri.Entities.Components;
 
@@ -8,7 +9,7 @@ namespace Khepri.Entities.Definitions
     public partial class SkillDef : ComponentDef
     {
         /// <inheritdoc/>
-        public override Component Create(Entity owner)
+        public override Component Create(Entity owner, ISet<EntityPrefab> ancestry)
         {
             return new SkillComponent(owner);
         }

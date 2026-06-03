@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 using Khepri.Entities.Components;
 
@@ -13,7 +14,8 @@ namespace Khepri.Entities.Definitions
     {
         /// <summary> Constructs a live component for <paramref name="owner"/> from this definition's authored values. </summary>
         /// <param name="owner"> The entity the produced component will belong to. </param>
+        /// <param name="ancestry"> The set of <see cref="EntityPrefab"/>s currently being instantiated on the recursion stack; container definitions forward it to <see cref="EntityPrefab.Instantiate(ISet{EntityPrefab})"/> so a prefab that transitively contains itself is rejected rather than recursing forever. Non-container definitions ignore it. </param>
         /// <returns> A fully constructed, non-null <see cref="Component"/>. </returns>
-        public abstract Component Create(Entity owner);
+        public abstract Component Create(Entity owner, ISet<EntityPrefab> ancestry);
     }
 }

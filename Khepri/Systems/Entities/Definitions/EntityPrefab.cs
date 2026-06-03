@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 using Khepri.Entities.Components;
 
@@ -21,14 +22,33 @@ namespace Khepri.Entities.Definitions
 
         /// <summary> Builds a fresh <see cref="Entity"/> with a new identity and a component for each definition in <see cref="Components"/>. </summary>
         /// <returns> A fully constructed entity. </returns>
-        /// <exception cref="InvalidOperationException"> Thrown when two definitions produce components of the same type (the entity holds at most one component per type). </exception>
+        /// <exception cref="InvalidOperationException"> Thrown when two definitions produce components of the same type, or when a container definition causes this prefab to (transitively) contain itself. </exception>
         public Entity Instantiate()
         {
+            return Instantiate(new HashSet<EntityPrefab>());
+        }
+
+
+        /// <summary> Cycle-aware recursive core of <see cref="Instantiate()"/>: builds the entity while guarding against a prefab that contains itself through a container definition. </summary>
+        /// <remarks> <see cref="ResourceLoader"/> caches each <c>.tres</c> to a single instance, so reference identity in <paramref name="ancestry"/> reliably detects a revisited prefab. A prefab shared by two siblings (a diamond) is permitted — only prefabs currently open on the recursion stack are rejected. </remarks>
+        /// <param name="ancestry"> The prefabs currently being instantiated higher up the recursion stack. </param>
+        /// <returns> A fully constructed entity. </returns>
+        /// <exception cref="InvalidOperationException"> Thrown when this prefab is already on the recursion stack (a containment cycle), or when two definitions resolve to the same component type. </exception>
+        internal Entity Instantiate(ISet<EntityPrefab> ancestry)
+        {
+            Boolean fresh = ancestry.Add(this);
+
+            if (!fresh)
+            {
+                throw new InvalidOperationException(
+                    $"Prefab containment cycle detected: entity prefab '{Name}' (transitively) contains itself.");
+            }
+
             Entity entity = new Entity(Guid.NewGuid());
 
             foreach (ComponentDef definition in Components)
             {
-                Component component = definition.Create(entity);
+                Component component = definition.Create(entity, ancestry);
                 Boolean   added     = entity.AddComponent(component);
 
                 if (!added)
@@ -37,6 +57,8 @@ namespace Khepri.Entities.Definitions
                         $"Entity prefab '{Name}' declares two components that resolve to the same type ('{component.GetType().Name}').");
                 }
             }
+
+            ancestry.Remove(this);
 
             return entity;
         }

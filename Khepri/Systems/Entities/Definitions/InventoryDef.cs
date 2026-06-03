@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 using Khepri.Entities.Components;
 
@@ -14,14 +15,14 @@ namespace Khepri.Entities.Definitions
 
 
         /// <inheritdoc/>
-        /// <exception cref="InvalidOperationException"> Thrown when a contained entity cannot be added (a duplicate instance or a containment cycle). </exception>
-        public override Component Create(Entity owner)
+        /// <exception cref="InvalidOperationException"> Thrown when a contained entity cannot be added (a duplicate instance or a runtime containment cycle), or when a content prefab transitively contains itself. </exception>
+        public override Component Create(Entity owner, ISet<EntityPrefab> ancestry)
         {
             InventoryComponent inventory = new InventoryComponent(owner);
 
             foreach (EntityPrefab prefab in Contents)
             {
-                Entity  child = prefab.Instantiate();   // TODO - Guard against cyclic prefab graphs if content authoring ever makes them likely.
+                Entity  child = prefab.Instantiate(ancestry);   // Cycle-aware: shares the recursion-stack set so a self-containing prefab fails fast.
                 Boolean added = inventory.AddEntity(child);
 
                 if (!added)
