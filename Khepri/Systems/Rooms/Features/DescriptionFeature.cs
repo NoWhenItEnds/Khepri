@@ -1,6 +1,4 @@
 using System;
-using Khepri.Prefabs;
-using Khepri.Rooms.Prefabs;
 
 namespace Khepri.Rooms.Features
 {
@@ -23,17 +21,6 @@ namespace Khepri.Rooms.Features
             }
 
             Text = text;
-        }
-
-
-        /// <summary> Creates a <see cref="DescriptionFeature"/> from prefab data, reading the required <c>"text"</c> property. </summary>
-        /// <param name="room"> The room the feature will be attached to. </param>
-        /// <param name="data"> The feature's parsed JSON data. </param>
-        /// <returns> A fully constructed <see cref="DescriptionFeature"/>. </returns>
-        [FeatureFactory]
-        private static DescriptionFeature Create(Room room, PrefabData data)
-        {
-            return new DescriptionFeature(room, data.GetString("text"));
         }
     }
 }

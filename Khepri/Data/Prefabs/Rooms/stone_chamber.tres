@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RoomPrefab" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Khepri/Systems/Rooms/Definitions/RoomPrefab.cs" id="1_roomprefab"]
+[ext_resource type="Script" path="res://Khepri/Systems/Rooms/Definitions/DescriptionDef.cs" id="2_descriptiondef"]
+
+[sub_resource type="Resource" id="DescriptionDef_stone"]
+script = ExtResource("2_descriptiondef")
+Text = "A cold stone chamber, its walls slick with moisture. Torchlight flickers across ancient carvings that line every surface."
+
+[resource]
+script = ExtResource("1_roomprefab")
+Name = "stone_chamber"
+Features = [SubResource("DescriptionDef_stone")]

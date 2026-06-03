@@ -1,5 +1,4 @@
 using Khepri.Entities;
-using Khepri.Prefabs;
 using Khepri.Rooms.Features;
 using System;
 using System.Collections.Generic;
@@ -8,7 +7,7 @@ using System.Linq;
 namespace Khepri.Rooms
 {
     /// <summary> A single self-contained playable space within the game world. It has entities within it, and connects to other rooms. </summary>
-    public class Room : IEquatable<Room>, IEntityContainer, IPartContainer<Feature>
+    public class Room : IEquatable<Room>, IEntityContainer
     {
         /// <summary> The room's unique identifier. Should be unique across all rooms. </summary>
         public readonly Guid UId;
@@ -56,10 +55,6 @@ namespace Khepri.Rooms
         /// <param name="feature"> The feature being added. </param>
         /// <returns> <c>true</c> if the feature was added; <c>false</c> if an equal feature already exists. </returns>
         public Boolean AddFeature(Feature feature) => _features.Add(feature);
-
-
-        /// <inheritdoc/>
-        Boolean IPartContainer<Feature>.Add(Feature part) => AddFeature(part);
 
 
         /// <summary> Gets the first attached feature of type <typeparamref name="T"/>. </summary>

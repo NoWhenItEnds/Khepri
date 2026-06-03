@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EntityPrefab" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Khepri/Systems/Entities/Definitions/EntityPrefab.cs" id="1_entityprefab"]
+[ext_resource type="Script" path="res://Khepri/Systems/Entities/Definitions/HealthDef.cs" id="2_healthdef"]
+
+[sub_resource type="Resource" id="HealthDef_goblin"]
+script = ExtResource("2_healthdef")
+Min = 20
+Max = 40
+
+[resource]
+script = ExtResource("1_entityprefab")
+Name = "goblin"
+Components = [SubResource("HealthDef_goblin")]

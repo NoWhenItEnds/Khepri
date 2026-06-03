@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Khepri.Entities.Components;
-using Khepri.Prefabs;
 
 namespace Khepri.Entities
 {
     /// <summary> A thing or object that can exist within a room. All things, including players and items, are entities. </summary>
-    public class Entity : IEquatable<Entity>, IPartContainer<Component>
+    public class Entity : IEquatable<Entity>
     {
         /// <summary> The entity's unique identifier. Should be unique across all entities. </summary>
         public readonly Guid UId;
@@ -30,10 +29,6 @@ namespace Khepri.Entities
         /// <param name="component"> The component being added. </param>
         /// <returns> <c>true</c> if the component was added; <c>false</c> if an equal component already exists. </returns>
         public Boolean AddComponent(Component component) => _components.Add(component);
-
-
-        /// <inheritdoc/>
-        Boolean IPartContainer<Component>.Add(Component part) => AddComponent(part);
 
 
         /// <summary> Gets the first attached component of type <typeparamref name="T"/>. </summary>

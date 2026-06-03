@@ -6,7 +6,7 @@ using Jaypen.Utilities.Logging;
 using Jaypen.Utilities.Singletons;
 using Khepri.Entities;
 using Khepri.Rooms;
-using Khepri.Rooms.Prefabs;
+using Khepri.Rooms.Definitions;
 using Microsoft.Extensions.Logging;
 
 namespace Khepri.Managers
@@ -19,18 +19,19 @@ namespace Khepri.Managers
     /// </remarks>
     public partial class RoomManager : SingletonNode<RoomManager>
     {
-        /// <summary> Godot-relative paths to directories containing room prefab JSON files. </summary>
-        /// <remarks> Each path is globalised via <see cref="ProjectSettings.GlobalizePath"/> before use. </remarks>
+        /// <summary> The Godot resource directories to scan for room prefab (<c>*.tres</c>) definitions. </summary>
         [ExportGroup("Settings")]
         [Export] private Godot.Collections.Array<String> _prefabPaths = new Godot.Collections.Array<String>
         {
             "res://Khepri/Data/Prefabs/Rooms"
         };
 
-        /// <summary> Godot-relative path to the world definition JSON file that declares rooms and connections. </summary>
-        /// <remarks> Globalised via <see cref="ProjectSettings.GlobalizePath"/> before use. </remarks>
+        /// <summary> Godot resource path to the world definition JSON file that declares rooms and connections. </summary>
         [Export] private String _worldDefinitionPath = "res://Khepri/Data/Worlds/overworld.json";
 
+
+        /// <summary> All loaded room prefabs, keyed by their <see cref="RoomPrefab.Name"/>. </summary>
+        private readonly Dictionary<String, RoomPrefab> _prefabsByName = new Dictionary<String, RoomPrefab>();
 
         /// <summary> All rooms that exist within the game world. </summary>
         private readonly HashSet<Room> _rooms = new HashSet<Room>();
@@ -39,23 +40,18 @@ namespace Khepri.Managers
         private static readonly ILogger Logger = Log.For<RoomManager>();
 
 
-        /// <summary> Builds the room catalogue, loads the world definition, constructs all rooms and connections, and populates the internal room set. </summary>
+        /// <summary> Loads the room prefabs, loads the world definition, constructs all rooms and connections, and populates the internal room set. </summary>
         /// <exception cref="InvalidOperationException"> Thrown when <see cref="EntityManager"/> has not been initialised, indicating a node ordering problem in <c>Game.tscn</c>. </exception>
         public override void _Ready()
         {
             EntityManager entityManager = EntityManager.Instance
                 ?? throw new InvalidOperationException("RoomManager._Ready requires EntityManager to be initialised first. Ensure the Entities node precedes the Rooms node in Game.tscn.");
 
-            Logger.LogInformation("Building room catalogue...");
-
-            FeatureRegistry  registry  = new FeatureRegistry();
-            FeatureDiscovery.RegisterAll(registry);
-
-            RoomCatalogue catalogue = new RoomCatalogue(registry);
+            Logger.LogInformation("Loading room prefabs...");
 
             foreach (String path in _prefabPaths)
             {
-                catalogue.LoadDirectory(ProjectSettings.GlobalizePath(path));
+                LoadPrefabsFrom(path);
             }
 
             Logger.LogInformation("Loading world definition from '{Path}'...", _worldDefinitionPath);
@@ -66,7 +62,7 @@ namespace Khepri.Managers
             Logger.LogInformation("Building world...");
 
             IReadOnlyCollection<Room> builtRooms = new WorldBuilder(
-                catalogue,
+                CreateRoomFromPrefab,
                 entityManager.CreateEntityFromPrefab).Build(worldDefinition);
 
             foreach (Room room in builtRooms)
@@ -79,7 +75,6 @@ namespace Khepri.Managers
 
 
         /// <summary> Creates a bidirectional <see cref="Connection"/> between two existing rooms and registers it on both endpoints. </summary>
-        /// <remarks> Use at runtime to wire user-created passages not declared in the world definition file. </remarks>
         /// <param name="roomA"> The first room endpoint; must already be tracked by this manager. </param>
         /// <param name="roomB"> The second room endpoint; must already be tracked by this manager and differ from <paramref name="roomA"/>. </param>
         /// <exception cref="ArgumentException"> Thrown when either room is not tracked by this manager, or when both refer to the same instance. </exception>
@@ -119,6 +114,69 @@ namespace Khepri.Managers
             }
 
             return result;
+        }
+
+
+        /// <summary> Builds a new <see cref="Room"/> from the named prefab, or returns <c>null</c> when no such prefab is loaded. </summary>
+        /// <remarks> Passed to <see cref="WorldBuilder"/> as its room-factory seam. </remarks>
+        /// <param name="prefabName"> The room prefab name to resolve. </param>
+        /// <returns> A freshly built room, or <c>null</c> when the name is unknown. </returns>
+        private Room? CreateRoomFromPrefab(String prefabName)
+        {
+            Boolean found = _prefabsByName.TryGetValue(prefabName, out RoomPrefab? prefab);
+            return found ? prefab!.Instantiate() : null;
+        }
+
+
+        /// <summary> Loads every <c>*.tres</c> room prefab in a single directory and registers each by name. </summary>
+        /// <param name="directory"> The Godot resource directory path to scan. </param>
+        /// <exception cref="InvalidOperationException"> Thrown when the directory cannot be opened, a resource fails to load as a <see cref="RoomPrefab"/>, a prefab name is blank, or two prefabs share a name. </exception>
+        private void LoadPrefabsFrom(String directory)
+        {
+            using DirAccess access = DirAccess.Open(directory);
+
+            if (access is null)
+            {
+                throw new InvalidOperationException($"Room prefab directory '{directory}' could not be opened (error {DirAccess.GetOpenError()}).");
+            }
+
+            foreach (String fileName in access.GetFiles())
+            {
+                Boolean isResource = fileName.EndsWith(".tres", StringComparison.OrdinalIgnoreCase);
+
+                if (!isResource)
+                {
+                    continue;
+                }
+
+                String     resourcePath = $"{directory}/{fileName}";
+                RoomPrefab prefab       = ResourceLoader.Load<RoomPrefab>(resourcePath)
+                    ?? throw new InvalidOperationException($"Resource '{resourcePath}' could not be loaded as a RoomPrefab.");
+
+                Register(prefab, resourcePath);
+            }
+        }
+
+
+        /// <summary> Registers a single room prefab by its name, rejecting blanks and duplicates. </summary>
+        /// <param name="prefab"> The loaded prefab to register. </param>
+        /// <param name="resourcePath"> The resource path, used only to enrich error messages. </param>
+        /// <exception cref="InvalidOperationException"> Thrown when <see cref="RoomPrefab.Name"/> is blank or already registered. </exception>
+        private void Register(RoomPrefab prefab, String resourcePath)
+        {
+            if (String.IsNullOrWhiteSpace(prefab.Name))
+            {
+                throw new InvalidOperationException($"Room prefab '{resourcePath}' has a blank Name.");
+            }
+
+            Boolean duplicate = _prefabsByName.ContainsKey(prefab.Name);
+
+            if (duplicate)
+            {
+                throw new InvalidOperationException($"Duplicate room prefab name '{prefab.Name}' (from '{resourcePath}').");
+            }
+
+            _prefabsByName[prefab.Name] = prefab;
         }
     }
 }
