@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Jaypen.Utilities.Extensions;
 using Jaypen.Utilities.Logging;
 using Jaypen.Utilities.Singletons;
 using Khepri.Entities;
@@ -36,11 +37,6 @@ namespace Khepri.Managers
         /// <summary> All rooms that exist within the game world. </summary>
         private readonly HashSet<Room> _rooms = new HashSet<Room>();
 
-        /// <summary> The room a freshly spawned entity (such as the player) is placed into. Currently the first room declared in the world definition. </summary>
-        private Room _startingRoom = null!;
-
-        /// <summary> Reverse index from a directly-placed entity to its room, so "which room is X in?" is an O(1) lookup instead of a per-frame containment scan. Maintained by <see cref="PlaceEntity"/> and the initial world build. </summary>
-        private readonly Dictionary<Entity, Room> _entityRooms = new Dictionary<Entity, Room>();
 
         /// <summary> The logger instance the manager uses. </summary>
         private static readonly ILogger Logger = Log.For<RoomManager>();
@@ -57,7 +53,10 @@ namespace Khepri.Managers
 
             foreach (String path in _prefabPaths)
             {
-                LoadPrefabsFrom(path);
+                foreach (RoomPrefab prefab in ResourceExtensions.GetResources<RoomPrefab>(path))
+                {
+                    Register(prefab, prefab.ResourcePath);
+                }
             }
 
             Logger.LogInformation("Loading world definition from '{Path}'...", _worldDefinitionPath);
@@ -76,56 +75,7 @@ namespace Khepri.Managers
                 _rooms.Add(room);
             }
 
-            _startingRoom = builtRooms.FirstOrDefault()
-                ?? throw new InvalidOperationException("The world definition produced no rooms, so no starting room could be determined.");
-
-            IndexRoomContents();
-
             Logger.LogInformation("World built with {Count} room(s).", _rooms.Count);
-        }
-
-
-        /// <summary> The room into which newly spawned entities (such as the player) are placed at the start of the game. </summary>
-        /// <remarks> Currently the first room declared in the world definition; a future world definition could flag an explicit spawn room. </remarks>
-        public Room StartingRoom => _startingRoom;
-
-
-        /// <summary> Places <paramref name="entity"/> directly into <paramref name="room"/>, keeping the reverse index in step so <see cref="GetCurrentRoom"/> stays O(1). </summary>
-        /// <remarks> The single choke point for room membership changes; route future movement through here so the index never drifts. </remarks>
-        /// <param name="entity"> The entity to place. </param>
-        /// <param name="room"> The room to place it in. </param>
-        public void PlaceEntity(Entity entity, Room room)
-        {
-            room.AddEntity(entity);
-            _entityRooms[entity] = room;
-        }
-
-
-        /// <summary> Returns every entity placed directly in a room (i.e. every actor candidate), excluding entities nested inside container components. </summary>
-        /// <returns> A snapshot of all directly-placed entities across all rooms. </returns>
-        public IReadOnlyCollection<Entity> GetAllEntities()
-        {
-            List<Entity> all = new List<Entity>();
-
-            foreach (Room room in _rooms)
-            {
-                all.AddRange(room.GetEntities());
-            }
-
-            return all;
-        }
-
-
-        /// <summary> Records each room's existing direct entities in the reverse index after the initial world build. </summary>
-        private void IndexRoomContents()
-        {
-            foreach (Room room in _rooms)
-            {
-                foreach (Entity entity in room.GetEntities())
-                {
-                    _entityRooms[entity] = room;
-                }
-            }
         }
 
 
@@ -155,21 +105,25 @@ namespace Khepri.Managers
         }
 
 
-        /// <summary> Returns the room a directly-placed entity occupies, via the reverse index. </summary>
-        /// <remarks> O(1) lookup over directly-placed entities; entities nested inside container components are not tracked here. </remarks>
+        /// <summary> Get all the rooms in the game world. </summary>
+        /// <returns> An immutable list containing all the discovered rooms in the game world.</returns>
+        public IReadOnlyCollection<Room> GetRooms() => _rooms.ToArray();
+
+
+        /// <summary> Returns the room that contains the given entity, searching the full <see cref="IEntityContainer"/> hierarchy. </summary>
         /// <param name="entity"> The entity to locate. </param>
-        /// <returns> The room the entity is directly placed in. </returns>
-        /// <exception cref="InvalidOperationException"> Thrown when <paramref name="entity"/> is not placed in any room. </exception>
+        /// <returns> The room whose containment tree includes <paramref name="entity"/> at any depth. </returns>
+        /// <exception cref="InvalidOperationException"> Thrown when <paramref name="entity"/> cannot be found in any room. </exception>
         public Room GetCurrentRoom(Entity entity)
         {
-            Boolean found = _entityRooms.TryGetValue(entity, out Room? room);
+            Room? result = _rooms.FirstOrDefault(room => ((IEntityContainer)room).Contains(entity));
 
-            if (!found)
+            if (result == null)
             {
                 throw new InvalidOperationException("The given entity doesn't exist within this plane of reality! This shouldn't be possible.");
             }
 
-            return room!;
+            return result;
         }
 
 
@@ -181,36 +135,6 @@ namespace Khepri.Managers
         {
             Boolean found = _prefabsByName.TryGetValue(prefabName, out RoomPrefab? prefab);
             return found ? prefab!.Instantiate() : null;
-        }
-
-
-        /// <summary> Loads every <c>*.tres</c> room prefab in a single directory and registers each by name. </summary>
-        /// <param name="directory"> The Godot resource directory path to scan. </param>
-        /// <exception cref="InvalidOperationException"> Thrown when the directory cannot be opened, a resource fails to load as a <see cref="RoomPrefab"/>, a prefab name is blank, or two prefabs share a name. </exception>
-        private void LoadPrefabsFrom(String directory)
-        {
-            using DirAccess access = DirAccess.Open(directory);
-
-            if (access is null)
-            {
-                throw new InvalidOperationException($"Room prefab directory '{directory}' could not be opened (error {DirAccess.GetOpenError()}).");
-            }
-
-            foreach (String fileName in access.GetFiles())
-            {
-                Boolean isResource = fileName.EndsWith(".tres", StringComparison.OrdinalIgnoreCase);
-
-                if (!isResource)
-                {
-                    continue;
-                }
-
-                String     resourcePath = $"{directory}/{fileName}";
-                RoomPrefab prefab       = ResourceLoader.Load<RoomPrefab>(resourcePath)
-                    ?? throw new InvalidOperationException($"Resource '{resourcePath}' could not be loaded as a RoomPrefab.");
-
-                Register(prefab, resourcePath);
-            }
         }
 
 

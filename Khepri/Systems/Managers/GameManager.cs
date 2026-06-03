@@ -1,10 +1,11 @@
 using Jaypen.Utilities.Logging;
 using Jaypen.Utilities.Singletons;
-using Khepri.Controllers;
 using Khepri.Entities;
 using Khepri.Rooms;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Khepri.Managers
 {
@@ -32,26 +33,9 @@ namespace Khepri.Managers
             Entity player = EntityManager.Instance!.CreateEntityFromPrefab("goblin");
             SetPlayerEntity(player);
 
-            RoomManager roomManager = RoomManager.Instance!;
-            roomManager.PlaceEntity(player, roomManager.StartingRoom);
-
-            // Stand up the turn/control layer. Created at runtime (rather than placed in the scene)
-            // so its singleton registers here, after the world has been built.
-            TurnManager turnManager = new TurnManager { Name = "Turns" };
-            AddChild(turnManager);
-
-            turnManager.SetPlayer(new PlayerController(player));
-
-            // Give every other actor already in the world a default AI brain.
-            foreach (Entity entity in roomManager.GetAllEntities())
-            {
-                Boolean isPlayer = entity.Equals(player);
-
-                if (!isPlayer)
-                {
-                    turnManager.Register(new AiController(entity));
-                }
-            }
+            IReadOnlyCollection<Room> rooms = RoomManager.Instance!.GetRooms();
+            Room startingRoom = rooms.First();
+            startingRoom.AddEntity(player);
         }
 
 
@@ -59,14 +43,6 @@ namespace Khepri.Managers
         public void SetPlayerEntity(Entity entity)  // TODO - Should the game manager be responsible for the player?
         {
             PlayerEntity = entity;
-        }
-
-
-        /// <summary> Advances the in-game clock by <paramref name="delta"/>. Called by <see cref="TurnManager"/> when a turn completes. </summary>
-        /// <param name="delta"> The amount of in-game time that has elapsed. </param>
-        public void AdvanceTime(TimeSpan delta)
-        {
-            GameTime += delta;
         }
     }
 }

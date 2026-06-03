@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using Jaypen.Utilities.Extensions;
 using Jaypen.Utilities.Singletons;
 using Khepri.Entities;
+using Khepri.Entities.Controllers;
 using Khepri.Entities.Definitions;
 
 namespace Khepri.Managers
@@ -13,14 +15,18 @@ namespace Khepri.Managers
         /// <summary> The Godot resource directories to scan for entity prefab (<c>*.tres</c>) definitions. </summary>
         /// <remarks> Paths are Godot resource paths (e.g. <c>res://Khepri/Data/Prefabs/Entities</c>). Every <c>.tres</c> in each directory is loaded as an <see cref="EntityPrefab"/>; prefab names must be unique across all directories. </remarks>
         [ExportGroup("Settings")]
-        [Export] private Godot.Collections.Array<String> _prefabPaths = new Godot.Collections.Array<String>();
+        [Export] private Godot.Collections.Array<String> _prefabPaths = new Godot.Collections.Array<String>
+        {
+            "res://Khepri/Data/Prefabs/Entities"
+        };
 
 
         /// <summary> All loaded entity prefabs, keyed by their <see cref="EntityPrefab.Name"/>. </summary>
         private readonly Dictionary<String, EntityPrefab> _prefabsByName = new Dictionary<String, EntityPrefab>();
 
-        /// <summary> All entities currently registered in the game world. </summary>
-        private readonly HashSet<Entity> _entities = new HashSet<Entity>();
+        /// <summary> All entities currently registered in the game world and their associated controller (if they have one). </summary>
+        /// <remarks> A null controller indicates that the entity doesn't currently have an associated controller. </remarks>
+        private readonly Dictionary<Entity, EntityController?> _entities = new Dictionary<Entity, EntityController?>();
 
 
         /// <summary> Loads every entity prefab resource from the configured directories and registers it by name. </summary>
@@ -28,7 +34,10 @@ namespace Khepri.Managers
         {
             foreach (String path in _prefabPaths)
             {
-                LoadPrefabsFrom(path);
+                foreach (EntityPrefab prefab in ResourceExtensions.GetResources<EntityPrefab>(path))
+                {
+                    Register(prefab, prefab.ResourcePath);
+                }
             }
         }
 
@@ -48,7 +57,8 @@ namespace Khepri.Managers
             }
 
             Entity  entity = prefab!.Instantiate();
-            Boolean added  = _entities.Add(entity);
+            AiController controller = new AiController(entity); // TODO - Not happy about always being AiController.
+            Boolean added  = _entities.TryAdd(entity, controller);
 
             if (!added)
             {
@@ -57,36 +67,6 @@ namespace Khepri.Managers
             }
 
             return entity;
-        }
-
-
-        /// <summary> Loads every <c>*.tres</c> entity prefab in a single directory and registers each by name. </summary>
-        /// <param name="directory"> The Godot resource directory path to scan. </param>
-        /// <exception cref="InvalidOperationException"> Thrown when the directory cannot be opened, a resource fails to load as an <see cref="EntityPrefab"/>, a prefab name is blank, or two prefabs share a name. </exception>
-        private void LoadPrefabsFrom(String directory)
-        {
-            using DirAccess access = DirAccess.Open(directory);
-
-            if (access is null)
-            {
-                throw new InvalidOperationException($"Entity prefab directory '{directory}' could not be opened (error {DirAccess.GetOpenError()}).");
-            }
-
-            foreach (String fileName in access.GetFiles())
-            {
-                Boolean isResource = fileName.EndsWith(".tres", StringComparison.OrdinalIgnoreCase);
-
-                if (!isResource)
-                {
-                    continue;
-                }
-
-                String       resourcePath = $"{directory}/{fileName}";
-                EntityPrefab prefab       = ResourceLoader.Load<EntityPrefab>(resourcePath)
-                    ?? throw new InvalidOperationException($"Resource '{resourcePath}' could not be loaded as an EntityPrefab.");
-
-                Register(prefab, resourcePath);
-            }
         }
 
 
