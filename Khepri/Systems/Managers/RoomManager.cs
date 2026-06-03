@@ -39,6 +39,9 @@ namespace Khepri.Managers
         /// <summary> The room a freshly spawned entity (such as the player) is placed into. Currently the first room declared in the world definition. </summary>
         private Room _startingRoom = null!;
 
+        /// <summary> Reverse index from a directly-placed entity to its room, so "which room is X in?" is an O(1) lookup instead of a per-frame containment scan. Maintained by <see cref="PlaceEntity"/> and the initial world build. </summary>
+        private readonly Dictionary<Entity, Room> _entityRooms = new Dictionary<Entity, Room>();
+
         /// <summary> The logger instance the manager uses. </summary>
         private static readonly ILogger Logger = Log.For<RoomManager>();
 
@@ -76,6 +79,8 @@ namespace Khepri.Managers
             _startingRoom = builtRooms.FirstOrDefault()
                 ?? throw new InvalidOperationException("The world definition produced no rooms, so no starting room could be determined.");
 
+            IndexRoomContents();
+
             Logger.LogInformation("World built with {Count} room(s).", _rooms.Count);
         }
 
@@ -83,6 +88,45 @@ namespace Khepri.Managers
         /// <summary> The room into which newly spawned entities (such as the player) are placed at the start of the game. </summary>
         /// <remarks> Currently the first room declared in the world definition; a future world definition could flag an explicit spawn room. </remarks>
         public Room StartingRoom => _startingRoom;
+
+
+        /// <summary> Places <paramref name="entity"/> directly into <paramref name="room"/>, keeping the reverse index in step so <see cref="GetCurrentRoom"/> stays O(1). </summary>
+        /// <remarks> The single choke point for room membership changes; route future movement through here so the index never drifts. </remarks>
+        /// <param name="entity"> The entity to place. </param>
+        /// <param name="room"> The room to place it in. </param>
+        public void PlaceEntity(Entity entity, Room room)
+        {
+            room.AddEntity(entity);
+            _entityRooms[entity] = room;
+        }
+
+
+        /// <summary> Returns every entity placed directly in a room (i.e. every actor candidate), excluding entities nested inside container components. </summary>
+        /// <returns> A snapshot of all directly-placed entities across all rooms. </returns>
+        public IReadOnlyCollection<Entity> GetAllEntities()
+        {
+            List<Entity> all = new List<Entity>();
+
+            foreach (Room room in _rooms)
+            {
+                all.AddRange(room.GetEntities());
+            }
+
+            return all;
+        }
+
+
+        /// <summary> Records each room's existing direct entities in the reverse index after the initial world build. </summary>
+        private void IndexRoomContents()
+        {
+            foreach (Room room in _rooms)
+            {
+                foreach (Entity entity in room.GetEntities())
+                {
+                    _entityRooms[entity] = room;
+                }
+            }
+        }
 
 
         /// <summary> Creates a bidirectional <see cref="Connection"/> between two existing rooms and registers it on both endpoints. </summary>
@@ -111,20 +155,21 @@ namespace Khepri.Managers
         }
 
 
-        /// <summary> Returns the room that contains the given entity, searching the full <see cref="IEntityContainer"/> hierarchy. </summary>
+        /// <summary> Returns the room a directly-placed entity occupies, via the reverse index. </summary>
+        /// <remarks> O(1) lookup over directly-placed entities; entities nested inside container components are not tracked here. </remarks>
         /// <param name="entity"> The entity to locate. </param>
-        /// <returns> The room whose containment tree includes <paramref name="entity"/> at any depth. </returns>
-        /// <exception cref="InvalidOperationException"> Thrown when <paramref name="entity"/> cannot be found in any room. </exception>
+        /// <returns> The room the entity is directly placed in. </returns>
+        /// <exception cref="InvalidOperationException"> Thrown when <paramref name="entity"/> is not placed in any room. </exception>
         public Room GetCurrentRoom(Entity entity)
         {
-            Room? result = _rooms.FirstOrDefault(room => ((IEntityContainer)room).Contains(entity));
+            Boolean found = _entityRooms.TryGetValue(entity, out Room? room);
 
-            if (result == null)
+            if (!found)
             {
                 throw new InvalidOperationException("The given entity doesn't exist within this plane of reality! This shouldn't be possible.");
             }
 
-            return result;
+            return room!;
         }
 
 
