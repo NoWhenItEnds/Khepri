@@ -7,16 +7,16 @@
 [ext_resource type="Script" uid="uid://dlyccmqrg6rf0" path="res://Khepri/Systems/UI/World/WorldWindow.cs" id="4_40jd7"]
 [ext_resource type="Texture2D" uid="uid://d4j6cd0c7tlok" path="res://Khepri/Data/Textures/World/Backgrounds/background_placeholder.png" id="4_lwcp1"]
 [ext_resource type="Script" uid="uid://elr6gga1cvgg" path="res://Khepri/Systems/UI/World/StatusBar.cs" id="5_gnjms"]
-[ext_resource type="Script" uid="uid://bfuti7ewauje3" path="res://Khepri/Systems/UI/World/TextWindow.cs" id="6_dqkud"]
-[ext_resource type="Script" uid="uid://csp0inj532x1g" path="res://Khepri/Systems/UI/World/DisplayWindow.cs" id="7_ryx0f"]
+[ext_resource type="Script" uid="uid://bfuti7ewauje3" path="res://Khepri/Systems/UI/World/TextPanel.cs" id="6_dqkud"]
+[ext_resource type="Script" uid="uid://csp0inj532x1g" path="res://Khepri/Systems/UI/World/DisplayPanel.cs" id="7_ryx0f"]
 [ext_resource type="Texture2D" uid="uid://4q335xxs2p" path="res://icon.svg" id="9_vos0w"]
+[ext_resource type="Script" uid="uid://dgur7vqnd6aoy" path="res://Khepri/Systems/UI/Map/MapWindow.cs" id="11_a5k30"]
 
 [node name="Game" type="Node" unique_id=1801120431]
 script = ExtResource("1_dycg1")
 
 [node name="Entities" type="Node" parent="." unique_id=458040416]
 script = ExtResource("2_8saus")
-_prefabPaths = Array[String](["res://Khepri/Data/Prefabs/Entities"])
 
 [node name="Rooms" type="Node" parent="." unique_id=1764317755]
 script = ExtResource("3_vos0w")
@@ -30,7 +30,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_ri25b")
 _background = NodePath("Background")
-_worldWindow = NodePath("TabContainer/World Window")
+_worldWindow = NodePath("TabContainer/World")
 
 [node name="Background" type="TextureRect" parent="UI" unique_id=59822985]
 layout_mode = 1
@@ -51,25 +51,25 @@ grow_horizontal = 2
 grow_vertical = 2
 current_tab = 0
 
-[node name="World Window" type="VBoxContainer" parent="UI/TabContainer" unique_id=1611766729 node_paths=PackedStringArray("_statusBar", "_textWindow", "_displayWindow")]
+[node name="World" type="VBoxContainer" parent="UI/TabContainer" unique_id=1611766729 node_paths=PackedStringArray("_statusBar", "_textPanel", "_displayPanel")]
 layout_mode = 2
 script = ExtResource("4_40jd7")
 _statusBar = NodePath("Status Bar")
-_textWindow = NodePath("HBoxContainer/Text Window")
-_displayWindow = NodePath("HBoxContainer/Display Window")
+_textPanel = NodePath("HBoxContainer/Text Panel")
+_displayPanel = NodePath("HBoxContainer/Display Panel")
 metadata/_tab_index = 0
 
-[node name="Status Bar" type="PanelContainer" parent="UI/TabContainer/World Window" unique_id=1313488816 node_paths=PackedStringArray("_dateTimeLabel", "_weatherLabel")]
+[node name="Status Bar" type="PanelContainer" parent="UI/TabContainer/World" unique_id=1313488816 node_paths=PackedStringArray("_dateTimeLabel", "_weatherLabel")]
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 script = ExtResource("5_gnjms")
 _dateTimeLabel = NodePath("HBoxContainer/DateTime Label")
 _weatherLabel = NodePath("HBoxContainer/Weather Label")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="UI/TabContainer/World Window/Status Bar" unique_id=1447167897]
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/TabContainer/World/Status Bar" unique_id=1447167897]
 layout_mode = 2
 
-[node name="DateTime Label" type="RichTextLabel" parent="UI/TabContainer/World Window/Status Bar/HBoxContainer" unique_id=1837193243]
+[node name="DateTime Label" type="RichTextLabel" parent="UI/TabContainer/World/Status Bar/HBoxContainer" unique_id=1837193243]
 layout_mode = 2
 size_flags_horizontal = 3
 bbcode_enabled = true
@@ -77,7 +77,7 @@ text = "Friday, 29 May 2015 05:50"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Weather Label" type="RichTextLabel" parent="UI/TabContainer/World Window/Status Bar/HBoxContainer" unique_id=1684546565]
+[node name="Weather Label" type="RichTextLabel" parent="UI/TabContainer/World/Status Bar/HBoxContainer" unique_id=1684546565]
 layout_mode = 2
 size_flags_horizontal = 3
 bbcode_enabled = true
@@ -85,26 +85,42 @@ text = "Dizzle"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="UI/TabContainer/World Window" unique_id=1145008148]
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/TabContainer/World" unique_id=1145008148]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Text Window" type="PanelContainer" parent="UI/TabContainer/World Window/HBoxContainer" unique_id=1601855850 node_paths=PackedStringArray("_roomLabel")]
+[node name="Text Panel" type="PanelContainer" parent="UI/TabContainer/World/HBoxContainer" unique_id=1601855850 node_paths=PackedStringArray("_roomLabel")]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("6_dqkud")
 _roomLabel = NodePath("Room Label")
 
-[node name="Room Label" type="RichTextLabel" parent="UI/TabContainer/World Window/HBoxContainer/Text Window" unique_id=1647581864]
+[node name="Room Label" type="RichTextLabel" parent="UI/TabContainer/World/HBoxContainer/Text Panel" unique_id=1647581864]
 layout_mode = 2
 bbcode_enabled = true
 
-[node name="Display Window" type="AspectRatioContainer" parent="UI/TabContainer/World Window/HBoxContainer" unique_id=1517190859 node_paths=PackedStringArray("_entityTexture")]
+[node name="Display Panel" type="AspectRatioContainer" parent="UI/TabContainer/World/HBoxContainer" unique_id=1517190859 node_paths=PackedStringArray("_entityTexture")]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("7_ryx0f")
 _entityTexture = NodePath("Entity Texture")
 
-[node name="Entity Texture" type="TextureRect" parent="UI/TabContainer/World Window/HBoxContainer/Display Window" unique_id=1460714512]
+[node name="Entity Texture" type="TextureRect" parent="UI/TabContainer/World/HBoxContainer/Display Panel" unique_id=1460714512]
 layout_mode = 2
 texture = ExtResource("9_vos0w")
+
+[node name="Map" type="HBoxContainer" parent="UI/TabContainer" unique_id=756539053 node_paths=PackedStringArray("_roomPanel", "_overworldPanel")]
+visible = false
+layout_mode = 2
+script = ExtResource("11_a5k30")
+_roomPanel = NodePath("Room Panel")
+_overworldPanel = NodePath("Overworld Panel")
+metadata/_tab_index = 1
+
+[node name="Room Panel" type="AspectRatioContainer" parent="UI/TabContainer/Map" unique_id=2022613893]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Overworld Panel" type="AspectRatioContainer" parent="UI/TabContainer/Map" unique_id=942326569]
+layout_mode = 2
+size_flags_horizontal = 3
