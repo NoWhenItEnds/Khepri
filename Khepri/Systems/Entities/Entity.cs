@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Godot;
 using Khepri.Entities.Components;
 
 namespace Khepri.Entities
@@ -10,6 +11,8 @@ namespace Khepri.Entities
     {
         /// <summary> The entity's unique identifier. Should be unique across all entities. </summary>
         public readonly Guid UId;
+
+        // TODO - This should have a dynamic description, like a room, and a generated texture...
 
         /// <summary> The set of all components currently attached to this entity. </summary>
         private readonly HashSet<Component> _components = new HashSet<Component>();
@@ -55,6 +58,22 @@ namespace Khepri.Entities
         /// <param name="component"> The component to remove. </param>
         /// <returns> <c>true</c> if the component was removed; <c>false</c> if it was not attached. </returns>
         public Boolean RemoveComponent(Component component) => _components.Remove(component);
+
+
+        /// <summary> Build a dynamic description of the entity's current state to display to the player. </summary>
+        /// <returns> A richly formatted string to display to the player representing the entity's current state / situation. </returns>
+        public String BuildDescription()
+        {
+            return "This is an entity.";   // TODO - Figure out how to do this!
+        }
+
+
+        /// <summary> Attempt to get a texture representing the current entity. </summary>
+        /// <returns> A texture that represents the current entity's state / situation. A null indicates that there isn't one. </returns>
+        public Texture2D? GetTexture()
+        {
+            return null;                // TODO - Figure out how to do this!
+        }
 
 
         /// <inheritdoc/>

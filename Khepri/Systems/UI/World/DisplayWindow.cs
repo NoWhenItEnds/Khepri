@@ -5,9 +5,9 @@ namespace Khepri.UI.World
     /// <summary> A window used to render characters, or display images of important objects that the player is examining. Also can render scenes of ongoing action. </summary>
     public partial class DisplayWindow : Control
     {
-        /// <summary> The texture to show an image of the current situation. </summary>
+        /// <summary> The texture to show an image of the currently selected entity. </summary>
         [ExportGroup("Nodes")]
-        [Export] private TextureRect _situationTexture = null!;
+        [Export] private TextureRect _entityTexture = null!;
 
 
         /// <summary> Force the display window to reflect the current game's state. </summary>

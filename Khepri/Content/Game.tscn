@@ -89,22 +89,22 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Text Window" type="PanelContainer" parent="UI/TabContainer/World Window/HBoxContainer" unique_id=1601855850 node_paths=PackedStringArray("_situationLabel")]
+[node name="Text Window" type="PanelContainer" parent="UI/TabContainer/World Window/HBoxContainer" unique_id=1601855850 node_paths=PackedStringArray("_roomLabel")]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("6_dqkud")
-_situationLabel = NodePath("Situation Label")
+_roomLabel = NodePath("Room Label")
 
-[node name="Situation Label" type="RichTextLabel" parent="UI/TabContainer/World Window/HBoxContainer/Text Window" unique_id=1647581864]
+[node name="Room Label" type="RichTextLabel" parent="UI/TabContainer/World Window/HBoxContainer/Text Window" unique_id=1647581864]
 layout_mode = 2
 bbcode_enabled = true
 
-[node name="Display Window" type="AspectRatioContainer" parent="UI/TabContainer/World Window/HBoxContainer" unique_id=1517190859 node_paths=PackedStringArray("_situationTexture")]
+[node name="Display Window" type="AspectRatioContainer" parent="UI/TabContainer/World Window/HBoxContainer" unique_id=1517190859 node_paths=PackedStringArray("_entityTexture")]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("7_ryx0f")
-_situationTexture = NodePath("Situation Texture")
+_entityTexture = NodePath("Entity Texture")
 
-[node name="Situation Texture" type="TextureRect" parent="UI/TabContainer/World Window/HBoxContainer/Display Window" unique_id=1460714512]
+[node name="Entity Texture" type="TextureRect" parent="UI/TabContainer/World Window/HBoxContainer/Display Window" unique_id=1460714512]
 layout_mode = 2
 texture = ExtResource("9_vos0w")

@@ -1,6 +1,7 @@
 using Khepri.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Khepri.Rooms
 {
@@ -25,6 +26,31 @@ namespace Khepri.Rooms
         {
             UId = uid;
         }
+
+
+        /// <summary> Build a dynamic description of the room's current state to display to the player. </summary>
+        /// <returns> A richly formatted string to display to the player representing the room's current state / situation. </returns>
+        public String BuildDescription()
+        {
+            return "This is a room.";   // TODO - Figure out how to do this!
+        }
+
+
+        /// <summary> Attempt to add an entity to the entities currently within the room. </summary>
+        /// <param name="entity"> The entity to move into the room. </param>
+        /// <returns> Whether the entity was successfully added to the room. </returns>
+        public Boolean AddEntity(Entity entity) => _entities.Add(entity);
+
+
+        /// <summary> Attempt to remove an entity from the entities currently within the room. </summary>
+        /// <param name="entity"> The entity to remove from the room. </param>
+        /// <returns> Whether the entity was successfully removed to the room. </returns>
+        public Boolean RemoveEntity(Entity entity) => _entities.Remove(entity);
+
+
+        /// <summary> Get an immutable array of the entities within this room. </summary>
+        /// <returns> The entities currently in this room. </returns>
+        public Entity[] GetEntities() => _entities.ToArray();
 
 
         /// <inheritdoc/>

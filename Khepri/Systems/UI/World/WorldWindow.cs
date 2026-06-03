@@ -1,4 +1,7 @@
 using Godot;
+using Khepri.Entities;
+using Khepri.Managers;
+using Khepri.Rooms;
 
 namespace Khepri.UI.World
 {
@@ -20,9 +23,12 @@ namespace Khepri.UI.World
         /// <summary> Force the window to update. </summary>
         public void ForceUpdate()
         {
+            Entity player = GameManager.Instance!.PlayerEntity;
+            Room room = RoomManager.Instance!.GetCurrentRoom(player);
+
             _statusBar.ForceUpdate();
-            _textWindow.ForceUpdate();
-            _displayWindow.ForceUpdate();
+            _textWindow.ForceUpdate(room);
+            _displayWindow.ForceUpdate();   // TODO - How do we know which entity to display? Do we even have the display update here?
         }
     }
 }
