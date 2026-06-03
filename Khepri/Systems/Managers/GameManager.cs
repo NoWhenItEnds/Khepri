@@ -25,7 +25,13 @@ namespace Khepri.Managers
         public override void _Ready()
         {
             Logger.LogInformation("Spawning player...");
-            SetPlayerEntity(EntityManager.Instance!.CreateEntityFromPrefab("goblin"));
+
+            Entity player = EntityManager.Instance!.CreateEntityFromPrefab("goblin");
+            SetPlayerEntity(player);
+
+            // Place the player into the world so it can be located by RoomManager.GetCurrentRoom.
+            // GameManager is the root node, so it readies after RoomManager has built the world.
+            RoomManager.Instance!.StartingRoom.AddEntity(player);
         }
 
 

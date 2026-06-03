@@ -1,14 +1,15 @@
-[gd_resource type="Resource" script_class="EntityPrefab" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="EntityPrefab" format=3 uid="uid://dnhtehckrpag6"]
 
-[ext_resource type="Script" path="res://Khepri/Systems/Entities/Definitions/EntityPrefab.cs" id="1_entityprefab"]
-[ext_resource type="Script" path="res://Khepri/Systems/Entities/Components/InventoryComponent.cs" id="2_inventory"]
-[ext_resource type="Resource" path="res://Khepri/Data/Prefabs/Entities/goblin.tres" id="3_goblin"]
+[ext_resource type="Script" uid="uid://cbi02cr1yhpc7" path="res://Khepri/Systems/Entities/Definitions/EntityPrefab.cs" id="1_entityprefab"]
+[ext_resource type="Script" uid="uid://b0a61lq1a6mfd" path="res://Khepri/Systems/Entities/Components/Component.cs" id="1_m3dj5"]
+[ext_resource type="Script" uid="uid://dds2sq2padbsr" path="res://Khepri/Systems/Entities/Components/InventoryComponent.cs" id="2_inventory"]
+[ext_resource type="Resource" uid="uid://c3dvok1i67o0e" path="res://Khepri/Data/Prefabs/Entities/goblin.tres" id="3_goblin"]
 
 [sub_resource type="Resource" id="Inventory_chest"]
 script = ExtResource("2_inventory")
-Contents = [ExtResource("3_goblin")]
+Contents = Array[ExtResource("1_entityprefab")]([ExtResource("3_goblin")])
 
 [resource]
 script = ExtResource("1_entityprefab")
 Name = "treasure_chest"
-Components = [SubResource("Inventory_chest")]
+Components = Array[ExtResource("1_m3dj5")]([SubResource("Inventory_chest")])

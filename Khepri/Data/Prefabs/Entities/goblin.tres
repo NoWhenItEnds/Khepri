@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="EntityPrefab" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="EntityPrefab" format=3 uid="uid://c3dvok1i67o0e"]
 
-[ext_resource type="Script" path="res://Khepri/Systems/Entities/Definitions/EntityPrefab.cs" id="1_entityprefab"]
-[ext_resource type="Script" path="res://Khepri/Systems/Entities/Components/HealthComponent.cs" id="2_health"]
+[ext_resource type="Script" uid="uid://cbi02cr1yhpc7" path="res://Khepri/Systems/Entities/Definitions/EntityPrefab.cs" id="1_entityprefab"]
+[ext_resource type="Script" uid="uid://b0a61lq1a6mfd" path="res://Khepri/Systems/Entities/Components/Component.cs" id="1_yvolf"]
+[ext_resource type="Script" uid="uid://b6ns2hywtblss" path="res://Khepri/Systems/Entities/Components/HealthComponent.cs" id="2_health"]
 
 [sub_resource type="Resource" id="Health_goblin"]
 script = ExtResource("2_health")
@@ -11,4 +12,4 @@ Max = 40
 [resource]
 script = ExtResource("1_entityprefab")
 Name = "goblin"
-Components = [SubResource("Health_goblin")]
+Components = Array[ExtResource("1_yvolf")]([SubResource("Health_goblin")])

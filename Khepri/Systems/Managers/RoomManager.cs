@@ -36,6 +36,9 @@ namespace Khepri.Managers
         /// <summary> All rooms that exist within the game world. </summary>
         private readonly HashSet<Room> _rooms = new HashSet<Room>();
 
+        /// <summary> The room a freshly spawned entity (such as the player) is placed into. Currently the first room declared in the world definition. </summary>
+        private Room _startingRoom = null!;
+
         /// <summary> The logger instance the manager uses. </summary>
         private static readonly ILogger Logger = Log.For<RoomManager>();
 
@@ -70,8 +73,16 @@ namespace Khepri.Managers
                 _rooms.Add(room);
             }
 
+            _startingRoom = builtRooms.FirstOrDefault()
+                ?? throw new InvalidOperationException("The world definition produced no rooms, so no starting room could be determined.");
+
             Logger.LogInformation("World built with {Count} room(s).", _rooms.Count);
         }
+
+
+        /// <summary> The room into which newly spawned entities (such as the player) are placed at the start of the game. </summary>
+        /// <remarks> Currently the first room declared in the world definition; a future world definition could flag an explicit spawn room. </remarks>
+        public Room StartingRoom => _startingRoom;
 
 
         /// <summary> Creates a bidirectional <see cref="Connection"/> between two existing rooms and registers it on both endpoints. </summary>

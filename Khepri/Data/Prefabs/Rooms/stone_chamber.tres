@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="RoomPrefab" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="RoomPrefab" format=3 uid="uid://ct5nrdrydbd5g"]
 
-[ext_resource type="Script" path="res://Khepri/Systems/Rooms/Definitions/RoomPrefab.cs" id="1_roomprefab"]
-[ext_resource type="Script" path="res://Khepri/Systems/Rooms/Features/DescriptionFeature.cs" id="2_description"]
+[ext_resource type="Script" uid="uid://dqias8m1ucccw" path="res://Khepri/Systems/Rooms/Features/Feature.cs" id="1_cysa7"]
+[ext_resource type="Script" uid="uid://dvo54q23dri4x" path="res://Khepri/Systems/Rooms/Definitions/RoomPrefab.cs" id="1_roomprefab"]
+[ext_resource type="Script" uid="uid://l3eawh1ckw48" path="res://Khepri/Systems/Rooms/Features/DescriptionFeature.cs" id="2_description"]
 
 [sub_resource type="Resource" id="Description_stone"]
 script = ExtResource("2_description")
@@ -10,4 +11,4 @@ Text = "A cold stone chamber, its walls slick with moisture. Torchlight flickers
 [resource]
 script = ExtResource("1_roomprefab")
 Name = "stone_chamber"
-Features = [SubResource("Description_stone")]
+Features = Array[ExtResource("1_cysa7")]([SubResource("Description_stone")])
