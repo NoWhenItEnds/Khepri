@@ -5,180 +5,222 @@ using System.Collections.Generic;
 
 namespace Khepri.UI.Map
 {
-    /// <summary> Panel displaying a breadth-first layout of the game world starting from the current room. </summary>
-    /// <remarks> Because the world is non-Euclidean (rooms have no coordinates), BFS depth is used as a proxy for distance — each depth level becomes one vertical column of room markers. The current room (depth 0) is highlighted with a distinct colour. </remarks>
-    /// <remarks>
-    /// Expected scene tree:
-    /// <code>
-    /// OverworldPanel (this script)
-    /// └── Columns : HBoxContainer   ← assign to _columns
-    /// </code>
-    /// Depth columns and room markers within them are built programmatically on each
-    /// <see cref="ForceUpdate"/>; no further editor-side children are required.
-    /// </remarks>
+    /// <summary> Panel displaying the game world as a node-link graph centred on the current room. </summary>
     public partial class OverworldPanel : Control
     {
-        /// <summary> The outer horizontal container that holds one <see cref="VBoxContainer"/> per BFS depth level. All column nodes are generated programmatically and freed on each update. </summary>
-        [ExportGroup("Nodes")]
-        [Export] private HBoxContainer _columns = null!;
+        /// <summary> The prefab instantiated once per room marker. Must resolve to a <see cref="RoomNode"/> at its root. </summary>
+        [ExportGroup("Prefabs")]
+        [Export] private PackedScene _roomNodeScene = null!;
 
 
-        /// <summary> Number of leading characters from a <see cref="Guid"/> shown as the room's short stable identifier. </summary>
-        private const Int32 UIdPrefixLength = 8;
+        /// <summary> Logical distance between a room and a directly-connected neighbour, before scaling to the panel. </summary>
+        private const Single StepLength = 1f;
 
-        /// <summary>
-        /// The colour used to tint the current room's marker panel, distinguishing it at a glance.
-        /// Expressed as a named colour constant so it can be updated without hunting for magic values.
-        /// </summary>
-        private static readonly Godot.Color CurrentRoomTint = new Godot.Color(0.2f, 0.6f, 1.0f, 1.0f);
+        /// <summary> Largest pixel distance allotted to one <see cref="StepLength"/>, so small graphs are not blown up to fill the panel. </summary>
+        private const Single MaxPixelsPerStep = 130f;
+
+        /// <summary> Pixel gap kept between the graph's outermost markers and the panel edge. </summary>
+        private const Single Margin = 60f;
+
+        /// <summary> Width of the drawn connection lines, in pixels. </summary>
+        private const Single EdgeWidth = 3f;
+
+        /// <summary> The colour of the drawn connection lines. </summary>
+        private static readonly Color EdgeColor = new Color(1f, 1f, 1f, 0.35f);
 
 
-        /// <summary> Forces the panel to rebuild the world layout via BFS from <paramref name="currentRoom"/>. Rooms with no connections are represented as a single column at depth 0. </summary>
-        /// <param name="currentRoom"> The room the player is currently in; used as the BFS root. Must not be null. </param>
-        public void ForceUpdate(Room currentRoom)
+        /// <summary> The layer holding edge lines; added first so it renders behind the room markers. </summary>
+        private Control _edgeLayer = null!;
+
+        /// <summary> The layer holding room markers; added second so it renders in front of the edges. </summary>
+        private Control _roomLayer = null!;
+
+        /// <summary> Pool of reusable room markers, parented to <see cref="_roomLayer"/>. </summary>
+        private ScenePool<RoomNode> _roomPool = null!;
+
+        /// <summary> Pool of reusable edge lines, parented to <see cref="_edgeLayer"/>. </summary>
+        private ScenePool<Line2D> _edgePool = null!;
+
+
+        /// <inheritdoc/>
+        public override void _Ready()
         {
-            IReadOnlyList<IReadOnlyList<Room>> depthGroups = BuildBfsDepthGroups(currentRoom);
+            _edgeLayer = CreateFullRectLayer();
+            _roomLayer = CreateFullRectLayer();
 
-            ClearGeneratedChildren(_columns);
-
-            for (Int32 depth = 0; depth < depthGroups.Count; depth++)
-            {
-                VBoxContainer column = BuildDepthColumn(depthGroups[depth], currentRoom, depth);
-                _columns.AddChild(column);
-            }
+            _roomPool = new ScenePool<RoomNode>(_roomLayer, () => _roomNodeScene.Instantiate<RoomNode>());
+            _edgePool = new ScenePool<Line2D>(_edgeLayer, CreateEdge);
         }
 
 
-        /// <summary>
-        /// Traverses the world graph via BFS starting from <paramref name="root"/> and groups rooms by depth.
-        /// The returned list index equals BFS depth: index 0 contains only <paramref name="root"/>,
-        /// index 1 its immediate neighbours, and so on. Each room appears at most once.
-        /// </summary>
-        /// <param name="root"> The room at which traversal begins; placed at depth 0. </param>
-        /// <returns>
-        /// A list of depth groups, each group being an ordered list of rooms discovered at that depth.
-        /// Never null; contains at least one group (the root itself).
-        /// </returns>
-        private static IReadOnlyList<IReadOnlyList<Room>> BuildBfsDepthGroups(Room root)
+        /// <summary> Rebuilds the graph to reflect the world reachable from <paramref name="currentRoom"/>. </summary>
+        /// <param name="currentRoom"> The player's current room; placed at the centre of the graph. Must not be null. </param>
+        public void ForceUpdate(Room currentRoom)
         {
-            List<IReadOnlyList<Room>> result = new List<IReadOnlyList<Room>>();
-            HashSet<Room> visited            = new HashSet<Room>();
-            Queue<Room> frontier             = new Queue<Room>();
+            Dictionary<Room, Vector2> layout = BuildLayout(currentRoom, out IReadOnlyList<(Room A, Room B)> edges);
+            Dictionary<Room, Vector2> pixels = ProjectToPanel(layout);
 
-            visited.Add(root);
+            _edgePool.Begin();
+            foreach ((Room a, Room b) in edges)
+            {
+                Line2D line = _edgePool.Acquire();
+                line.Points = new Vector2[] { pixels[a], pixels[b] };
+            }
+            _edgePool.End();
+
+            _roomPool.Begin();
+            foreach (KeyValuePair<Room, Vector2> entry in pixels)
+            {
+                RoomNode node = _roomPool.Acquire();
+                node.SetRoom(entry.Key, entry.Key.Equals(currentRoom));
+                node.CenterOn(entry.Value);
+            }
+            _roomPool.End();
+        }
+
+
+        /// <summary> Traverses the world graph via BFS from <paramref name="root"/>, assigning each reachable room a logical position by accumulating the unit direction of the connection that first reached it. </summary>
+        /// <param name="root"> The room placed at the origin; the graph's centre. </param>
+        /// <param name="edges"> Receives the unique list of connections between reachable rooms, for edge rendering. </param>
+        /// <returns> A map from each reachable room to its logical (pre-scaling) position; always contains <paramref name="root"/> at the origin. </returns>
+        private static Dictionary<Room, Vector2> BuildLayout(Room root, out IReadOnlyList<(Room, Room)> edges)
+        {
+            Dictionary<Room, Vector2> positions = new Dictionary<Room, Vector2>();
+            HashSet<(Guid, Guid)> seenEdges     = new HashSet<(Guid, Guid)>();
+            List<(Room, Room)> edgeList         = new List<(Room, Room)>();
+            Queue<Room> frontier                = new Queue<Room>();
+
+            positions[root] = Vector2.Zero;
             frontier.Enqueue(root);
 
             while (frontier.Count > 0)
             {
-                Int32 levelSize     = frontier.Count;
-                List<Room> level    = new List<Room>();
+                Room current = frontier.Dequeue();
 
-                for (Int32 i = 0; i < levelSize; i++)
+                foreach (Connection connection in current.GetConnections())
                 {
-                    Room current = frontier.Dequeue();
-                    level.Add(current);
-
-                    foreach (Connection connection in current.GetConnections())
+                    foreach (Room neighbour in connection.GetRooms())
                     {
-                        foreach (Room neighbour in connection.GetRooms())
+                        if (neighbour.Equals(current))
                         {
-                            Boolean isNew = !visited.Contains(neighbour);
-                            if (isNew)
-                            {
-                                visited.Add(neighbour);
-                                frontier.Enqueue(neighbour);
-                            }
+                            continue;   // Self-connections carry no inter-room direction; skip them for layout.
+                        }
+
+                        (Guid, Guid) edgeKey = OrderEdgeKey(current.UId, neighbour.UId);
+                        if (seenEdges.Add(edgeKey))
+                        {
+                            edgeList.Add((current, neighbour));
+                        }
+
+                        if (!positions.ContainsKey(neighbour))
+                        {
+                            RoomPosition direction = FirstPosition(connection, current);
+                            positions[neighbour]   = positions[current] + (DirectionToVector(direction) * StepLength);
+                            frontier.Enqueue(neighbour);
                         }
                     }
                 }
-
-                result.Add(level.AsReadOnly());
             }
 
-            return result.AsReadOnly();
+            edges = edgeList;
+            return positions;
         }
 
 
-        /// <summary>
-        /// Builds a vertical column node containing one marker panel per room in <paramref name="rooms"/>.
-        /// </summary>
-        /// <param name="rooms"> The rooms to render in this column, in BFS discovery order. </param>
-        /// <param name="currentRoom"> The player's current room, used to apply the highlight tint. </param>
-        /// <param name="depth"> BFS depth of this column, shown as a header label above the room markers. </param>
-        /// <returns> A configured <see cref="VBoxContainer"/> ready to be added to <see cref="_columns"/>. </returns>
-        private static VBoxContainer BuildDepthColumn(IReadOnlyList<Room> rooms, Room currentRoom, Int32 depth)
+        /// <summary> Maps each room's logical position into panel pixel coordinates, centred and uniformly scaled to fit within <see cref="Margin"/> of the edges. </summary>
+        /// <param name="layout"> The logical positions produced by <see cref="BuildLayout"/>. </param>
+        /// <returns> A map from each room to its pixel-space centre point within this panel. </returns>
+        private Dictionary<Room, Vector2> ProjectToPanel(Dictionary<Room, Vector2> layout)
         {
-            VBoxContainer column = new VBoxContainer();
+            Vector2 min = new Vector2(Single.MaxValue, Single.MaxValue);
+            Vector2 max = new Vector2(Single.MinValue, Single.MinValue);
 
-            Label header = new Label();
-            header.Text                = depth == 0 ? "Here" : $"+{depth}";
-            header.HorizontalAlignment = HorizontalAlignment.Center;
-            column.AddChild(header);
-
-            foreach (Room room in rooms)
+            foreach (Vector2 position in layout.Values)
             {
-                Panel marker = BuildRoomMarker(room, currentRoom);
-                column.AddChild(marker);
+                min = new Vector2(Mathf.Min(min.X, position.X), Mathf.Min(min.Y, position.Y));
+                max = new Vector2(Mathf.Max(max.X, position.X), Mathf.Max(max.Y, position.Y));
             }
 
-            return column;
+            Vector2 logicalCentre = (min + max) / 2f;
+            Vector2 span          = max - min;
+
+            // Pick the largest uniform scale that keeps every marker inside the margin on both axes, capped so a
+            // tiny graph is not magnified to fill the panel. An axis with no spread imposes no limit.
+            Single scaleX = span.X > Mathf.Epsilon ? (Size.X - (2f * Margin)) / span.X : Single.MaxValue;
+            Single scaleY = span.Y > Mathf.Epsilon ? (Size.Y - (2f * Margin)) / span.Y : Single.MaxValue;
+            Single scale  = Mathf.Min(Mathf.Min(scaleX, scaleY), MaxPixelsPerStep);
+
+            Vector2 panelCentre = Size / 2f;
+
+            Dictionary<Room, Vector2> pixels = new Dictionary<Room, Vector2>(layout.Count);
+            foreach (KeyValuePair<Room, Vector2> entry in layout)
+            {
+                pixels[entry.Key] = panelCentre + ((entry.Value - logicalCentre) * scale);
+            }
+
+            return pixels;
         }
 
 
-        /// <summary>
-        /// Constructs a <see cref="Panel"/> node representing a single room on the overworld map.
-        /// The panel contains a label showing the room's short UID prefix and connection count.
-        /// The current room's panel is tinted with <see cref="CurrentRoomTint"/>.
-        /// </summary>
-        /// <param name="room"> The room to represent. </param>
-        /// <param name="currentRoom"> The player's current room; equality determines whether the tint is applied. </param>
-        /// <returns> A configured panel ready to be added to a depth column. </returns>
-        private static Panel BuildRoomMarker(Room room, Room currentRoom)
+        /// <summary> Returns the position at which <paramref name="connection"/> attaches within <paramref name="room"/>, defaulting to <see cref="RoomPosition.Center"/> if none is found. </summary>
+        /// <param name="connection"> The connection whose attachment direction is wanted. </param>
+        /// <param name="room"> The room from whose perspective the direction is measured. </param>
+        /// <returns> The first attachment position within <paramref name="room"/>. </returns>
+        private static RoomPosition FirstPosition(Connection connection, Room room)
         {
-            // TODO: Replace the UID prefix with a human-readable display name once rooms store
-            //       one at runtime. The prefab's ResourceName is the natural source — pass it
-            //       through Room (e.g. via a NameFeature) when that data becomes available.
-
-            Boolean isCurrent         = room.Equals(currentRoom);
-            Int32 connectionCount     = room.GetConnections().Count;
-            String shortId            = room.UId.ToString()[..UIdPrefixLength];
-
-            Panel panel = new Panel();
-            panel.CustomMinimumSize = new Godot.Vector2(90f, 50f);
-
-            if (isCurrent)
+            foreach (RoomPosition position in connection.GetPositions(room))
             {
-                panel.Modulate = CurrentRoomTint;
+                return position;
             }
 
-            Label label = new Label();
-            label.Text                = $"{shortId}{System.Environment.NewLine}exits: {connectionCount}";
-            label.HorizontalAlignment = HorizontalAlignment.Center;
-            label.AutowrapMode        = TextServer.AutowrapMode.WordSmart;
-            label.AnchorRight         = 1f;
-            label.AnchorBottom        = 1f;
-
-            panel.AddChild(label);
-
-            return panel;
+            return RoomPosition.Center;
         }
 
 
-        /// <summary>
-        /// Detaches and frees all programmatically-generated children of <paramref name="container"/> to prevent
-        /// stale or duplicate nodes accumulating across successive <see cref="ForceUpdate"/> calls.
-        /// <see cref="Node.RemoveChild"/> is called before <see cref="Node.QueueFree"/> so the old nodes leave the
-        /// scene tree in the same frame that new children are added, preventing transient double-occupancy and the
-        /// Godot "node already has a sibling with this name" warning.
-        /// </summary>
-        /// <param name="container"> The container whose children are to be detached and freed. </param>
-        private static void ClearGeneratedChildren(Node container)
+        /// <summary> Maps a <see cref="RoomPosition"/> to a unit direction in panel space (north is up / negative Y). </summary>
+        /// <param name="position"> The room position to convert. </param>
+        /// <returns> A unit-length offset, or the zero vector for <see cref="RoomPosition.Center"/>. </returns>
+        private static Vector2 DirectionToVector(RoomPosition position) => position switch
         {
-            foreach (Node child in container.GetChildren())
-            {
-                container.RemoveChild(child);
-                child.QueueFree();
-            }
+            RoomPosition.NorthWest => new Vector2(-1f, -1f).Normalized(),
+            RoomPosition.North     => new Vector2(0f, -1f),
+            RoomPosition.NorthEast => new Vector2(1f, -1f).Normalized(),
+            RoomPosition.West      => new Vector2(-1f, 0f),
+            RoomPosition.Center    => Vector2.Zero,
+            RoomPosition.East      => new Vector2(1f, 0f),
+            RoomPosition.SouthWest => new Vector2(-1f, 1f).Normalized(),
+            RoomPosition.South     => new Vector2(0f, 1f),
+            RoomPosition.SouthEast => new Vector2(1f, 1f).Normalized(),
+            _                      => Vector2.Zero,
+        };
+
+
+        /// <summary> Builds an order-independent key for a connection between two rooms, so each edge is recorded once. </summary>
+        /// <param name="a"> One endpoint's identifier. </param>
+        /// <param name="b"> The other endpoint's identifier. </param>
+        /// <returns> A tuple of the two identifiers in ascending order. </returns>
+        private static (Guid, Guid) OrderEdgeKey(Guid a, Guid b) => a.CompareTo(b) <= 0 ? (a, b) : (b, a);
+
+
+        /// <summary> Creates a fresh, mouse-transparent <see cref="Line2D"/> for use as an edge. </summary>
+        /// <returns> A configured line ready to have its two endpoints assigned. </returns>
+        private static Line2D CreateEdge() => new Line2D
+        {
+            Width        = EdgeWidth,
+            DefaultColor = EdgeColor,
+            Antialiased  = true,
+        };
+
+
+        /// <summary> Creates a full-rect, mouse-transparent child <see cref="Control"/> to host one pool's nodes. </summary>
+        /// <returns> The created layer, already added as a child of this panel. </returns>
+        private Control CreateFullRectLayer()
+        {
+            Control layer = new Control();
+            layer.SetAnchorsPreset(LayoutPreset.FullRect);
+            layer.MouseFilter = MouseFilterEnum.Ignore;
+            AddChild(layer);
+            return layer;
         }
     }
 }

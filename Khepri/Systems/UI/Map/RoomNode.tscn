@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://dwm6nmpkyteg1"]
+
+[ext_resource type="Script" uid="uid://d1pkxm8rfkt3u" path="res://Khepri/Systems/UI/Map/RoomNode.cs" id="1_nmpvm"]
+
+[node name="RoomNode" type="Control" unique_id=1050874650 node_paths=PackedStringArray("_nameLabel")]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_nmpvm")
+_nameLabel = NodePath("Name Label")
+
+[node name="Button" type="Button" parent="." unique_id=1440599689]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Name Label" type="RichTextLabel" parent="." unique_id=449156434]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+bbcode_enabled = true
+text = "PLACEHOLDER"
+scroll_active = false
+horizontal_alignment = 1
+vertical_alignment = 1

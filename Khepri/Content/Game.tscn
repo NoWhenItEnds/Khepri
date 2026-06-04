@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://dgur7vqnd6aoy" path="res://Khepri/Systems/UI/Map/MapWindow.cs" id="11_a5k30"]
 [ext_resource type="Script" uid="uid://bduigns4wshda" path="res://Khepri/Systems/UI/Map/RoomPanel.cs" id="12_s26ps"]
 [ext_resource type="Script" uid="uid://bquawc3o67bad" path="res://Khepri/Systems/UI/Map/OverworldPanel.cs" id="13_xoaus"]
+[ext_resource type="PackedScene" uid="uid://dwm6nmpkyteg1" path="res://Khepri/Systems/UI/Map/RoomNode.tscn" id="14_xoaus"]
 
 [node name="Game" type="Node" unique_id=1801120431]
 script = ExtResource("1_dycg1")
@@ -129,11 +130,8 @@ _grid = NodePath("Grid")
 [node name="Grid" type="GridContainer" parent="UI/TabContainer/Map/Room Panel" unique_id=156620766]
 layout_mode = 2
 
-[node name="Overworld Panel" type="AspectRatioContainer" parent="UI/TabContainer/Map" unique_id=942326569 node_paths=PackedStringArray("_columns")]
+[node name="Overworld Panel" type="Control" parent="UI/TabContainer/Map" unique_id=942326569]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("13_xoaus")
-_columns = NodePath("Columns")
-
-[node name="Columns" type="HBoxContainer" parent="UI/TabContainer/Map/Overworld Panel" unique_id=733130372]
-layout_mode = 2
+_roomNodeScene = ExtResource("14_xoaus")
