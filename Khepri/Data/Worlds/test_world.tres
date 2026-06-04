@@ -1,0 +1,139 @@
+[gd_resource type="Resource" script_class="WorldDefinition" format=3 uid="uid://cpj0hyjqahhxq"]
+
+[ext_resource type="Script" uid="uid://qcuq8b45m1m" path="res://Khepri/Systems/Worlds/Definitions/RoomConnection.cs" id="1_xmcty"]
+[ext_resource type="Script" uid="uid://b1ha2ko2ptyxq" path="res://Khepri/Systems/Worlds/Definitions/RoomInstance.cs" id="2_bppna"]
+[ext_resource type="Script" uid="uid://hafab63ok3l6" path="res://Khepri/Systems/Worlds/Definitions/EntityPlacement.cs" id="3_gaev2"]
+[ext_resource type="Resource" uid="uid://ct5nrdrydbd5g" path="res://Khepri/Data/Prefabs/Rooms/stone_chamber.tres" id="4_yai44"]
+[ext_resource type="Script" uid="uid://b31wuli6ws8mh" path="res://Khepri/Systems/Worlds/Definitions/WorldDefinition.cs" id="5_7ufb3"]
+
+[sub_resource type="Resource" id="Resource_obnam"]
+script = ExtResource("1_xmcty")
+FromId = "center_room"
+FromPosition = 1
+ToId = "north_room"
+ToPosition = 7
+Distance = 10.0
+metadata/_custom_type_script = "uid://qcuq8b45m1m"
+
+[sub_resource type="Resource" id="Resource_2x5wj"]
+script = ExtResource("1_xmcty")
+FromId = "center_room"
+FromPosition = 2
+ToId = "northeast_room"
+ToPosition = 6
+Distance = 10.0
+metadata/_custom_type_script = "uid://qcuq8b45m1m"
+
+[sub_resource type="Resource" id="Resource_xmcty"]
+script = ExtResource("1_xmcty")
+FromId = "center_room"
+FromPosition = 5
+ToId = "east_room"
+ToPosition = 3
+Distance = 10.0
+metadata/_custom_type_script = "uid://qcuq8b45m1m"
+
+[sub_resource type="Resource" id="Resource_bppna"]
+script = ExtResource("1_xmcty")
+FromId = "center_room"
+FromPosition = 8
+ToId = "southeast_room"
+ToPosition = 0
+Distance = 10.0
+metadata/_custom_type_script = "uid://qcuq8b45m1m"
+
+[sub_resource type="Resource" id="Resource_gaev2"]
+script = ExtResource("1_xmcty")
+FromId = "center_room"
+FromPosition = 7
+ToId = "south_room"
+ToPosition = 1
+Distance = 10.0
+metadata/_custom_type_script = "uid://qcuq8b45m1m"
+
+[sub_resource type="Resource" id="Resource_yai44"]
+script = ExtResource("1_xmcty")
+FromId = "center_room"
+FromPosition = 6
+ToId = "southwest_room"
+ToPosition = 2
+Distance = 10.0
+metadata/_custom_type_script = "uid://qcuq8b45m1m"
+
+[sub_resource type="Resource" id="Resource_7ufb3"]
+script = ExtResource("1_xmcty")
+FromId = "center_room"
+FromPosition = 3
+ToId = "west_room"
+ToPosition = 5
+Distance = 10.0
+metadata/_custom_type_script = "uid://qcuq8b45m1m"
+
+[sub_resource type="Resource" id="Resource_6wsn7"]
+script = ExtResource("1_xmcty")
+FromId = "center_room"
+FromPosition = 0
+ToId = "northwest_room"
+ToPosition = 8
+Distance = 10.0
+metadata/_custom_type_script = "uid://qcuq8b45m1m"
+
+[sub_resource type="Resource" id="Resource_ol74h"]
+script = ExtResource("2_bppna")
+Id = "center_room"
+Prefab = ExtResource("4_yai44")
+metadata/_custom_type_script = "uid://b1ha2ko2ptyxq"
+
+[sub_resource type="Resource" id="Resource_b7vun"]
+script = ExtResource("2_bppna")
+Id = "north_room"
+Prefab = ExtResource("4_yai44")
+metadata/_custom_type_script = "uid://b1ha2ko2ptyxq"
+
+[sub_resource type="Resource" id="Resource_qj8gp"]
+script = ExtResource("2_bppna")
+Id = "northeast_room"
+Prefab = ExtResource("4_yai44")
+metadata/_custom_type_script = "uid://b1ha2ko2ptyxq"
+
+[sub_resource type="Resource" id="Resource_73dnh"]
+script = ExtResource("2_bppna")
+Id = "east_room"
+Prefab = ExtResource("4_yai44")
+metadata/_custom_type_script = "uid://b1ha2ko2ptyxq"
+
+[sub_resource type="Resource" id="Resource_di5d7"]
+script = ExtResource("2_bppna")
+Id = "southeast_room"
+Prefab = ExtResource("4_yai44")
+metadata/_custom_type_script = "uid://b1ha2ko2ptyxq"
+
+[sub_resource type="Resource" id="Resource_j5lum"]
+script = ExtResource("2_bppna")
+Id = "south_room"
+Prefab = ExtResource("4_yai44")
+metadata/_custom_type_script = "uid://b1ha2ko2ptyxq"
+
+[sub_resource type="Resource" id="Resource_nfag4"]
+script = ExtResource("2_bppna")
+Id = "southwest_room"
+Prefab = ExtResource("4_yai44")
+metadata/_custom_type_script = "uid://b1ha2ko2ptyxq"
+
+[sub_resource type="Resource" id="Resource_guq5o"]
+script = ExtResource("2_bppna")
+Id = "west_room"
+Prefab = ExtResource("4_yai44")
+metadata/_custom_type_script = "uid://b1ha2ko2ptyxq"
+
+[sub_resource type="Resource" id="Resource_dw6mr"]
+script = ExtResource("2_bppna")
+Id = "northwest_room"
+Prefab = ExtResource("4_yai44")
+metadata/_custom_type_script = "uid://b1ha2ko2ptyxq"
+
+[resource]
+script = ExtResource("5_7ufb3")
+Rooms = Array[ExtResource("2_bppna")]([SubResource("Resource_ol74h"), SubResource("Resource_b7vun"), SubResource("Resource_qj8gp"), SubResource("Resource_73dnh"), SubResource("Resource_di5d7"), SubResource("Resource_j5lum"), SubResource("Resource_nfag4"), SubResource("Resource_guq5o"), SubResource("Resource_dw6mr")])
+Connections = Array[ExtResource("1_xmcty")]([SubResource("Resource_obnam"), SubResource("Resource_2x5wj"), SubResource("Resource_xmcty"), SubResource("Resource_bppna"), SubResource("Resource_gaev2"), SubResource("Resource_yai44"), SubResource("Resource_7ufb3"), SubResource("Resource_6wsn7")])
+metadata/_custom_type_script = "uid://b31wuli6ws8mh"
