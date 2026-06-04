@@ -1,4 +1,5 @@
 using Godot;
+using Jaypen.Utilities.Extensions;
 using Jaypen.Utilities.Logging;
 using Jaypen.Utilities.Singletons;
 using Khepri.Entities;
@@ -11,7 +12,7 @@ using System.Linq;
 namespace Khepri.Managers
 {
     /// <summary> The game world's central manager. The entrypoint. Works a little like Program.cs. </summary>
-    /// <remarks> Its <c>_Ready</c> is the single bootstrap point: it loads the world definition, runs world construction. </remarks>
+    /// <remarks> Its <c>_Ready</c> is the single bootstrap point: it loads the world definitions, runs world construction. </remarks>
     public partial class GameManager : SingletonNode<GameManager>
     {
         /// <summary> The current entity controlled by the player. Equivalent to <c>TurnManager.Player.Owner</c>; held here as session state for convenient access. </summary>
@@ -21,20 +22,20 @@ namespace Khepri.Managers
         /// <summary> The current time within the game world. Advanced by <see cref="AdvanceTime"/> as turns are taken, not by real time. </summary>
         public DateTime GameTime { get; private set; } = DateTime.Now;
 
-        /// <summary> Godot resource path to the <c>WorldDefinition</c> <c>.tres</c> file that declares rooms and connections. Use the <c>res://</c> scheme — do not globalise this path. </summary>
+        /// <summary> The Godot resource directories to scan for <see cref="WorldDefinition"/> (<c>*.tres</c>) definitions. </summary>
+        /// <remarks> Paths are Godot resource paths (e.g. <c>res://Khepri/Data/Worlds</c>). Every <c>.tres</c> in each directory is loaded as a <see cref="WorldDefinition"/> and built into the shared room set. Use the <c>res://</c> scheme — do not globalise these paths. </remarks>
         [ExportGroup("Settings")]
-        [Export] private String _worldDefinitionPath = "res://Khepri/Data/Worlds/Overworld.tres";
+        [Export] private Godot.Collections.Array<String> _worldDefinitionPaths = new Godot.Collections.Array<String>
+        {
+            "res://Khepri/Data/Worlds"
+        };
 
 
         /// <summary> The logger instance the manager uses. </summary>
         private static readonly ILogger Logger = Log.For<GameManager>();
 
 
-        /// <summary> Bootstraps the session: loads the world definition, builds all rooms and connections, then spawns and places the player. </summary>
-        /// <exception cref="InvalidOperationException">
-        /// Thrown when <see cref="RoomManager"/> or <see cref="EntityManager"/> has not been initialised (node ordering problem in <c>Game.tscn</c>),
-        /// or when the world definition resource cannot be loaded from <see cref="_worldDefinitionPath"/>.
-        /// </exception>
+        /// <inheritdoc/>
         public override void _Ready()
         {
             RoomManager roomManager = RoomManager.Instance
@@ -43,24 +44,27 @@ namespace Khepri.Managers
             EntityManager entityManager = EntityManager.Instance
                 ?? throw new InvalidOperationException("GameManager._Ready requires EntityManager to be initialised first. Ensure the Entities node precedes the GameManager root node in Game.tscn.");
 
-            Logger.LogInformation("Loading world definition from '{Path}'...", _worldDefinitionPath);
+            List<WorldDefinition> worldDefinitions = new List<WorldDefinition>();
 
-            WorldDefinition? worldDefinition = ResourceLoader.Load<WorldDefinition>(_worldDefinitionPath);
-
-            if (worldDefinition is null)
+            foreach (String path in _worldDefinitionPaths)
             {
-                throw new InvalidOperationException(
-                    $"World definition resource could not be loaded from '{_worldDefinitionPath}'. Ensure the file exists and is a valid WorldDefinition resource.");
+                Logger.LogInformation("Loading world definitions from '{Path}'...", path);
+                worldDefinitions.AddRange(ResourceExtensions.GetResources<WorldDefinition>(path));
             }
 
-            Logger.LogInformation("Building world...");
+            if (worldDefinitions.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    $"No world definitions were found in any configured directory ({String.Join(", ", _worldDefinitionPaths)}). Ensure at least one valid WorldDefinition resource exists.");
+            }
 
-            IReadOnlyCollection<Room> builtRooms = new WorldBuilder(
-                roomManager.CreateRoom,
-                entityManager.CreateEntity,
-                roomManager.AddConnection).Build(worldDefinition);
+            Logger.LogInformation("Building {WorldCount} world(s)...", worldDefinitions.Count);
 
-            Logger.LogInformation("World built with {Count} room(s).", builtRooms.Count);
+            IReadOnlyCollection<Room> builtRooms =
+                new WorldBuilder(roomManager.CreateRoom, entityManager.CreateEntity, roomManager.AddConnection)
+                    .Build(worldDefinitions);
+
+            Logger.LogInformation("World built with {RoomCount} room(s).", builtRooms.Count);
 
             Logger.LogInformation("Spawning player...");
 

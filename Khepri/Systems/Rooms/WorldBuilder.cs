@@ -7,16 +7,19 @@ using System.Collections.Generic;
 
 namespace Khepri.Rooms
 {
-    /// <summary> Constructs a live, connected world from a <see cref="WorldDefinition"/> resource in two deterministic passes: first instantiate and populate all rooms, then wire their connections. </summary>
+    /// <summary> Constructs a live, connected world from one or more <see cref="WorldDefinition"/> resources in two deterministic passes: first instantiate and populate all rooms, then wire their connections. </summary>
     /// <remarks>
+    /// All supplied definitions share a single room-instance id namespace, so a <see cref="RoomConnection"/> declared in one definition may reference a room declared in another. This mirrors how the entity and room prefab catalogues merge multiple source directories into one registry with global name uniqueness.
+    /// <para>
     /// Pure two-pass orchestration — all instantiation and registration is delegated to the manager layer via three injected seams:
+    /// </para>
     /// <list type="bullet">
     ///   <item><description><c>roomFactory</c> — builds and registers a <see cref="Room"/> (provided by <c>RoomManager.CreateRoom</c>).</description></item>
     ///   <item><description><c>entitySpawner</c> — builds and registers an <see cref="Entity"/> (provided by <c>EntityManager.CreateEntity</c>).</description></item>
     ///   <item><description><c>connectionLinker</c> — constructs and wires a position-aware, distance-weighted connection between two rooms (provided by <c>RoomManager.AddConnection</c>); receives roomA, positionA, roomB, positionB, distance.</description></item>
     /// </list>
-    /// Pass 1 — for each <see cref="RoomInstance"/>, validate the id, delegate room creation to <c>roomFactory</c>, then spawn each <see cref="EntityPlacement"/> via <c>entitySpawner</c>.
-    /// Pass 2 — for each <see cref="RoomConnection"/>, look up both endpoints by id and delegate connection wiring to <c>connectionLinker</c>.
+    /// Pass 1 — for each <see cref="RoomInstance"/> across every definition, validate the id, delegate room creation to <c>roomFactory</c>, then spawn each <see cref="EntityPlacement"/> via <c>entitySpawner</c>.
+    /// Pass 2 — for each <see cref="RoomConnection"/> across every definition, look up both endpoints by id and delegate connection wiring to <c>connectionLinker</c>.
     /// </remarks>
     public sealed class WorldBuilder
     {
@@ -45,50 +48,53 @@ namespace Khepri.Rooms
         }
 
 
-        /// <summary> Executes the two-pass world-construction algorithm and returns the fully populated, connected rooms. </summary>
-        /// <param name="definition"> The world definition resource describing the rooms and connections to build. </param>
+        /// <summary> Executes the two-pass world-construction algorithm over every supplied definition and returns the fully populated, connected rooms. </summary>
+        /// <param name="definitions"> The world definition resources describing the rooms and connections to build; all share a single room-instance id namespace. </param>
         /// <returns> An immutable collection of all constructed rooms, in declaration order. </returns>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when a <see cref="RoomInstance.Id"/> is blank or duplicated, when <see cref="RoomInstance.Prefab"/> or an <see cref="EntityPlacement.Prefab"/> is null, or when a <see cref="RoomConnection"/> references an instance id absent from the built room map.
+        /// Thrown when a <see cref="RoomInstance.Id"/> is blank or duplicated across the supplied definitions, when <see cref="RoomInstance.Prefab"/> or an <see cref="EntityPlacement.Prefab"/> is null, or when a <see cref="RoomConnection"/> references an instance id absent from the built room map.
         /// </exception>
-        public IReadOnlyCollection<Room> Build(WorldDefinition definition)
+        public IReadOnlyCollection<Room> Build(IEnumerable<WorldDefinition> definitions)
         {
-            Dictionary<String, Room> roomMap = BuildRoomMap(definition);
-            WireConnections(definition, roomMap);
+            Dictionary<String, Room> roomMap = BuildRoomMap(definitions);
+            WireConnections(definitions, roomMap);
 
             return new List<Room>(roomMap.Values).AsReadOnly();
         }
 
 
-        /// <summary> Pass 1: validates ids, delegates room creation to <see cref="_roomFactory"/>, and populates each room with its entity placements. </summary>
-        /// <param name="definition"> The world definition whose room instances drive the pass. </param>
+        /// <summary> Pass 1: validates ids, delegates room creation to <see cref="_roomFactory"/>, and populates each room with its entity placements, merging every definition into one id namespace. </summary>
+        /// <param name="definitions"> The world definitions whose room instances drive the pass. </param>
         /// <returns> A map from each instance id to its constructed <see cref="Room"/>. </returns>
-        /// <exception cref="InvalidOperationException"> Thrown when any room id is blank, any id is duplicated, or any prefab reference is null. </exception>
-        private Dictionary<String, Room> BuildRoomMap(WorldDefinition definition)
+        /// <exception cref="InvalidOperationException"> Thrown when any room id is blank, any id is duplicated across the definitions, or any prefab reference is null. </exception>
+        private Dictionary<String, Room> BuildRoomMap(IEnumerable<WorldDefinition> definitions)
         {
             Dictionary<String, Room> roomMap = new Dictionary<String, Room>();
 
-            foreach (RoomInstance spec in definition.Rooms)
+            foreach (WorldDefinition definition in definitions)
             {
-                Boolean idBlank = String.IsNullOrWhiteSpace(spec.Id);
-
-                if (idBlank)
+                foreach (RoomInstance spec in definition.Rooms)
                 {
-                    throw new InvalidOperationException(
-                        "A RoomInstance in the world definition has a blank Id. Every room instance must have a unique, non-blank identifier.");
+                    Boolean idBlank = String.IsNullOrWhiteSpace(spec.Id);
+
+                    if (idBlank)
+                    {
+                        throw new InvalidOperationException(
+                            "A RoomInstance has a blank Id. Every room instance must have a unique, non-blank identifier across all world definitions.");
+                    }
+
+                    Boolean duplicate = roomMap.ContainsKey(spec.Id);
+
+                    if (duplicate)
+                    {
+                        throw new InvalidOperationException(
+                            $"Duplicate room instance id '{spec.Id}'. Each room instance must have a unique id across all world definitions.");
+                    }
+
+                    Room room = InstantiateRoom(spec);
+                    PopulateRoom(room, spec);
+                    roomMap[spec.Id] = room;
                 }
-
-                Boolean duplicate = roomMap.ContainsKey(spec.Id);
-
-                if (duplicate)
-                {
-                    throw new InvalidOperationException(
-                        $"Duplicate room instance id '{spec.Id}'. Each room instance must have a unique id within the world definition.");
-                }
-
-                Room room = InstantiateRoom(spec);
-                PopulateRoom(room, spec);
-                roomMap[spec.Id] = room;
             }
 
             return roomMap;
@@ -135,18 +141,21 @@ namespace Khepri.Rooms
         }
 
 
-        /// <summary> Pass 2: delegates connection wiring to <see cref="_connectionLinker"/> for each <see cref="RoomConnection"/>. </summary>
-        /// <param name="definition"> The world definition whose connection entries drive the pass. </param>
+        /// <summary> Pass 2: delegates connection wiring to <see cref="_connectionLinker"/> for each <see cref="RoomConnection"/> across every definition. </summary>
+        /// <param name="definitions"> The world definitions whose connection entries drive the pass. </param>
         /// <param name="roomMap"> The map produced by Pass 1; both endpoint ids must be present. </param>
         /// <exception cref="InvalidOperationException"> Propagated from <see cref="ResolveEndpoint"/> when an endpoint id is absent from <paramref name="roomMap"/>. </exception>
-        private void WireConnections(WorldDefinition definition, Dictionary<String, Room> roomMap)
+        private void WireConnections(IEnumerable<WorldDefinition> definitions, Dictionary<String, Room> roomMap)
         {
-            foreach (RoomConnection spec in definition.Connections)
+            foreach (WorldDefinition definition in definitions)
             {
-                Room roomFrom = ResolveEndpoint(roomMap, spec.FromId, spec);
-                Room roomTo   = ResolveEndpoint(roomMap, spec.ToId,   spec);
+                foreach (RoomConnection spec in definition.Connections)
+                {
+                    Room roomFrom = ResolveEndpoint(roomMap, spec.FromId, spec);
+                    Room roomTo   = ResolveEndpoint(roomMap, spec.ToId,   spec);
 
-                _connectionLinker(roomFrom, spec.FromPosition, roomTo, spec.ToPosition, spec.Distance);
+                    _connectionLinker(roomFrom, spec.FromPosition, roomTo, spec.ToPosition, spec.Distance);
+                }
             }
         }
 
