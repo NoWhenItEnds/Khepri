@@ -37,7 +37,9 @@ namespace Khepri.Entities.Components
         }
 
 
-        /// <inheritdoc/>
+        /// <summary> Attempt to add an entity to the entities currently within the container. </summary>
+        /// <param name="entity"> The entity to move into the container. </param>
+        /// <returns> <c>true</c> if the entity was successfully added; <c>false</c> if it was already present or if adding it would create a containment cycle (e.g. placing the owning entity, or any ancestor in its container tree, into this container). </returns>
         public Boolean AddEntity(Entity entity)
         {
             Boolean wouldCycle = entity.Equals(Owner)
@@ -47,7 +49,9 @@ namespace Khepri.Entities.Components
         }
 
 
-        /// <inheritdoc/>
+        /// <summary> Attempt to remove an entity from the entities currently within the container. </summary>
+        /// <param name="entity"> The entity to remove from the container. </param>
+        /// <returns> Whether the entity was successfully removed from the container. </returns>
         public Boolean RemoveEntity(Entity entity) => _entities.Remove(entity);
 
 

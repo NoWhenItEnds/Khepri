@@ -20,8 +20,8 @@ namespace Khepri.Rooms
         /// <summary> The connections branching off from this current room. </summary>
         private readonly HashSet<Connection> _connections = new HashSet<Connection>();
 
-        /// <summary> The entities directly in the current room, not those nested within container components. </summary>
-        private readonly HashSet<Entity> _entities = new HashSet<Entity>();
+        /// <summary> All the relative locations in the room and the entities occupying them. </summary>
+        private readonly Dictionary<RoomPosition, List<Entity>> _entities = new Dictionary<RoomPosition, List<Entity>>();
 
         /// <summary> The features that define the characteristics of this room, keyed by exact runtime type — a room holds at most one feature of each concrete type. Features are aspects of the room itself; entities are its contents — they are separate collections. </summary>
         private readonly Dictionary<Type, Feature> _features = new Dictionary<Type, Feature>();
@@ -32,6 +32,12 @@ namespace Khepri.Rooms
         public Room(Guid uid)
         {
             UId = uid;
+
+            // Initialise the entity lists for each position in the room.
+            foreach (RoomPosition position in Enum.GetValues<RoomPosition>())
+            {
+                _entities[position] = new List<Entity>();
+            }
         }
 
 
@@ -75,16 +81,36 @@ namespace Khepri.Rooms
         public IReadOnlyCollection<Connection> GetConnections() => _connections.ToArray();
 
 
-        /// <inheritdoc/>
-        public Boolean AddEntity(Entity entity) => _entities.Add(entity);
+        /// <summary> Attempt to add an entity to the entities currently within the container. </summary>
+        /// <param name="entity"> The entity to move into the container. </param>
+        /// <param name="position"> The position within the room to place the entity. </param>
+        /// <returns> <c>true</c> if the entity was successfully added; <c>false</c> if it was already present. </returns>
+        public Boolean AddEntity(Entity entity, RoomPosition position)
+        {
+            Boolean result = false;
+            if (!((IEntityContainer)this).Contains(entity))
+            {
+                _entities[position].Add(entity);
+                result = true;
+            }
+            return result;
+        }
+
+
+        /// <summary> Attempt to remove an entity from the entities currently within the container. </summary>
+        /// <param name="entity"> The entity to remove from the container. </param>
+        /// <returns> Whether the entity was successfully removed from the container. </returns>
+        public Boolean RemoveEntity(Entity entity) => _entities.Values.Any(x => x.Remove(entity));
 
 
         /// <inheritdoc/>
-        public Boolean RemoveEntity(Entity entity) => _entities.Remove(entity);
+        public IReadOnlyCollection<Entity> GetEntities() => _entities.Values.SelectMany(x => x).ToArray();
 
 
-        /// <inheritdoc/>
-        public IReadOnlyCollection<Entity> GetEntities() => _entities.ToArray();
+        /// <summary> Returns a snapshot of the entities currently occupying a single position within the room. </summary>
+        /// <param name="position"> The room position whose entities are to be retrieved. </param>
+        /// <returns> An immutable snapshot of the entities at <paramref name="position"/>; never null, but may be empty when no entities occupy that position. </returns>
+        public IReadOnlyCollection<Entity> GetEntities(RoomPosition position) => _entities[position].ToArray();
 
 
         /// <inheritdoc/>

@@ -1,39 +1,55 @@
+using Godot;
 using Khepri.Entities;
+using Khepri.Entities.Definitions;
+using Khepri.Rooms.Definitions;
 using System;
 using System.Collections.Generic;
 
 namespace Khepri.Rooms
 {
-    /// <summary> Constructs a live, connected world from a parsed <see cref="WorldDefinition"/> in two deterministic passes: first instantiate and populate all rooms, then wire their connections. </summary>
+    /// <summary> Constructs a live, connected world from a <see cref="WorldDefinition"/> resource in two deterministic passes: first instantiate and populate all rooms, then wire their connections. </summary>
     /// <remarks>
-    /// Godot-free and decoupled from the managers. Both construction responsibilities are injected as delegates: <c>roomFactory</c> turns a room prefab name into a fresh <see cref="Room"/>, and <c>entitySpawner</c> turns an entity prefab name into a fresh <see cref="Entity"/>. These are the only seams between this POCO layer and the Godot layer above it.
-    /// Pass 1 — for each <see cref="RoomInstanceSpec"/>, build the room via <c>roomFactory</c>, record the instance id-to-<see cref="Room"/> mapping, then spawn each declared entity into the room.
-    /// Pass 2 — for each <see cref="ConnectionSpec"/>, look up both rooms by instance id, construct a <see cref="Connection"/>, and register it on both room endpoints.
+    /// Pure two-pass orchestration — all instantiation and registration is delegated to the manager layer via three injected seams:
+    /// <list type="bullet">
+    ///   <item><description><c>roomFactory</c> — builds and registers a <see cref="Room"/> (provided by <c>RoomManager.CreateRoom</c>).</description></item>
+    ///   <item><description><c>entitySpawner</c> — builds and registers an <see cref="Entity"/> (provided by <c>EntityManager.CreateEntity</c>).</description></item>
+    ///   <item><description><c>connectionLinker</c> — constructs and wires a position-aware, distance-weighted connection between two rooms (provided by <c>RoomManager.AddConnection</c>); receives roomA, positionA, roomB, positionB, distance.</description></item>
+    /// </list>
+    /// Pass 1 — for each <see cref="RoomInstance"/>, validate the id, delegate room creation to <c>roomFactory</c>, then spawn each <see cref="EntityPlacement"/> via <c>entitySpawner</c>.
+    /// Pass 2 — for each <see cref="RoomConnection"/>, look up both endpoints by id and delegate connection wiring to <c>connectionLinker</c>.
     /// </remarks>
     public sealed class WorldBuilder
     {
-        /// <summary> Resolves a room prefab name to a freshly built <see cref="Room"/>, or returns <c>null</c> when the name is unknown. </summary>
-        private readonly Func<String, Room?> _roomFactory;
+        /// <summary> Builds and registers a <see cref="Room"/> from the given prefab; provided by <c>RoomManager.CreateRoom</c>. </summary>
+        private readonly Func<RoomPrefab, Room> _roomFactory;
 
-        /// <summary> Maps an entity prefab name to a freshly spawned <see cref="Entity"/>; provided by the Godot layer so this class stays Godot-free. </summary>
-        private readonly Func<String, Entity> _entitySpawner;
+        /// <summary> Builds and registers a freshly spawned <see cref="Entity"/> from the given prefab; provided by <c>EntityManager.CreateEntity</c>. </summary>
+        private readonly Func<EntityPrefab, Entity> _entitySpawner;
+
+        /// <summary> Constructs a position-aware, distance-weighted bidirectional connection between two already-registered rooms and wires it on both endpoints; provided by <c>RoomManager.AddConnection</c>. Parameters are: roomA, positionA, roomB, positionB, distance. </summary>
+        private readonly Action<Room, RoomPosition, Room, RoomPosition, Single> _connectionLinker;
 
 
-        /// <summary> Initialises the builder with the room-factory and entity-spawner delegates. </summary>
-        /// <param name="roomFactory"> A delegate that builds a new <see cref="Room"/> from a room prefab name, returning <c>null</c> when the name is not registered. </param>
-        /// <param name="entitySpawner"> A delegate that builds a new <see cref="Entity"/> from an entity prefab name. </param>
-        public WorldBuilder(Func<String, Room?> roomFactory, Func<String, Entity> entitySpawner)
+        /// <summary> Initialises the builder with the three manager-layer delegates that handle all instantiation and registration. </summary>
+        /// <param name="roomFactory"> Creates and registers a <see cref="Room"/> from the given <see cref="RoomPrefab"/>. </param>
+        /// <param name="entitySpawner"> Creates and registers an <see cref="Entity"/> from the given <see cref="EntityPrefab"/>. </param>
+        /// <param name="connectionLinker"> Constructs and registers a position-aware, distance-weighted bidirectional connection; receives roomA, positionA, roomB, positionB, distance. </param>
+        public WorldBuilder(
+            Func<RoomPrefab, Room>                                  roomFactory,
+            Func<EntityPrefab, Entity>                              entitySpawner,
+            Action<Room, RoomPosition, Room, RoomPosition, Single>  connectionLinker)
         {
-            _roomFactory   = roomFactory;
-            _entitySpawner = entitySpawner;
+            _roomFactory      = roomFactory;
+            _entitySpawner    = entitySpawner;
+            _connectionLinker = connectionLinker;
         }
 
 
         /// <summary> Executes the two-pass world-construction algorithm and returns the fully populated, connected rooms. </summary>
-        /// <param name="definition"> The parsed world definition describing the rooms and connections to build. </param>
-        /// <returns> An immutable collection of all constructed rooms, in the order they were declared in <paramref name="definition"/>. </returns>
+        /// <param name="definition"> The world definition resource describing the rooms and connections to build. </param>
+        /// <returns> An immutable collection of all constructed rooms, in declaration order. </returns>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when a <see cref="RoomInstanceSpec.PrefabName"/> is not registered, or when a <see cref="ConnectionSpec"/> references an instance id not found in the built room map.
+        /// Thrown when a <see cref="RoomInstance.Id"/> is blank or duplicated, when <see cref="RoomInstance.Prefab"/> or an <see cref="EntityPlacement.Prefab"/> is null, or when a <see cref="RoomConnection"/> references an instance id absent from the built room map.
         /// </exception>
         public IReadOnlyCollection<Room> Build(WorldDefinition definition)
         {
@@ -44,16 +60,32 @@ namespace Khepri.Rooms
         }
 
 
-        /// <summary> Pass 1: instantiates every room declared in <paramref name="definition"/> and populates each with its specified entities. </summary>
-        /// <param name="definition"> The world definition whose room instance specs drive the pass. </param>
+        /// <summary> Pass 1: validates ids, delegates room creation to <see cref="_roomFactory"/>, and populates each room with its entity placements. </summary>
+        /// <param name="definition"> The world definition whose room instances drive the pass. </param>
         /// <returns> A map from each instance id to its constructed <see cref="Room"/>. </returns>
-        /// <exception cref="InvalidOperationException"> Thrown when a prefab name cannot be resolved; the message includes the offending instance id and prefab name. </exception>
+        /// <exception cref="InvalidOperationException"> Thrown when any room id is blank, any id is duplicated, or any prefab reference is null. </exception>
         private Dictionary<String, Room> BuildRoomMap(WorldDefinition definition)
         {
             Dictionary<String, Room> roomMap = new Dictionary<String, Room>();
 
-            foreach (RoomInstanceSpec spec in definition.Rooms)
+            foreach (RoomInstance spec in definition.Rooms)
             {
+                Boolean idBlank = String.IsNullOrWhiteSpace(spec.Id);
+
+                if (idBlank)
+                {
+                    throw new InvalidOperationException(
+                        "A RoomInstance in the world definition has a blank Id. Every room instance must have a unique, non-blank identifier.");
+                }
+
+                Boolean duplicate = roomMap.ContainsKey(spec.Id);
+
+                if (duplicate)
+                {
+                    throw new InvalidOperationException(
+                        $"Duplicate room instance id '{spec.Id}'. Each room instance must have a unique id within the world definition.");
+                }
+
                 Room room = InstantiateRoom(spec);
                 PopulateRoom(room, spec);
                 roomMap[spec.Id] = room;
@@ -63,51 +95,58 @@ namespace Khepri.Rooms
         }
 
 
-        /// <summary> Creates a single room from the prefab named in <paramref name="spec"/>. </summary>
-        /// <param name="spec"> The room instance spec whose <see cref="RoomInstanceSpec.PrefabName"/> is resolved via the room factory. </param>
-        /// <returns> A newly constructed <see cref="Room"/> with all prefab features applied. </returns>
-        /// <exception cref="InvalidOperationException"> Thrown when the room factory does not recognise <see cref="RoomInstanceSpec.PrefabName"/>; the message includes the instance id and prefab name. </exception>
-        private Room InstantiateRoom(RoomInstanceSpec spec)
+        /// <summary> Delegates creation of a single room to <see cref="_roomFactory"/> after validating the prefab reference. </summary>
+        /// <param name="spec"> The room instance whose <see cref="RoomInstance.Prefab"/> is passed to the factory. </param>
+        /// <returns> A newly constructed, manager-registered <see cref="Room"/>. </returns>
+        /// <exception cref="InvalidOperationException"> Thrown when <see cref="RoomInstance.Prefab"/> is null; the message names the instance id. </exception>
+        private Room InstantiateRoom(RoomInstance spec)
         {
-            Room? room = _roomFactory(spec.PrefabName);
+            Boolean prefabMissing = spec.Prefab is null;
 
-            if (room is null)
+            if (prefabMissing)
             {
                 throw new InvalidOperationException(
-                    $"Room instance '{spec.Id}': room prefab '{spec.PrefabName}' has not been loaded.");
+                    $"Room instance '{spec.Id}' has no Prefab assigned. Set the Prefab field in the WorldDefinition resource.");
             }
 
-            return room;
+            return _roomFactory(spec.Prefab!);
         }
 
 
-        /// <summary> Spawns each entity prefab named in <paramref name="spec"/> and adds the resulting entity to <paramref name="room"/>. </summary>
+        /// <summary> Spawns each <see cref="EntityPlacement"/> declared in <paramref name="spec"/> and adds the resulting entity to <paramref name="room"/> at the placement's declared position. </summary>
         /// <param name="room"> The room to receive the entities. </param>
-        /// <param name="spec"> The room instance spec whose <see cref="RoomInstanceSpec.EntityPrefabNames"/> drive the spawning loop. </param>
-        private void PopulateRoom(Room room, RoomInstanceSpec spec)
+        /// <param name="spec"> The room instance whose <see cref="RoomInstance.Entities"/> drive the spawning loop. </param>
+        /// <exception cref="InvalidOperationException"> Thrown when any <see cref="EntityPlacement.Prefab"/> is null; the message names the owning room instance id. </exception>
+        private void PopulateRoom(Room room, RoomInstance spec)
         {
-            foreach (String entityPrefabName in spec.EntityPrefabNames)
+            foreach (EntityPlacement placement in spec.Entities)
             {
-                Entity entity = _entitySpawner(entityPrefabName);
-                room.AddEntity(entity);
+                Boolean prefabMissing = placement.Prefab is null;
+
+                if (prefabMissing)
+                {
+                    throw new InvalidOperationException(
+                        $"Room instance '{spec.Id}' contains an EntityPlacement with no Prefab assigned. Set the Prefab field on every EntityPlacement in the WorldDefinition resource.");
+                }
+
+                Entity entity = _entitySpawner(placement.Prefab!);
+                room.AddEntity(entity, placement.Position);
             }
         }
 
 
-        /// <summary> Pass 2: constructs a <see cref="Connection"/> for each <see cref="ConnectionSpec"/> and registers it on both room endpoints. </summary>
-        /// <param name="definition"> The world definition whose connection specs drive the pass. </param>
+        /// <summary> Pass 2: delegates connection wiring to <see cref="_connectionLinker"/> for each <see cref="RoomConnection"/>. </summary>
+        /// <param name="definition"> The world definition whose connection entries drive the pass. </param>
         /// <param name="roomMap"> The map produced by Pass 1; both endpoint ids must be present. </param>
         /// <exception cref="InvalidOperationException"> Propagated from <see cref="ResolveEndpoint"/> when an endpoint id is absent from <paramref name="roomMap"/>. </exception>
-        private static void WireConnections(WorldDefinition definition, Dictionary<String, Room> roomMap)
+        private void WireConnections(WorldDefinition definition, Dictionary<String, Room> roomMap)
         {
-            foreach (ConnectionSpec spec in definition.Connections)
+            foreach (RoomConnection spec in definition.Connections)
             {
                 Room roomFrom = ResolveEndpoint(roomMap, spec.FromId, spec);
                 Room roomTo   = ResolveEndpoint(roomMap, spec.ToId,   spec);
 
-                Connection connection = new Connection(roomFrom, roomTo);
-                roomFrom.AddConnection(connection);
-                roomTo.AddConnection(connection);
+                _connectionLinker(roomFrom, spec.FromPosition, roomTo, spec.ToPosition, spec.Distance);
             }
         }
 
@@ -118,7 +157,7 @@ namespace Khepri.Rooms
         /// <param name="spec"> The connection spec being processed; both endpoint ids are included in the error message. </param>
         /// <returns> The <see cref="Room"/> registered under <paramref name="instanceId"/>. </returns>
         /// <exception cref="InvalidOperationException"> Thrown when <paramref name="instanceId"/> is not present in <paramref name="roomMap"/>. </exception>
-        private static Room ResolveEndpoint(Dictionary<String, Room> roomMap, String instanceId, ConnectionSpec spec)
+        private static Room ResolveEndpoint(Dictionary<String, Room> roomMap, String instanceId, RoomConnection spec)
         {
             Boolean found = roomMap.TryGetValue(instanceId, out Room? room);
 

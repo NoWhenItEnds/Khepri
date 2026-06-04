@@ -42,12 +42,32 @@ namespace Khepri.Managers
         }
 
 
-        /// <summary> Creates an entity from the named prefab and registers it in the world. </summary>
+        /// <summary> Instantiates the given prefab, wires an <see cref="AiController"/>, registers the entity in the game world, and returns it. </summary>
+        /// <param name="prefab"> The prefab to instantiate; must not be null. </param>
+        /// <returns> The newly constructed, registered entity. </returns>
+        /// <exception cref="InvalidOperationException"> Thrown when the new entity's UID collides with one already registered (an identity bug). </exception>
+        public Entity CreateEntity(EntityPrefab prefab)
+        {
+            Entity entity = prefab.Instantiate();
+            AiController controller = new AiController(entity); // TODO - Not happy about always being AiController.
+            Boolean added = _entities.TryAdd(entity, controller);
+
+            if (!added)
+            {
+                throw new InvalidOperationException(
+                    $"Entity with UID '{entity.UId}' (prefab '{prefab.Name}') could not be registered because that UID already exists. This indicates an identity collision bug.");
+            }
+
+            return entity;
+        }
+
+
+        /// <summary> Resolves a prefab by name and delegates to <see cref="CreateEntity(EntityPrefab)"/> to build and register the entity. </summary>
         /// <param name="prefabName"> The name of the prefab to instantiate; must exist in a loaded directory. </param>
         /// <returns> The newly constructed, registered entity. </returns>
         /// <exception cref="KeyNotFoundException"> Thrown when no prefab with <paramref name="prefabName"/> has been loaded. </exception>
         /// <exception cref="InvalidOperationException"> Thrown when the new entity's UID collides with one already registered (an identity bug). </exception>
-        public Entity CreateEntityFromPrefab(String prefabName)
+        public Entity CreateEntity(String prefabName)
         {
             Boolean found = _prefabsByName.TryGetValue(prefabName, out EntityPrefab? prefab);
 
@@ -56,17 +76,7 @@ namespace Khepri.Managers
                 throw new KeyNotFoundException($"No entity prefab named '{prefabName}' has been loaded.");
             }
 
-            Entity  entity = prefab!.Instantiate();
-            AiController controller = new AiController(entity); // TODO - Not happy about always being AiController.
-            Boolean added  = _entities.TryAdd(entity, controller);
-
-            if (!added)
-            {
-                throw new InvalidOperationException(
-                    $"Entity with UID '{entity.UId}' (prefab '{prefabName}') could not be registered because that UID already exists. This indicates an identity collision bug.");
-            }
-
-            return entity;
+            return CreateEntity(prefab!);
         }
 
 

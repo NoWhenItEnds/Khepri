@@ -3,54 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Jaypen.Utilities.Extensions;
-using Jaypen.Utilities.Logging;
 using Jaypen.Utilities.Singletons;
 using Khepri.Entities;
 using Khepri.Rooms;
 using Khepri.Rooms.Definitions;
-using Microsoft.Extensions.Logging;
 
 namespace Khepri.Managers
 {
-    /// <summary> The game world's singleton managing rooms and connections between them. </summary>
-    /// <remarks>
-    /// Depends on <see cref="EntityManager"/> being initialised before this node's <c>_Ready</c> runs.
-    /// In <c>Game.tscn</c> the <c>Entities</c> node precedes the <c>Rooms</c> node as a sibling,
-    /// which guarantees Godot's bottom-up <c>_Ready</c> ordering executes EntityManager first.
-    /// </remarks>
+    /// <summary> The game world's singleton managing rooms, their prefab catalogue, and the connections between them. </summary>
     public partial class RoomManager : SingletonNode<RoomManager>
     {
         /// <summary> The Godot resource directories to scan for room prefab (<c>*.tres</c>) definitions. </summary>
+        /// <remarks> Paths are Godot resource paths (e.g. <c>res://Khepri/Data/Prefabs/Rooms</c>). Every <c>.tres</c> in each directory is loaded as a <see cref="RoomPrefab"/>; prefab names must be unique across all directories. </remarks>
         [ExportGroup("Settings")]
         [Export] private Godot.Collections.Array<String> _prefabPaths = new Godot.Collections.Array<String>
         {
             "res://Khepri/Data/Prefabs/Rooms"
         };
 
-        /// <summary> Godot resource path to the world definition JSON file that declares rooms and connections. </summary>
-        [Export] private String _worldDefinitionPath = "res://Khepri/Data/Worlds/overworld.json";
-
 
         /// <summary> All loaded room prefabs, keyed by their <see cref="RoomPrefab.Name"/>. </summary>
         private readonly Dictionary<String, RoomPrefab> _prefabsByName = new Dictionary<String, RoomPrefab>();
 
-        /// <summary> All rooms that exist within the game world. </summary>
+        /// <summary> All rooms that currently exist within the game world. </summary>
         private readonly HashSet<Room> _rooms = new HashSet<Room>();
 
 
-        /// <summary> The logger instance the manager uses. </summary>
-        private static readonly ILogger Logger = Log.For<RoomManager>();
-
-
-        /// <summary> Loads the room prefabs, loads the world definition, constructs all rooms and connections, and populates the internal room set. </summary>
-        /// <exception cref="InvalidOperationException"> Thrown when <see cref="EntityManager"/> has not been initialised, indicating a node ordering problem in <c>Game.tscn</c>. </exception>
+        /// <summary> Loads every room prefab resource from the configured directories and registers each by name. </summary>
         public override void _Ready()
         {
-            EntityManager entityManager = EntityManager.Instance
-                ?? throw new InvalidOperationException("RoomManager._Ready requires EntityManager to be initialised first. Ensure the Entities node precedes the Rooms node in Game.tscn.");
-
-            Logger.LogInformation("Loading room prefabs...");
-
             foreach (String path in _prefabPaths)
             {
                 foreach (RoomPrefab prefab in ResourceExtensions.GetResources<RoomPrefab>(path))
@@ -58,32 +39,55 @@ namespace Khepri.Managers
                     Register(prefab, prefab.ResourcePath);
                 }
             }
-
-            Logger.LogInformation("Loading world definition from '{Path}'...", _worldDefinitionPath);
-
-            WorldDefinition worldDefinition = new WorldDefinitionLoader().Load(
-                ProjectSettings.GlobalizePath(_worldDefinitionPath));
-
-            Logger.LogInformation("Building world...");
-
-            IReadOnlyCollection<Room> builtRooms = new WorldBuilder(
-                CreateRoomFromPrefab,
-                entityManager.CreateEntityFromPrefab).Build(worldDefinition);
-
-            foreach (Room room in builtRooms)
-            {
-                _rooms.Add(room);
-            }
-
-            Logger.LogInformation("World built with {Count} room(s).", _rooms.Count);
         }
 
 
-        /// <summary> Creates a bidirectional <see cref="Connection"/> between two existing rooms and registers it on both endpoints. </summary>
+        /// <summary> Instantiates the given prefab, registers the resulting room in the live room set, and returns it. </summary>
+        /// <remarks> This is the seam passed to <see cref="Rooms.WorldBuilder"/> as its <c>roomFactory</c> delegate, so rooms are registered as they are built during world construction. </remarks>
+        /// <param name="prefab"> The room prefab to instantiate; must not be null. </param>
+        /// <returns> The newly constructed, registered room. </returns>
+        /// <exception cref="ArgumentNullException"> Thrown when <paramref name="prefab"/> is null. </exception>
+        public Room CreateRoom(RoomPrefab prefab)
+        {
+            if (prefab is null)
+            {
+                throw new ArgumentNullException(nameof(prefab), "Cannot create a room from a null prefab.");
+            }
+
+            Room room = prefab.Instantiate();
+            _rooms.Add(room);
+
+            return room;
+        }
+
+
+        /// <summary> Resolves a prefab by name and delegates to <see cref="CreateRoom(RoomPrefab)"/> to build and register the room. </summary>
+        /// <remarks> The world-construction build path uses direct prefab references via <see cref="CreateRoom(RoomPrefab)"/>, so this by-name entry point is currently unused by <see cref="Rooms.WorldBuilder"/>. It exists for symmetry with <see cref="EntityManager.CreateEntity(String)"/> and for future by-name creation scenarios. </remarks>
+        /// <param name="prefabName"> The name of the prefab to instantiate; must exist in a loaded directory. </param>
+        /// <returns> The newly constructed, registered room. </returns>
+        /// <exception cref="KeyNotFoundException"> Thrown when no prefab with <paramref name="prefabName"/> has been loaded. </exception>
+        public Room CreateRoom(String prefabName)
+        {
+            Boolean found = _prefabsByName.TryGetValue(prefabName, out RoomPrefab? prefab);
+
+            if (!found)
+            {
+                throw new KeyNotFoundException($"No room prefab named '{prefabName}' has been loaded.");
+            }
+
+            return CreateRoom(prefab!);
+        }
+
+
+        /// <summary> Creates a position-aware, distance-weighted bidirectional <see cref="Connection"/> between two room endpoints and registers it on both. </summary>
+        /// <remarks> Also serves as the <c>connectionLinker</c> seam passed to <see cref="Rooms.WorldBuilder"/>. Both rooms must already be registered via <see cref="CreateRoom(Definitions.RoomPrefab)"/>. </remarks>
         /// <param name="roomA"> The first room endpoint; must already be tracked by this manager. </param>
-        /// <param name="roomB"> The second room endpoint; must already be tracked by this manager and differ from <paramref name="roomA"/>. </param>
-        /// <exception cref="ArgumentException"> Thrown when either room is not tracked by this manager, or when both refer to the same instance. </exception>
-        public void AddConnection(Room roomA, Room roomB)
+        /// <param name="positionA"> The position within <paramref name="roomA"/> at which this connection attaches. </param>
+        /// <param name="roomB"> The second room endpoint; must already be tracked by this manager. </param>
+        /// <param name="positionB"> The position within <paramref name="roomB"/> at which this connection attaches. </param>
+        /// <param name="distance"> The travel cost through the connection in metres; must be zero or positive. Defaults to 0. </param>
+        /// <exception cref="ArgumentException"> Thrown when either room is not tracked by this manager. Propagated from <see cref="Connection"/> when both endpoints are the same room at the same position, or when <paramref name="distance"/> is negative. </exception>
+        public void AddConnection(Room roomA, RoomPosition positionA, Room roomB, RoomPosition positionB, Single distance = 0f)
         {
             Boolean roomAKnown = _rooms.Contains(roomA);
 
@@ -99,14 +103,14 @@ namespace Khepri.Managers
                 throw new ArgumentException("The room is not tracked by this RoomManager.", nameof(roomB));
             }
 
-            Connection connection = new Connection(roomA, roomB);
+            Connection connection = new Connection(roomA, positionA, roomB, positionB, distance);
             roomA.AddConnection(connection);
             roomB.AddConnection(connection);
         }
 
 
-        /// <summary> Get all the rooms in the game world. </summary>
-        /// <returns> An immutable list containing all the discovered rooms in the game world.</returns>
+        /// <summary> Returns all rooms currently in the game world. </summary>
+        /// <returns> An immutable snapshot of all registered rooms; never null, but may be empty before world construction has run. </returns>
         public IReadOnlyCollection<Room> GetRooms() => _rooms.ToArray();
 
 
@@ -120,21 +124,10 @@ namespace Khepri.Managers
 
             if (result == null)
             {
-                throw new InvalidOperationException("The given entity doesn't exist within this plane of reality! This shouldn't be possible.");
+                throw new InvalidOperationException($"The given entity <{entity.UId}> doesn't exist within this plane of reality! This shouldn't be possible.");
             }
 
             return result;
-        }
-
-
-        /// <summary> Builds a new <see cref="Room"/> from the named prefab, or returns <c>null</c> when no such prefab is loaded. </summary>
-        /// <remarks> Passed to <see cref="WorldBuilder"/> as its room-factory seam. </remarks>
-        /// <param name="prefabName"> The room prefab name to resolve. </param>
-        /// <returns> A freshly built room, or <c>null</c> when the name is unknown. </returns>
-        private Room? CreateRoomFromPrefab(String prefabName)
-        {
-            Boolean found = _prefabsByName.TryGetValue(prefabName, out RoomPrefab? prefab);
-            return found ? prefab!.Instantiate() : null;
         }
 
 
