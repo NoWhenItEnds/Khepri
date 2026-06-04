@@ -22,8 +22,9 @@ namespace Khepri.UI.Map
         /// <inheritdoc/>
         public override void _Ready()
         {
-            // The marker lives on a plain (non-container) layer, so it keeps whatever size it is given. Mirror the
-            // prefab's minimum size into the actual size so CenterOn has real dimensions to offset against.
+            // The marker lives directly on the panel (a non-container parent), so it keeps whatever size it is
+            // given. Mirror the prefab's minimum size into the actual size so CenterOn has real dimensions to
+            // offset against.
             Size = CustomMinimumSize;
         }
 

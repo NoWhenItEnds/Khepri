@@ -1,4 +1,5 @@
 using Godot;
+using Jaypen.Utilities.Pooling;
 using Khepri.Rooms;
 using System;
 using System.Collections.Generic;
@@ -6,6 +7,24 @@ using System.Collections.Generic;
 namespace Khepri.UI.Map
 {
     /// <summary> Panel displaying the game world as a node-link graph centred on the current room. </summary>
+    /// <remarks>
+    /// Rooms are nodes and connections are edges. The world is non-Euclidean (rooms have no global coordinates),
+    /// but every connection attaches at a <see cref="RoomPosition"/> that encodes the direction travelled to reach
+    /// a neighbour. Starting from the current room at the origin, each reachable room is placed by accumulating the
+    /// unit direction of the connection that first reached it. Neighbours that share an exit direction are fanned
+    /// out angularly so their markers do not stack. Because a looping, non-Euclidean world cannot always be honoured
+    /// on a flat plane, two rooms may still occasionally land near the same point — an accepted limitation.
+    /// <para/>
+    /// The graph renders at a fixed scale with the current room centred; the player can drag to pan and use the wheel
+    /// to zoom. Room markers are <see cref="RoomNode"/> prefab instances and edges are <see cref="Line2D"/> nodes,
+    /// both recycled through a <see cref="NodePool{T}"/> so a rebuild reuses nodes instead of re-instancing them.
+    /// Edges sit on a layer behind the markers.
+    /// <code>
+    /// OverworldPanel (this script, a plain Control used as the drawing surface)
+    /// </code>
+    /// The edge and room layers, and the markers and edges within them, are created programmatically; no editor-side
+    /// children are required beyond assigning the room-node prefab.
+    /// </remarks>
     public partial class OverworldPanel : Control
     {
         /// <summary> The prefab instantiated once per room marker. Must resolve to a <see cref="RoomNode"/> at its root. </summary>
@@ -16,11 +35,20 @@ namespace Khepri.UI.Map
         /// <summary> Logical distance between a room and a directly-connected neighbour, before scaling to the panel. </summary>
         private const Single StepLength = 1f;
 
-        /// <summary> Largest pixel distance allotted to one <see cref="StepLength"/>, so small graphs are not blown up to fill the panel. </summary>
-        private const Single MaxPixelsPerStep = 130f;
+        /// <summary> Pixels one <see cref="StepLength"/> spans at unit zoom. </summary>
+        private const Single PixelsPerStep = 120f;
 
-        /// <summary> Pixel gap kept between the graph's outermost markers and the panel edge. </summary>
-        private const Single Margin = 60f;
+        /// <summary> Total angular spread, in radians, across which neighbours sharing one exit direction are fanned. </summary>
+        private const Single FanSpread = Mathf.Pi / 2f;
+
+        /// <summary> Smallest permitted zoom factor. </summary>
+        private const Single MinZoom = 0.35f;
+
+        /// <summary> Largest permitted zoom factor. </summary>
+        private const Single MaxZoom = 3f;
+
+        /// <summary> Multiplicative zoom change applied per wheel notch. </summary>
+        private const Single ZoomStep = 1.1f;
 
         /// <summary> Width of the drawn connection lines, in pixels. </summary>
         private const Single EdgeWidth = 3f;
@@ -29,57 +57,145 @@ namespace Khepri.UI.Map
         private static readonly Color EdgeColor = new Color(1f, 1f, 1f, 0.35f);
 
 
-        /// <summary> The layer holding edge lines; added first so it renders behind the room markers. </summary>
+        /// <summary> The layer holding edge lines; added before any markers so it renders behind them. </summary>
         private Control _edgeLayer = null!;
 
-        /// <summary> The layer holding room markers; added second so it renders in front of the edges. </summary>
-        private Control _roomLayer = null!;
-
-        /// <summary> Pool of reusable room markers, parented to <see cref="_roomLayer"/>. </summary>
-        private ScenePool<RoomNode> _roomPool = null!;
+        /// <summary> Pool of reusable room markers, parented directly to this panel (above <see cref="_edgeLayer"/>). </summary>
+        private NodePool<RoomNode> _roomPool = null!;
 
         /// <summary> Pool of reusable edge lines, parented to <see cref="_edgeLayer"/>. </summary>
-        private ScenePool<Line2D> _edgePool = null!;
+        private NodePool<Line2D> _edgePool = null!;
+
+        /// <summary> Player-controlled pan, in pixels, added to the current room's centred position. Persists across rebuilds. </summary>
+        private Vector2 _panOffset = Vector2.Zero;
+
+        /// <summary> Player-controlled zoom factor multiplying <see cref="PixelsPerStep"/>. </summary>
+        private Single _zoom = 1f;
+
+        /// <summary> Whether a pan-drag is currently in progress. </summary>
+        private Boolean _isPanning;
+
+        /// <summary> The room the graph was last built for; used to skip rebuilding when nothing has changed. Null until the first build. </summary>
+        private Room? _builtRoom;
+
+        /// <summary> Logical (pre-scaling) positions of the rooms in the current build, reused by <see cref="Reproject"/>. </summary>
+        private Dictionary<Room, Vector2> _logical = new Dictionary<Room, Vector2>();
+
+        /// <summary> The active markers and the room each represents, so they can be repositioned without rebuilding. </summary>
+        private readonly List<(RoomNode Node, Room Room)> _markers = new List<(RoomNode, Room)>();
+
+        /// <summary> The active edge lines and the room pair each spans, so they can be repositioned without rebuilding. </summary>
+        private readonly List<(Line2D Line, Room A, Room B)> _edges = new List<(Line2D, Room, Room)>();
 
 
         /// <inheritdoc/>
         public override void _Ready()
         {
-            _edgeLayer = CreateFullRectLayer();
-            _roomLayer = CreateFullRectLayer();
+            // Mask the graph to the panel's rect so markers and edges panned out of view are clipped, not drawn over the rest of the UI.
+            ClipContents = true;
 
-            _roomPool = new ScenePool<RoomNode>(_roomLayer, () => _roomNodeScene.Instantiate<RoomNode>());
-            _edgePool = new ScenePool<Line2D>(_edgeLayer, CreateEdge);
+            _edgeLayer = CreateFullRectLayer();
+
+            // Markers are parented directly to the panel, so they are added after _edgeLayer and render in front of
+            // the edges. Their Buttons stay clickable while a drag begun on empty panel space still pans (Godot keeps
+            // feeding motion to the panel that captured the press).
+            _roomPool = new NodePool<RoomNode>(this, () => _roomNodeScene.Instantiate<RoomNode>());
+            _edgePool = new NodePool<Line2D>(_edgeLayer, CreateEdge);
         }
 
 
-        /// <summary> Rebuilds the graph to reflect the world reachable from <paramref name="currentRoom"/>. </summary>
+        /// <inheritdoc/>
+        public override void _GuiInput(InputEvent @event)
+        {
+            switch (@event)
+            {
+                case InputEventMouseButton { ButtonIndex: MouseButton.WheelUp, Pressed: true } wheelUp:
+                    ZoomAt(wheelUp.Position, ZoomStep);
+                    AcceptEvent();
+                    break;
+
+                case InputEventMouseButton { ButtonIndex: MouseButton.WheelDown, Pressed: true } wheelDown:
+                    ZoomAt(wheelDown.Position, 1f / ZoomStep);
+                    AcceptEvent();
+                    break;
+
+                case InputEventMouseButton { ButtonIndex: MouseButton.Left } leftButton:
+                    _isPanning = leftButton.Pressed;
+                    AcceptEvent();
+                    break;
+
+                case InputEventMouseMotion motion when _isPanning:
+                    _panOffset += motion.Relative;
+                    AcceptEvent();
+                    break;
+            }
+        }
+
+
+        /// <summary> Reflects the world reachable from <paramref name="currentRoom"/>, rebuilding the graph only when the room has changed and otherwise just repositioning the existing markers and edges. </summary>
+        /// <remarks> Markers are rebuilt (and so briefly hidden) only on a room change; within a room they are merely repositioned, which keeps their Buttons interactive across frames. </remarks>
         /// <param name="currentRoom"> The player's current room; placed at the centre of the graph. Must not be null. </param>
         public void ForceUpdate(Room currentRoom)
         {
-            Dictionary<Room, Vector2> layout = BuildLayout(currentRoom, out IReadOnlyList<(Room A, Room B)> edges);
-            Dictionary<Room, Vector2> pixels = ProjectToPanel(layout);
-
-            _edgePool.Begin();
-            foreach ((Room a, Room b) in edges)
+            if (!currentRoom.Equals(_builtRoom))
             {
-                Line2D line = _edgePool.Acquire();
-                line.Points = new Vector2[] { pixels[a], pixels[b] };
+                Rebuild(currentRoom);
             }
-            _edgePool.End();
 
-            _roomPool.Begin();
-            foreach (KeyValuePair<Room, Vector2> entry in pixels)
-            {
-                RoomNode node = _roomPool.Acquire();
-                node.SetRoom(entry.Key, entry.Key.Equals(currentRoom));
-                node.CenterOn(entry.Value);
-            }
-            _roomPool.End();
+            Reproject();
         }
 
 
-        /// <summary> Traverses the world graph via BFS from <paramref name="root"/>, assigning each reachable room a logical position by accumulating the unit direction of the connection that first reached it. </summary>
+        /// <summary> Rebuilds the marker and edge nodes for <paramref name="currentRoom"/>, recycling them through the pools. </summary>
+        /// <param name="currentRoom"> The room to centre the graph on. </param>
+        private void Rebuild(Room currentRoom)
+        {
+            _logical = BuildLayout(currentRoom, out IReadOnlyList<(Room A, Room B)> edges);
+
+            _edgePool.ReleaseAll();
+            _edges.Clear();
+            foreach ((Room a, Room b) in edges)
+            {
+                Line2D line = _edgePool.Acquire();
+                _edges.Add((line, a, b));
+            }
+
+            _roomPool.ReleaseAll();
+            _markers.Clear();
+            foreach (KeyValuePair<Room, Vector2> entry in _logical)
+            {
+                RoomNode node = _roomPool.Acquire();
+                node.SetRoom(entry.Key, entry.Key.Equals(currentRoom));
+                _markers.Add((node, entry.Key));
+            }
+
+            _builtRoom = currentRoom;
+        }
+
+
+        /// <summary> Repositions the existing markers and edges for the current pan, zoom, and panel size, without touching the pools. </summary>
+        private void Reproject()
+        {
+            Single scale   = PixelsPerStep * _zoom;
+            Vector2 origin = (Size / 2f) + _panOffset;
+
+            foreach ((RoomNode node, Room room) in _markers)
+            {
+                node.CenterOn(origin + (_logical[room] * scale));
+            }
+
+            foreach ((Line2D line, Room a, Room b) in _edges)
+            {
+                line.Points = new Vector2[] { origin + (_logical[a] * scale), origin + (_logical[b] * scale) };
+            }
+        }
+
+
+        /// <summary>
+        /// Traverses the world graph via BFS from <paramref name="root"/>, assigning each reachable room a logical
+        /// position by accumulating the unit direction of the connection that first reached it. Neighbours of a room
+        /// that share an exit direction are fanned out so their markers do not coincide.
+        /// </summary>
         /// <param name="root"> The room placed at the origin; the graph's centre. </param>
         /// <param name="edges"> Receives the unique list of connections between reachable rooms, for edge rendering. </param>
         /// <returns> A map from each reachable room to its logical (pre-scaling) position; always contains <paramref name="root"/> at the origin. </returns>
@@ -97,6 +213,11 @@ namespace Khepri.UI.Map
             {
                 Room current = frontier.Dequeue();
 
+                // Group this room's not-yet-placed neighbours by the exit direction reaching them, so several
+                // neighbours sharing a direction can be fanned out instead of stacking on one point.
+                Dictionary<RoomPosition, List<Room>> pending = new Dictionary<RoomPosition, List<Room>>();
+                HashSet<Room> scheduled                      = new HashSet<Room>();
+
                 foreach (Connection connection in current.GetConnections())
                 {
                     foreach (Room neighbour in connection.GetRooms())
@@ -106,18 +227,32 @@ namespace Khepri.UI.Map
                             continue;   // Self-connections carry no inter-room direction; skip them for layout.
                         }
 
-                        (Guid, Guid) edgeKey = OrderEdgeKey(current.UId, neighbour.UId);
-                        if (seenEdges.Add(edgeKey))
+                        if (seenEdges.Add(OrderEdgeKey(current.UId, neighbour.UId)))
                         {
                             edgeList.Add((current, neighbour));
                         }
 
-                        if (!positions.ContainsKey(neighbour))
+                        if (!positions.ContainsKey(neighbour) && scheduled.Add(neighbour))
                         {
                             RoomPosition direction = FirstPosition(connection, current);
-                            positions[neighbour]   = positions[current] + (DirectionToVector(direction) * StepLength);
-                            frontier.Enqueue(neighbour);
+                            if (!pending.TryGetValue(direction, out List<Room>? group))
+                            {
+                                group              = new List<Room>();
+                                pending[direction] = group;
+                            }
+                            group.Add(neighbour);
                         }
+                    }
+                }
+
+                foreach (KeyValuePair<RoomPosition, List<Room>> group in pending)
+                {
+                    IReadOnlyList<Vector2> offsets = FanOffsets(group.Key, group.Value.Count);
+                    for (Int32 i = 0; i < group.Value.Count; i++)
+                    {
+                        Room neighbour       = group.Value[i];
+                        positions[neighbour] = positions[current] + offsets[i];
+                        frontier.Enqueue(neighbour);
                     }
                 }
             }
@@ -127,38 +262,55 @@ namespace Khepri.UI.Map
         }
 
 
-        /// <summary> Maps each room's logical position into panel pixel coordinates, centred and uniformly scaled to fit within <see cref="Margin"/> of the edges. </summary>
-        /// <param name="layout"> The logical positions produced by <see cref="BuildLayout"/>. </param>
-        /// <returns> A map from each room to its pixel-space centre point within this panel. </returns>
-        private Dictionary<Room, Vector2> ProjectToPanel(Dictionary<Room, Vector2> layout)
+        /// <summary>
+        /// Produces <paramref name="count"/> offset vectors of length <see cref="StepLength"/>, fanned across
+        /// <see cref="FanSpread"/> radians centred on <paramref name="direction"/> so co-directional neighbours
+        /// splay apart. A single neighbour gets the exact direction; <see cref="RoomPosition.Center"/> (which has
+        /// no direction) is spread evenly around a full circle.
+        /// </summary>
+        /// <param name="direction"> The shared exit direction the neighbours were reached through. </param>
+        /// <param name="count"> The number of neighbours to lay out; must be at least one. </param>
+        /// <returns> One offset per neighbour, in the same order they should be assigned. </returns>
+        private static IReadOnlyList<Vector2> FanOffsets(RoomPosition direction, Int32 count)
         {
-            Vector2 min = new Vector2(Single.MaxValue, Single.MaxValue);
-            Vector2 max = new Vector2(Single.MinValue, Single.MinValue);
+            Vector2 baseDirection  = DirectionToVector(direction);
+            List<Vector2> offsets  = new List<Vector2>(count);
 
-            foreach (Vector2 position in layout.Values)
+            if (count == 1)
             {
-                min = new Vector2(Mathf.Min(min.X, position.X), Mathf.Min(min.Y, position.Y));
-                max = new Vector2(Mathf.Max(max.X, position.X), Mathf.Max(max.Y, position.Y));
+                offsets.Add(baseDirection * StepLength);
+                return offsets;
             }
 
-            Vector2 logicalCentre = (min + max) / 2f;
-            Vector2 span          = max - min;
+            Boolean isCentre = baseDirection == Vector2.Zero;
+            Single baseAngle = isCentre ? 0f : Mathf.Atan2(baseDirection.Y, baseDirection.X);
 
-            // Pick the largest uniform scale that keeps every marker inside the margin on both axes, capped so a
-            // tiny graph is not magnified to fill the panel. An axis with no spread imposes no limit.
-            Single scaleX = span.X > Mathf.Epsilon ? (Size.X - (2f * Margin)) / span.X : Single.MaxValue;
-            Single scaleY = span.Y > Mathf.Epsilon ? (Size.Y - (2f * Margin)) / span.Y : Single.MaxValue;
-            Single scale  = Mathf.Min(Mathf.Min(scaleX, scaleY), MaxPixelsPerStep);
-
-            Vector2 panelCentre = Size / 2f;
-
-            Dictionary<Room, Vector2> pixels = new Dictionary<Room, Vector2>(layout.Count);
-            foreach (KeyValuePair<Room, Vector2> entry in layout)
+            for (Int32 i = 0; i < count; i++)
             {
-                pixels[entry.Key] = panelCentre + ((entry.Value - logicalCentre) * scale);
+                Single fraction = (Single)i / (count - 1);
+                Single angle    = isCentre
+                    ? Mathf.Tau * i / count
+                    : baseAngle + Mathf.Lerp(-FanSpread / 2f, FanSpread / 2f, fraction);
+
+                offsets.Add(new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * StepLength);
             }
 
-            return pixels;
+            return offsets;
+        }
+
+
+        /// <summary> Adjusts the zoom by <paramref name="factor"/> while keeping the logical point under <paramref name="anchor"/> fixed on screen. </summary>
+        /// <param name="anchor"> The screen point (panel-local) to zoom about, typically the cursor. </param>
+        /// <param name="factor"> Multiplier applied to the current zoom before clamping. </param>
+        private void ZoomAt(Vector2 anchor, Single factor)
+        {
+            Single oldScale = PixelsPerStep * _zoom;
+            _zoom           = Mathf.Clamp(_zoom * factor, MinZoom, MaxZoom);
+            Single newScale = PixelsPerStep * _zoom;
+
+            Vector2 origin  = (Size / 2f) + _panOffset;
+            Vector2 logical = (anchor - origin) / oldScale;
+            _panOffset      = anchor - (logical * newScale) - (Size / 2f);
         }
 
 
@@ -202,7 +354,7 @@ namespace Khepri.UI.Map
         private static (Guid, Guid) OrderEdgeKey(Guid a, Guid b) => a.CompareTo(b) <= 0 ? (a, b) : (b, a);
 
 
-        /// <summary> Creates a fresh, mouse-transparent <see cref="Line2D"/> for use as an edge. </summary>
+        /// <summary> Creates a fresh, antialiased <see cref="Line2D"/> for use as an edge. </summary>
         /// <returns> A configured line ready to have its two endpoints assigned. </returns>
         private static Line2D CreateEdge() => new Line2D
         {
