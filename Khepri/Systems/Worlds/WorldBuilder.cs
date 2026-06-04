@@ -1,11 +1,12 @@
-using Godot;
 using Khepri.Entities;
 using Khepri.Entities.Definitions;
+using Khepri.Rooms;
 using Khepri.Rooms.Definitions;
+using Khepri.Worlds.Definitions;
 using System;
 using System.Collections.Generic;
 
-namespace Khepri.Rooms
+namespace Khepri.Worlds
 {
     /// <summary> Constructs a live, connected world from one or more <see cref="WorldDefinition"/> resources in two deterministic passes: first instantiate and populate all rooms, then wire their connections. </summary>
     /// <remarks>

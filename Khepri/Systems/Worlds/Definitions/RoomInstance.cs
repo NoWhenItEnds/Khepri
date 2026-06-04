@@ -2,7 +2,7 @@ using System;
 using Godot;
 using Khepri.Rooms.Definitions;
 
-namespace Khepri.Rooms
+namespace Khepri.Worlds.Definitions
 {
     /// <summary> A designer-authored Godot resource describing a single room instance within a world definition: a unique identifier, the prefab template to build it from, and the entity placements to populate it with. </summary>
     /// <remarks> The <see cref="Id"/> field serves as the primary key used by <see cref="RoomConnection"/> to identify endpoints. Duplicate or blank ids are rejected by <see cref="WorldBuilder"/> at build time. </remarks>

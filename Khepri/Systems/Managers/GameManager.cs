@@ -4,6 +4,8 @@ using Jaypen.Utilities.Logging;
 using Jaypen.Utilities.Singletons;
 using Khepri.Entities;
 using Khepri.Rooms;
+using Khepri.Worlds;
+using Khepri.Worlds.Definitions;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

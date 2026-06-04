@@ -1,7 +1,8 @@
 using System;
 using Godot;
+using Khepri.Rooms;
 
-namespace Khepri.Rooms
+namespace Khepri.Worlds.Definitions
 {
     /// <summary> A designer-authored Godot resource that declares a bidirectional connection between two room instances within a <see cref="WorldDefinition"/>, identified by their <see cref="RoomInstance.Id"/> values and the position within each room at which the connection attaches. </summary>
     /// <remarks>

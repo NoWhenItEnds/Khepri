@@ -1,8 +1,8 @@
-using System;
 using Godot;
 using Khepri.Entities.Definitions;
+using Khepri.Rooms;
 
-namespace Khepri.Rooms
+namespace Khepri.Worlds.Definitions
 {
     /// <summary> A designer-authored Godot resource that pairs an entity prefab with the <see cref="RoomPosition"/> slot it should occupy when spawned into a room. </summary>
     /// <remarks> This resource replaces the bare entity-prefab-name strings from the JSON layer, adding a mandatory position so every placement unambiguously declares where in the room the entity starts. </remarks>
