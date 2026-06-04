@@ -11,12 +11,23 @@ namespace Khepri.UI.Map
         [ExportGroup("Nodes")]
         [Export] private RichTextLabel _nameLabel = null!;
 
+        /// <summary> The button the player clicks to select this room. </summary>
+        [Export] private Button _button = null!;
+
 
         /// <summary> Number of leading characters from the room's <see cref="Guid"/> shown as a short stable identifier. </summary>
         private const Int32 UIdPrefixLength = 8;
 
         /// <summary> The colour multiplier applied to the marker representing the player's current room. </summary>
         private static readonly Color CurrentRoomTint = new Color(0.2f, 0.6f, 1.0f, 1.0f);
+
+
+        /// <summary> Raised when the player clicks this marker, carrying the room it represents. </summary>
+        /// <remarks> A plain C# event rather than a Godot signal because <see cref="Room"/> is a C# type that cannot cross the Variant boundary. </remarks>
+        public event Action<Room>? Selected;
+
+        /// <summary> The room currently represented by this marker; supplied by <see cref="SetRoom"/>. </summary>
+        private Room _room = null!;
 
 
         /// <inheritdoc/>
@@ -26,6 +37,8 @@ namespace Khepri.UI.Map
             // given. Mirror the prefab's minimum size into the actual size so CenterOn has real dimensions to
             // offset against.
             Size = CustomMinimumSize;
+
+            _button.Pressed += OnButtonPressed;
         }
 
 
@@ -36,12 +49,17 @@ namespace Khepri.UI.Map
         {
             // TODO: Replace the UID prefix with a human-readable name once rooms carry one at runtime
             //       (e.g. via a NameFeature sourced from the prefab's ResourceName).
+            _room          = room;
             String shortId = room.UId.ToString()[..UIdPrefixLength];
-            Int32 exits = room.GetConnections().Count;
+            Int32 exits    = room.GetConnections().Count;
 
             Color colour = isCurrent ? CurrentRoomTint : Colors.White;
             _nameLabel.Text = $"[color={colour.ToHtml()}]{shortId}{System.Environment.NewLine}[/color]";
         }
+
+
+        /// <summary> Relays the button press as a <see cref="Selected"/> event for the room this marker represents. </summary>
+        private void OnButtonPressed() => Selected?.Invoke(_room);
 
 
         /// <summary> Positions the marker so its centre sits at <paramref name="point"/> in the parent's coordinate space. </summary>

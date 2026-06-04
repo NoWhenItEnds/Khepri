@@ -16,6 +16,23 @@ namespace Khepri.UI.Map
         [Export] private OverworldPanel _overworldPanel = null!;
 
 
+        /// <inheritdoc/>
+        public override void _Ready()
+        {
+            _overworldPanel.RoomSelected += OnRoomSelected;
+        }
+
+
+        /// <summary> Moves the player into the room they selected on the overworld map. </summary>
+        /// <remarks> Routes the player's choice through the same <see cref="RoomManager.MoveEntity"/> primitive the AI uses; the move is a no-op when the chosen room is not directly connected to the player's current one. </remarks>
+        /// <param name="destination"> The room the player clicked. </param>
+        private void OnRoomSelected(Room destination)
+        {
+            Entity player = GameManager.Instance!.PlayerEntity;
+            RoomManager.Instance!.MoveEntity(player, destination);
+        }
+
+
         /// <summary> Forces both child panels to reflect the current game state by resolving the player and their containing room from the global managers. </summary>
         public void ForceUpdate()
         {

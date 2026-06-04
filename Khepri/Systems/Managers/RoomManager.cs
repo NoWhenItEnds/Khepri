@@ -131,6 +131,44 @@ namespace Khepri.Managers
         }
 
 
+        /// <summary> Moves <paramref name="entity"/> from its current room into <paramref name="destination"/>, provided the two rooms are directly connected. </summary>
+        /// <remarks>
+        /// This is the single shared move primitive: the player's UI and AI controllers both funnel through it so
+        /// movement rules live in one place. The entity arrives at the <see cref="RoomPosition"/> where the connecting
+        /// link attaches within <paramref name="destination"/> — i.e. at the doorway it came through. Only
+        /// directly-connected rooms are reachable in one call; multi-room travel is a higher-level concern (pathfinding)
+        /// that would call this once per step.
+        /// </remarks>
+        /// <param name="entity"> The entity to move; must currently occupy a tracked room. </param>
+        /// <param name="destination"> The room to move the entity into. </param>
+        /// <returns> <c>true</c> if the move happened; <c>false</c> if the entity is already there or no connection links the two rooms. </returns>
+        /// <exception cref="InvalidOperationException"> Propagated from <see cref="GetCurrentRoom"/> when the entity occupies no room. </exception>
+        public Boolean MoveEntity(Entity entity, Room destination)
+        {
+            Room current = GetCurrentRoom(entity);
+
+            if (current.Equals(destination))
+            {
+                return false;
+            }
+
+            Connection? link = current.GetConnections()
+                .FirstOrDefault(connection => connection.GetRooms().Any(room => room.Equals(destination)));
+
+            if (link is null)
+            {
+                return false;
+            }
+
+            RoomPosition arrival = link.GetPositions(destination).FirstOrDefault();
+
+            current.RemoveEntity(entity);
+            destination.AddEntity(entity, arrival);
+
+            return true;
+        }
+
+
         /// <summary> Registers a single room prefab by its name, rejecting blanks and duplicates. </summary>
         /// <param name="prefab"> The loaded prefab to register. </param>
         /// <param name="resourcePath"> The resource path, used only to enrich error messages. </param>

@@ -88,6 +88,10 @@ namespace Khepri.UI.Map
         private readonly List<(Line2D Line, Room A, Room B)> _edges = new List<(Line2D, Room, Room)>();
 
 
+        /// <summary> Raised when the player clicks a room marker, carrying the room they chose. </summary>
+        public event Action<Room>? RoomSelected;
+
+
         /// <inheritdoc/>
         public override void _Ready()
         {
@@ -98,8 +102,9 @@ namespace Khepri.UI.Map
 
             // Markers are parented directly to the panel, so they are added after _edgeLayer and render in front of
             // the edges. Their Buttons stay clickable while a drag begun on empty panel space still pans (Godot keeps
-            // feeding motion to the panel that captured the press).
-            _roomPool = new NodePool<RoomNode>(this, () => _roomNodeScene.Instantiate<RoomNode>());
+            // feeding motion to the panel that captured the press). Each marker is subscribed once, at creation, so
+            // reuse across rebuilds does not stack duplicate handlers.
+            _roomPool = new NodePool<RoomNode>(this, CreateMarker);
             _edgePool = new NodePool<Line2D>(_edgeLayer, CreateEdge);
         }
 
@@ -352,6 +357,21 @@ namespace Khepri.UI.Map
         /// <param name="b"> The other endpoint's identifier. </param>
         /// <returns> A tuple of the two identifiers in ascending order. </returns>
         private static (Guid, Guid) OrderEdgeKey(Guid a, Guid b) => a.CompareTo(b) <= 0 ? (a, b) : (b, a);
+
+
+        /// <summary> Instantiates a room marker and subscribes to its selection event; used as the room pool's factory. </summary>
+        /// <returns> A new marker wired to relay clicks through <see cref="RoomSelected"/>. </returns>
+        private RoomNode CreateMarker()
+        {
+            RoomNode marker = _roomNodeScene.Instantiate<RoomNode>();
+            marker.Selected += OnMarkerSelected;
+            return marker;
+        }
+
+
+        /// <summary> Relays a marker's selection up through this panel's <see cref="RoomSelected"/> event. </summary>
+        /// <param name="room"> The room whose marker was clicked. </param>
+        private void OnMarkerSelected(Room room) => RoomSelected?.Invoke(room);
 
 
         /// <summary> Creates a fresh, antialiased <see cref="Line2D"/> for use as an edge. </summary>
