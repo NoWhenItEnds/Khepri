@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Khepri.Descriptions;
 using Khepri.Entities.Definitions;
 
 namespace Khepri.Entities.Components
@@ -57,5 +58,32 @@ namespace Khepri.Entities.Components
 
         /// <inheritdoc/>
         public IReadOnlyCollection<Entity> GetEntities() => _entities.ToArray();
+
+
+        /// <summary> Lists the inventory's contents as a sentence in its entity's description, each held entity named as its own note. </summary>
+        /// <param name="builder"> The builder assembling the owning entity's description. </param>
+        public override void Contribute(DescriptionBuilder builder)
+        {
+            if (_entities.Count == 0)
+            {
+                return;
+            }
+
+            builder.Text("Contains ");
+
+            Boolean first = true;
+            foreach (Entity entity in _entities)
+            {
+                if (!first)
+                {
+                    builder.Text(", ");
+                }
+
+                builder.Note(entity.GetName(), entity);
+                first = false;
+            }
+
+            builder.Text(".");
+        }
     }
 }

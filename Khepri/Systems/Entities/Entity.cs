@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Khepri.Descriptions;
 using Khepri.Entities.Components;
 
 namespace Khepri.Entities
 {
     /// <summary> A thing or object that can exist within a room. All things, including players and items, are entities. </summary>
-    public class Entity : IEquatable<Entity>
+    public class Entity : IEquatable<Entity>, INoteSource
     {
         /// <summary> The entity's unique identifier. Should be unique across all entities. </summary>
         public readonly Guid UId;
@@ -65,11 +66,62 @@ namespace Khepri.Entities
         }
 
 
-        /// <summary> Build a dynamic description of the entity's current state to display to the player. </summary>
-        /// <returns> A richly formatted string to display to the player representing the entity's current state / situation. </returns>
-        public String BuildDescription()
+        /// <summary> Builds a dynamic description of the entity's current state — its tooltip body when it appears as a note. </summary>
+        /// <remarks> Composed from the entity's components the same way a room is composed from its features; container components (an inventory, an equipment slot) fold their held entities in as further notes. </remarks>
+        /// <returns> The assembled description of the entity's current state. </returns>
+        public Description BuildDescription()
         {
-            return "This is an entity.";   // TODO - Figure out how to do this!
+            DescriptionBuilder builder = new DescriptionBuilder();
+
+            // Open by naming what the entity is, then let its components add detail.
+            builder.Text(Capitalise(GetName()) + ".");
+
+            List<Action<DescriptionBuilder>> contributions = new List<Action<DescriptionBuilder>>();
+
+            foreach (Component component in _components.Values)
+            {
+                contributions.Add(component.Contribute);
+            }
+
+            Description detail = DescriptionBuilder.Compose(contributions);
+            if (detail.Spans.Count > 0)
+            {
+                builder.Text(" ").Append(detail);
+            }
+
+            return builder.Build();
+        }
+
+
+        /// <summary> Returns the text with its first character upper-cased, for opening a sentence. </summary>
+        /// <param name="text"> The text to capitalise. </param>
+        /// <returns> The capitalised text, or the original when it is empty. </returns>
+        private static String Capitalise(String text) =>
+            String.IsNullOrEmpty(text) ? text : Char.ToUpper(text[0]) + text.Substring(1);
+
+
+        /// <summary> Appends this entity to its container's description as a single hoverable note, labelled with its current name and pointing back at itself. </summary>
+        /// <remarks> Called when the entity is listed inside something else — a room, or a container component such as an inventory. Hovering the note surfaces this entity's own <see cref="BuildDescription"/>. </remarks>
+        /// <param name="builder"> The builder assembling the containing room's or entity's description. </param>
+        public void Contribute(DescriptionBuilder builder)
+        {
+            builder.Note(GetName(), this);
+        }
+
+
+        /// <summary> Resolves the entity's current display name from its components. </summary>
+        /// <remarks> The name emerges from whatever components are present — the most salient noun, decorated by the adjectives others contribute — so it tracks the entity through transformations rather than being fixed at spawn. </remarks>
+        /// <returns> The composed name, or a fallback label when no component claims a noun. </returns>
+        public String GetName()
+        {
+            NameBuilder builder = new NameBuilder();
+
+            foreach (Component component in _components.Values)
+            {
+                component.Contribute(builder);
+            }
+
+            return builder.Build();
         }
 
 

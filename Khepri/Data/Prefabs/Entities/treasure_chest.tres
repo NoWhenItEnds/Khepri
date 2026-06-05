@@ -4,6 +4,22 @@
 [ext_resource type="Script" uid="uid://b0a61lq1a6mfd" path="res://Khepri/Systems/Entities/Components/Component.cs" id="1_m3dj5"]
 [ext_resource type="Script" uid="uid://dds2sq2padbsr" path="res://Khepri/Systems/Entities/Components/InventoryComponent.cs" id="2_inventory"]
 [ext_resource type="Resource" uid="uid://c3dvok1i67o0e" path="res://Khepri/Data/Prefabs/Entities/goblin.tres" id="3_goblin"]
+[ext_resource type="Script" uid="uid://ckindcmp00001" path="res://Khepri/Systems/Entities/Components/KindComponent.cs" id="4_kind"]
+[ext_resource type="Script" uid="uid://cmaterialcmp01" path="res://Khepri/Systems/Entities/Components/MaterialComponent.cs" id="5_material"]
+[ext_resource type="Script" uid="uid://cconditcmp0001" path="res://Khepri/Systems/Entities/Components/ConditionComponent.cs" id="6_condition"]
+
+[sub_resource type="Resource" id="Kind_chest"]
+script = ExtResource("4_kind")
+Noun = "chest"
+Salience = 100
+
+[sub_resource type="Resource" id="Material_chest"]
+script = ExtResource("5_material")
+Material = "iron"
+
+[sub_resource type="Resource" id="Condition_chest"]
+script = ExtResource("6_condition")
+Condition = "battered"
 
 [sub_resource type="Resource" id="Inventory_chest"]
 script = ExtResource("2_inventory")
@@ -12,4 +28,4 @@ Contents = Array[ExtResource("1_entityprefab")]([ExtResource("3_goblin")])
 [resource]
 script = ExtResource("1_entityprefab")
 Name = "treasure_chest"
-Components = Array[ExtResource("1_m3dj5")]([SubResource("Inventory_chest")])
+Components = Array[ExtResource("1_m3dj5")]([SubResource("Kind_chest"), SubResource("Material_chest"), SubResource("Condition_chest"), SubResource("Inventory_chest")])

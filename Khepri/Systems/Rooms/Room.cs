@@ -1,3 +1,4 @@
+using Khepri.Descriptions;
 using Khepri.Entities;
 using Khepri.Rooms.Features;
 using System;
@@ -42,18 +43,30 @@ namespace Khepri.Rooms
 
 
         /// <summary> Builds a dynamic description of the room's current state to display to the player. </summary>
-        /// <remarks> Delegates to an attached <see cref="DescriptionFeature"/> when one is present; otherwise returns a sensible default. </remarks>
-        /// <returns> A formatted string representing the room's current state. </returns>
-        public String BuildDescription()
+        /// <remarks>
+        /// The room's features contribute their prose in <see cref="Feature.Order"/>, then its entities each fold in as a hoverable note.
+        /// Noteworthy spans in the result carry a reference to the feature or entity they describe, so the UI can show a tooltip sourced from that live object on hover.
+        /// </remarks>
+        /// <returns> The assembled description of the room's current state. </returns>
+        public Description BuildDescription()
         {
-            DescriptionFeature? descriptionFeature = GetFeature<DescriptionFeature>();
-            Boolean hasDescription                 = descriptionFeature is not null;
+            List<Action<DescriptionBuilder>> contributions = new List<Action<DescriptionBuilder>>();
 
-            String result = hasDescription
-                ? descriptionFeature!.Text
-                : "This is a room.";
+            foreach (Feature feature in _features.Values.OrderBy(feature => feature.Order))
+            {
+                contributions.Add(feature.Contribute);
+            }
 
-            return result;
+            foreach (Entity entity in GetEntities())
+            {
+                contributions.Add(entity.Contribute);
+            }
+
+            Description description = DescriptionBuilder.Compose(contributions);
+
+            return description.Spans.Count > 0
+                ? description
+                : new DescriptionBuilder().Text("This is a room.").Build();
         }
 
 

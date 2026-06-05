@@ -3,6 +3,17 @@
 [ext_resource type="Script" uid="uid://cbi02cr1yhpc7" path="res://Khepri/Systems/Entities/Definitions/EntityPrefab.cs" id="1_entityprefab"]
 [ext_resource type="Script" uid="uid://b0a61lq1a6mfd" path="res://Khepri/Systems/Entities/Components/Component.cs" id="1_yvolf"]
 [ext_resource type="Script" uid="uid://b6ns2hywtblss" path="res://Khepri/Systems/Entities/Components/HealthComponent.cs" id="2_health"]
+[ext_resource type="Script" uid="uid://ckindcmp00001" path="res://Khepri/Systems/Entities/Components/KindComponent.cs" id="3_kind"]
+[ext_resource type="Script" uid="uid://cconditcmp0001" path="res://Khepri/Systems/Entities/Components/ConditionComponent.cs" id="4_condition"]
+
+[sub_resource type="Resource" id="Kind_goblin"]
+script = ExtResource("3_kind")
+Noun = "goblin"
+Salience = 100
+
+[sub_resource type="Resource" id="Condition_goblin"]
+script = ExtResource("4_condition")
+Condition = "snarling"
 
 [sub_resource type="Resource" id="Health_goblin"]
 script = ExtResource("2_health")
@@ -12,4 +23,4 @@ Max = 40
 [resource]
 script = ExtResource("1_entityprefab")
 Name = "goblin"
-Components = Array[ExtResource("1_yvolf")]([SubResource("Health_goblin")])
+Components = Array[ExtResource("1_yvolf")]([SubResource("Kind_goblin"), SubResource("Condition_goblin"), SubResource("Health_goblin")])

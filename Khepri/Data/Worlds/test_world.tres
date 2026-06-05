@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://hafab63ok3l6" path="res://Khepri/Systems/Worlds/Definitions/EntityPlacement.cs" id="3_gaev2"]
 [ext_resource type="Resource" uid="uid://ct5nrdrydbd5g" path="res://Khepri/Data/Prefabs/Rooms/stone_chamber.tres" id="4_yai44"]
 [ext_resource type="Script" uid="uid://b31wuli6ws8mh" path="res://Khepri/Systems/Worlds/Definitions/WorldDefinition.cs" id="5_7ufb3"]
+[ext_resource type="Resource" uid="uid://dnhtehckrpag6" path="res://Khepri/Data/Prefabs/Entities/treasure_chest.tres" id="6_chest"]
 
 [sub_resource type="Resource" id="Resource_obnam"]
 script = ExtResource("1_xmcty")
@@ -87,10 +88,17 @@ ToPosition = 7
 Distance = 10.0
 metadata/_custom_type_script = "uid://qcuq8b45m1m"
 
+[sub_resource type="Resource" id="Placement_chest"]
+script = ExtResource("3_gaev2")
+Prefab = ExtResource("6_chest")
+Position = 4
+metadata/_custom_type_script = "uid://hafab63ok3l6"
+
 [sub_resource type="Resource" id="Resource_ol74h"]
 script = ExtResource("2_bppna")
 Id = "center_room"
 Prefab = ExtResource("4_yai44")
+Entities = Array[ExtResource("3_gaev2")]([SubResource("Placement_chest")])
 metadata/_custom_type_script = "uid://b1ha2ko2ptyxq"
 
 [sub_resource type="Resource" id="Resource_b7vun"]

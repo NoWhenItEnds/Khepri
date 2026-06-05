@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Godot;
+using Khepri.Descriptions;
 using Khepri.Entities.Definitions;
 
 namespace Khepri.Entities.Components
@@ -28,6 +29,20 @@ namespace Khepri.Entities.Components
         /// <remarks> The default is a no-op; components whose authored values are already their runtime values need not override it. Not called on the restore path, so rolled values stay fixed across a save/load. </remarks>
         /// <param name="ancestry"> The <see cref="EntityPrefab"/>s currently open on the instantiation stack; container components forward it to <see cref="EntityPrefab.Instantiate(ISet{EntityPrefab})"/> to reject a prefab that transitively contains itself. </param>
         public virtual void OnInstantiate(ISet<EntityPrefab> ancestry)
+        {
+        }
+
+
+        /// <summary> Appends this component's contribution to its entity's description. The default is a no-op, for components that have no prose to add. </summary>
+        /// <param name="builder"> The builder assembling the owning entity's description. </param>
+        public virtual void Contribute(DescriptionBuilder builder)
+        {
+        }
+
+
+        /// <summary> Contributes this component's claim to its entity's name — a noun (with salience) and/or decorating adjectives. The default is a no-op, for components that do not bear on what the entity is called. </summary>
+        /// <param name="builder"> The builder assembling the owning entity's name. </param>
+        public virtual void Contribute(NameBuilder builder)
         {
         }
     }
