@@ -33,7 +33,7 @@ namespace Khepri.Descriptions
         {
             if (!String.IsNullOrEmpty(noun) && salience > _salience)
             {
-                _noun     = noun;
+                _noun = noun;
                 _salience = salience;
             }
             return this;
@@ -44,7 +44,7 @@ namespace Khepri.Descriptions
         /// <param name="adjective"> The adjective to add; blank adjectives are ignored. </param>
         /// <param name="rank"> Orders this adjective among the others; lower ranks sit furthest from the noun. </param>
         /// <returns> This builder, for chaining. </returns>
-        public NameBuilder Adjective(String adjective, Int32 rank = 0)
+        public NameBuilder Adjective(String adjective, Int32 rank = 0)  // TODO - Rather than a rank, can this be ordered from an English perspective automatically?
         {
             if (!String.IsNullOrEmpty(adjective))
             {

@@ -23,9 +23,7 @@ namespace Khepri.Descriptions
     {
         /// <summary> Initialises a new instance of the <see cref="TextSpan"/> class. </summary>
         /// <param name="text"> The prose to render. </param>
-        public TextSpan(String text) : base(text)
-        {
-        }
+        public TextSpan(String text) : base(text) { }
     }
 
 

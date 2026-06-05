@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Text;
 
 namespace Jaypen.Utilities.Extensions
@@ -7,6 +8,12 @@ namespace Jaypen.Utilities.Extensions
     /// <remarks> All case-folding operations use culture-invariant methods (<c>Char.ToLowerInvariant</c>, <c>Char.IsLower</c>, etc.) to avoid the Turkish-locale case-folding bug. </remarks>
     public static class StringExtensions
     {
+        /// <summary> Returns the text with its first character upper-cased, for opening a sentence. </summary>
+        /// <param name="text"> The text to capitalise. </param>
+        /// <returns> The capitalised text, or the original when it is empty. </returns>
+        public static String ToCapitalised(this String text) => CultureInfo.CurrentCulture.TextInfo.ToTitleCase(text.ToLowerInvariant());
+
+
         /// <summary> Converts <paramref name="input"/> to a canonical lowercase snake_case string according to the following rules (applied in order). </summary>
         /// <remarks>
         /// Normalisation rules applied in order:

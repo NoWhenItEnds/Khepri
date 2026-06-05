@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Jaypen.Utilities.Extensions;
 using Khepri.Descriptions;
 using Khepri.Entities.Components;
 
@@ -67,14 +68,13 @@ namespace Khepri.Entities
 
 
         /// <summary> Builds a dynamic description of the entity's current state — its tooltip body when it appears as a note. </summary>
-        /// <remarks> Composed from the entity's components the same way a room is composed from its features; container components (an inventory, an equipment slot) fold their held entities in as further notes. </remarks>
         /// <returns> The assembled description of the entity's current state. </returns>
         public Description BuildDescription()
         {
             DescriptionBuilder builder = new DescriptionBuilder();
 
             // Open by naming what the entity is, then let its components add detail.
-            builder.Text(Capitalise(GetName()) + ".");
+            builder.Text(GetName().ToCapitalised() + ".");
 
             List<Action<DescriptionBuilder>> contributions = new List<Action<DescriptionBuilder>>();
 
@@ -91,13 +91,6 @@ namespace Khepri.Entities
 
             return builder.Build();
         }
-
-
-        /// <summary> Returns the text with its first character upper-cased, for opening a sentence. </summary>
-        /// <param name="text"> The text to capitalise. </param>
-        /// <returns> The capitalised text, or the original when it is empty. </returns>
-        private static String Capitalise(String text) =>
-            String.IsNullOrEmpty(text) ? text : Char.ToUpper(text[0]) + text.Substring(1);
 
 
         /// <summary> Appends this entity to its container's description as a single hoverable note, labelled with its current name and pointing back at itself. </summary>

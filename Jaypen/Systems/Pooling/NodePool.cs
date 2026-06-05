@@ -4,11 +4,7 @@ using System.Collections.Generic;
 
 namespace Jaypen.Utilities.Pooling
 {
-    /// <summary>
-    /// A reusable pool of <typeparamref name="T"/> nodes parented under a single host, avoiding the cost of
-    /// repeatedly freeing and re-instancing nodes. Acquired nodes are activated (made visible); idle nodes are
-    /// deactivated (hidden) and kept for reuse rather than freed.
-    /// </summary>
+    /// <summary> A reusable pool of <typeparamref name="T"/> nodes parented under a single host, avoiding the cost of repeatedly freeing and re-instancing nodes. </summary>
     /// <remarks>
     /// Two usage styles are supported and may be mixed:
     /// <list type="bullet">
@@ -16,8 +12,6 @@ namespace Jaypen.Utilities.Pooling
     /// <item> Immediate-mode rebuild: <see cref="ReleaseAll"/> then re-<see cref="Acquire"/> every node each pass
     ///        (e.g. a UI list rebuilt whenever its source data changes). </item>
     /// </list>
-    /// Activation toggles <see cref="CanvasItem.Visible"/> or <see cref="Node3D.Visible"/> where applicable;
-    /// non-visual nodes are simply left parented and idle. The pool is not thread-safe.
     /// </remarks>
     /// <typeparam name="T"> The kind of node the pool hands out. </typeparam>
     public sealed class NodePool<T> where T : Node
@@ -44,8 +38,8 @@ namespace Jaypen.Utilities.Pooling
         /// <param name="onRelease"> Optional hook run as a node returns to the pool, e.g. to reset its state. </param>
         public NodePool(Node host, Func<T> factory, Action<T>? onRelease = null)
         {
-            _host      = host;
-            _factory   = factory;
+            _host = host;
+            _factory = factory;
             _onRelease = onRelease;
         }
 

@@ -65,10 +65,11 @@ namespace Khepri.Descriptions
                 DescriptionBuilder part = new DescriptionBuilder();
                 contribute(part);
 
-                if (part.IsEmpty) { continue; }
-
-                if (!result.IsEmpty) { result.Text(separator); }
-                result.Append(part.Build());
+                if (!part.IsEmpty)
+                {
+                    if (!result.IsEmpty) { result.Text(separator); }
+                    result.Append(part.Build());
+                }
             }
 
             return result.Build();
