@@ -15,11 +15,11 @@ Salience = 100
 
 [sub_resource type="Resource" id="Material_chest"]
 script = ExtResource("5_material")
-Material = "iron"
+Word = "iron"
 
 [sub_resource type="Resource" id="Condition_chest"]
 script = ExtResource("6_condition")
-Condition = "battered"
+Word = "battered"
 
 [sub_resource type="Resource" id="Inventory_chest"]
 script = ExtResource("2_inventory")

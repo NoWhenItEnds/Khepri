@@ -13,7 +13,7 @@ Salience = 100
 
 [sub_resource type="Resource" id="Condition_goblin"]
 script = ExtResource("4_condition")
-Condition = "snarling"
+Word = "snarling"
 
 [sub_resource type="Resource" id="Health_goblin"]
 script = ExtResource("2_health")

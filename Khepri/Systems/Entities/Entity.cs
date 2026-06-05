@@ -109,13 +109,22 @@ namespace Khepri.Entities
         {
             NameBuilder builder = new NameBuilder();
 
-            foreach (Component component in _components.Values)
+            // Contribute non-adjectives first (the noun is placed last regardless), then adjective
+            // components in the royal order of their kinds, so the name reads naturally.
+            foreach (Component component in _components.Values.OrderBy(NameOrder))
             {
                 component.Contribute(builder);
             }
 
             return builder.Build();
         }
+
+
+        /// <summary> Sort key placing non-adjective components before adjective ones, and adjectives among themselves in their royal order. </summary>
+        /// <param name="component"> The component to rank. </param>
+        /// <returns> A key that orders components for name assembly. </returns>
+        private static Int32 NameOrder(Component component) =>
+            component is AdjectiveComponent adjective ? adjective.RoyalIndex : -1;
 
 
         /// <summary> Attempt to get a texture representing the current entity. </summary>
