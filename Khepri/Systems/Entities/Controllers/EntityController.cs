@@ -1,3 +1,4 @@
+using Khepri.Entities.Actions;
 using Khepri.Rooms;
 
 namespace Khepri.Entities.Controllers
@@ -18,9 +19,10 @@ namespace Khepri.Entities.Controllers
         }
 
 
-        /// <summary> Performs this entity's action for the current turn within <paramref name="room"/>, the room its owner currently occupies. </summary>
-        /// <remarks> The room is the controller's whole view of the world: <see cref="Room.GetEntities"/> gives who is present and <see cref="Room.GetConnections"/> the exits. When controllers gain the ability to <em>change</em> the world (move, attack), those verbs will be injected here rather than reached for via a manager singleton. </remarks>
+        /// <summary> Decides this entity's action for the current turn within <paramref name="room"/>, the room its owner currently occupies. </summary>
+        /// <remarks> The room is the controller's whole view of the world: <see cref="Room.GetEntities"/> gives who is present and <see cref="Room.GetConnections"/> the exits. The brain only <em>decides</em> — it constructs and returns the action to perform but never mutates the world itself; the returned <see cref="EntityAction"/> self-executes when the scheduler performs it. Returns <c>null</c> when the brain has no action this turn (for example, a player still awaiting input). </remarks>
         /// <param name="room"> The room the owner is in. </param>
-        public abstract void Act(Room room);
+        /// <returns> The action to perform, or <c>null</c> to take no action this turn. </returns>
+        public abstract EntityAction? Act(Room room);
     }
 }

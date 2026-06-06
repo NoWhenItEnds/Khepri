@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SkillKind" format=3 uid="uid://gyfuebqs7pfg"]
+
+[ext_resource type="Script" uid="uid://ds36sjfqjmgbj" path="res://Khepri/Systems/Entities/Components/Skills/SkillKind.cs" id="1_vjp1e"]
+
+[resource]
+script = ExtResource("1_vjp1e")
+Noun = "Persuasion"
+Category = 2
+Summary = "Winning others round through reason, charm, and rhetoric."
+metadata/_custom_type_script = "uid://ds36sjfqjmgbj"

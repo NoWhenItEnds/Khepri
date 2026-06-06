@@ -1,4 +1,5 @@
 using Jaypen.Utilities.Logging;
+using Khepri.Entities.Actions;
 using Khepri.Rooms;
 using Microsoft.Extensions.Logging;
 
@@ -19,10 +20,12 @@ namespace Khepri.Entities.Controllers
 
 
         /// <inheritdoc/>
-        public override void Act(Room room)
+        public override EntityAction? Act(Room room)
         {
-            // TODO - Translate the player's input (move, interact, etc.) into a concrete action against the room.
+            // TODO - Translate the player's input (move, interact, etc.) into a concrete action; returns null until input arrives.
             Logger.LogInformation("Player ({Uid}) takes a turn in room {Room}.", Entity.UId, room.UId);
+
+            return null;
         }
     }
 }

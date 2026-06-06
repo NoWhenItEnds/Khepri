@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SkillKind" format=3 uid="uid://ddl3m7vdb044s"]
+
+[ext_resource type="Script" uid="uid://ds36sjfqjmgbj" path="res://Khepri/Systems/Entities/Components/Skills/SkillKind.cs" id="1_grjvb"]
+
+[resource]
+script = ExtResource("1_grjvb")
+Noun = "Evocation"
+Category = 1
+Summary = "The raising and shaping of raw magical force into fire, frost, and lightning."
+metadata/_custom_type_script = "uid://ds36sjfqjmgbj"

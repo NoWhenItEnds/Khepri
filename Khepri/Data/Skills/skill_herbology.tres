@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="SkillKind" format=3 uid="uid://dpuvocv16bj3o"]
+
+[ext_resource type="Script" uid="uid://ds36sjfqjmgbj" path="res://Khepri/Systems/Entities/Components/Skills/SkillKind.cs" id="1_wclwg"]
+
+[resource]
+script = ExtResource("1_wclwg")
+Noun = "Herbology"
+Summary = "Knowledge of magical plants and fungi: their cultivation, hazards, and the reagents they yield for potions and alchemy."
+metadata/_custom_type_script = "uid://ds36sjfqjmgbj"

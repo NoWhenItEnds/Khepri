@@ -1,4 +1,5 @@
 using Jaypen.Utilities.Logging;
+using Khepri.Entities.Actions;
 using Khepri.Rooms;
 using Microsoft.Extensions.Logging;
 
@@ -19,10 +20,13 @@ namespace Khepri.Entities.Controllers
 
 
         /// <inheritdoc/>
-        public override void Act(Room room)
+        public override EntityAction? Act(Room room)
         {
             int others = room.GetEntities().Count - 1;   // GetEntities includes this actor.
             Logger.LogInformation("Entity ({Uid}) surveys room {Room}; sees {Others} other(s).", Entity.UId, room.UId, others);
+
+            // TODO - Survey the room and decide on a concrete action; idles (no action) for now.
+            return null;
         }
     }
 }
