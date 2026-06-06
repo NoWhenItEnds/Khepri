@@ -10,7 +10,7 @@ namespace Khepri.Entities.Components
     /// <summary> A component allowing an entity to hold other entities. </summary>
     /// <remarks> <see cref="Contents"/> authors the prefabs the inventory starts populated with; <see cref="OnInstantiate"/> instantiates each as a live child entity. The held entities are runtime-only state and are not exported. </remarks>
     [GlobalClass]
-    public partial class InventoryComponent : Component, IEntityContainer
+    public partial class InventoryComponent : Component, IEntityContainer, IDescriptionContributor
     {
         /// <summary> The entity prefabs this inventory is populated with at spawn time. Direct resource references, so a chest-containing-a-goblin is authored by dragging the goblin prefab into this list. </summary>
         [Export] public Godot.Collections.Array<EntityPrefab> Contents { get; set; } = new();
@@ -62,7 +62,7 @@ namespace Khepri.Entities.Components
 
         /// <summary> Lists the inventory's contents as a sentence in its entity's description, each held entity named as its own note. </summary>
         /// <param name="builder"> The builder assembling the owning entity's description. </param>
-        public override void Contribute(DescriptionBuilder builder)
+        public void Contribute(DescriptionBuilder builder)
         {
             if (_entities.Count == 0)
             {

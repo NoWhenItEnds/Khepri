@@ -78,9 +78,9 @@ namespace Khepri.Entities
 
             List<Action<DescriptionBuilder>> contributions = new List<Action<DescriptionBuilder>>();
 
-            foreach (Component component in _components.Values)
+            foreach (IDescriptionContributor contributor in _components.Values.OfType<IDescriptionContributor>())
             {
-                contributions.Add(component.Contribute);
+                contributions.Add(contributor.Contribute);
             }
 
             Description detail = DescriptionBuilder.Compose(contributions);
@@ -109,22 +109,17 @@ namespace Khepri.Entities
         {
             NameBuilder builder = new NameBuilder();
 
-            // Contribute non-adjectives first (the noun is placed last regardless), then adjective
-            // components in the royal order of their kinds, so the name reads naturally.
-            foreach (Component component in _components.Values.OrderBy(NameOrder))
+            // The noun comes solely from the identity component; absent one, the builder falls back.
+            GetComponent<IdentityComponent>()?.ResolveNoun(builder);
+
+            // Decorating adjectives follow, in the royal order of their kinds, so the name reads naturally.
+            foreach (AdjectiveComponent adjective in _components.Values.OfType<AdjectiveComponent>().OrderBy(a => a.RoyalIndex))
             {
-                component.Contribute(builder);
+                adjective.Contribute(builder);
             }
 
             return builder.Build();
         }
-
-
-        /// <summary> Sort key placing non-adjective components before adjective ones, and adjectives among themselves in their royal order. </summary>
-        /// <param name="component"> The component to rank. </param>
-        /// <returns> A key that orders components for name assembly. </returns>
-        private static Int32 NameOrder(Component component) =>
-            component is AdjectiveComponent adjective ? adjective.RoyalIndex : -1;
 
 
         /// <summary> Attempt to get a texture representing the current entity. </summary>

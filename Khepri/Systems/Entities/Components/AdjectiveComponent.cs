@@ -32,8 +32,9 @@ namespace Khepri.Entities.Components
         }
 
 
-        /// <inheritdoc/>
-        public override void Contribute(NameBuilder builder)
+        /// <summary> Contributes this component's adjective to its entity's name. </summary>
+        /// <param name="builder"> The builder assembling the owning entity's name. </param>
+        public virtual void Contribute(NameBuilder builder)
         {
             builder.Adjective(Word);
         }
