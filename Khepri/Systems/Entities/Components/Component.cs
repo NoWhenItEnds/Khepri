@@ -30,5 +30,13 @@ namespace Khepri.Entities.Components
         public virtual void OnInstantiate(ISet<EntityPrefab> ancestry)
         {
         }
+
+
+        /// <summary> Verifies this component's authored data once at load, before any entity is built from its prefab. The default is a no-op, for components with no authoring invariants to enforce. </summary>
+        /// <remarks> Distinct from <see cref="OnInstantiate"/>: this asserts fixed facts about the authored template (a required reference was filled), whereas <see cref="OnInstantiate"/> resolves per-spawn state. Running it once at load surfaces authoring mistakes at boot rather than lazily when an entity of that prefab first spawns. </remarks>
+        /// <param name="prefab"> The prefab this template belongs to, named in any error raised. </param>
+        public virtual void Validate(EntityPrefab prefab)
+        {
+        }
     }
 }

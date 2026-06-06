@@ -4,6 +4,7 @@ using Godot;
 using Jaypen.Utilities.Extensions;
 using Jaypen.Utilities.Singletons;
 using Khepri.Entities;
+using Khepri.Entities.Components;
 using Khepri.Entities.Controllers;
 using Khepri.Entities.Definitions;
 
@@ -83,7 +84,7 @@ namespace Khepri.Managers
         /// <summary> Registers a single prefab by its name, rejecting blanks and duplicates. </summary>
         /// <param name="prefab"> The loaded prefab to register. </param>
         /// <param name="resourcePath"> The resource path, used only to enrich error messages. </param>
-        /// <exception cref="InvalidOperationException"> Thrown when <see cref="EntityPrefab.Name"/> is blank or already registered. </exception>
+        /// <exception cref="InvalidOperationException"> Thrown when <see cref="EntityPrefab.Name"/> is blank or already registered, or when a component fails its authoring validation. </exception>
         private void Register(EntityPrefab prefab, String resourcePath)
         {
             if (String.IsNullOrWhiteSpace(prefab.Name))
@@ -96,6 +97,12 @@ namespace Khepri.Managers
             if (duplicate)
             {
                 throw new InvalidOperationException($"Duplicate entity prefab name '{prefab.Name}' (from '{resourcePath}').");
+            }
+
+            // Verify each authored template up front, so authoring mistakes fail fast at boot rather than when an entity first spawns.
+            foreach (Component component in prefab.Components)
+            {
+                component.Validate(prefab);
             }
 
             _prefabsByName[prefab.Name] = prefab;

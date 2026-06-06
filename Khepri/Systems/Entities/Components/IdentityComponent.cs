@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Godot;
 using Khepri.Descriptions;
 using Khepri.Entities.Components.Parts;
@@ -16,21 +15,17 @@ namespace Khepri.Entities.Components
 
 
         /// <inheritdoc/>
-        public override void OnInstantiate(ISet<EntityPrefab> ancestry)
+        public override void Validate(EntityPrefab prefab)
         {
             if (Parts.Count == 0)
             {
                 throw new InvalidOperationException(
-                    $"Entity '{Owner.UId}' has an IdentityComponent with no parts. Every entity must have at least one part so it always resolves to a name.");
+                    $"Entity prefab '{prefab.Name}' has an IdentityComponent with no parts. Every entity must have at least one part so it always resolves to a name.");
             }
 
             foreach (PartComponent part in Parts)
             {
-                if (part.Kind is null)  // TODO - IS there a better way?
-                {
-                    throw new InvalidOperationException(
-                        $"Entity '{Owner.UId}' has a part of type '{part.GetType().Name}' with a null Kind. Every part must carry an EntityKind so the entity resolves to a meaningful name.");
-                }
+                part.Validate(prefab);
             }
         }
 

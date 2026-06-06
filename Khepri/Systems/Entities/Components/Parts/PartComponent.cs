@@ -1,28 +1,38 @@
+using System;
 using Godot;
 using Khepri.Descriptions;
+using Khepri.Entities.Definitions;
 
 namespace Khepri.Entities.Components.Parts
 {
     /// <summary> A single anatomical or structural part belonging to an entity — for example a head, an arm, or a door. </summary>
-    /// <remarks> Parts are held only inside an <see cref="IdentityComponent"/>. Every part must carry a non-null <see cref="Kind"/>; this is enforced by <see cref="IdentityComponent.OnInstantiate"/> at spawn time. </remarks>
-    [GlobalClass]   // TODO - Is there a better way to enure non-null identity?
+    /// <remarks> Parts are held only inside an <see cref="IdentityComponent"/>. Every part must carry a <see cref="Kind"/>; the non-nullable type declares that contract and <see cref="IdentityComponent.Validate"/> enforces it once at load, so the spawn and naming paths may treat it as guaranteed. </remarks>
+    [GlobalClass]
     public abstract partial class PartComponent : Resource
     {
-        /// <summary> The entity kind this part belongs to — the data-bearing identity it claims for its entity, for example a goblin <see cref="EntityKind"/> on a core part. Required: a null value is rejected by <see cref="IdentityComponent.OnInstantiate"/> at spawn time. The null-guard in <see cref="Contribute(NameBuilder)"/> remains as defensive cover on the save/load restore path, on which <see cref="IdentityComponent.OnInstantiate"/> is not called. </summary>
-        [Export] public EntityKind? Kind { get; set; } = null;
+        /// <summary> The entity kind this part belongs to — the data-bearing identity it claims for its entity, for example a goblin <see cref="EntityKind"/> on a core part. Required: the non-nullable type declares the contract, and <see cref="Validate"/> verifies the Inspector slot was filled once at load, so everything downstream may treat it as set. </summary>
+        [Export] public EntityKind Kind { get; set; } = null!;
 
 
-        /// <summary> Submits the kind's noun to the builder when <see cref="Kind"/> is set, then allows subclasses to add adjectives. </summary>
-        /// <remarks>
-        /// The null check is retained as defensive cover for the save/load restore path; on the spawn path <see cref="Kind"/> is guaranteed non-null by <see cref="IdentityComponent.OnInstantiate"/>. Subclasses that override this method should call <c>base.Contribute(builder)</c> to preserve the kind's noun claim unless they deliberately supersede it.
-        /// </remarks>
+        /// <summary> Verifies this part's authored data once at load, before any entity is built. </summary>
+        /// <param name="prefab"> The prefab being validated, named in any error raised. </param>
+        /// <exception cref="InvalidOperationException"> Thrown when <see cref="Kind"/> was left unset in the Inspector. </exception>
+        public void Validate(EntityPrefab prefab)
+        {
+            if (Kind is null)
+            {
+                throw new InvalidOperationException(
+                    $"Entity prefab '{prefab.Name}' has a part of type '{GetType().Name}' with no Kind. Every part must carry an EntityKind so the entity resolves to a meaningful name.");
+            }
+        }
+
+
+        /// <summary> Submits the kind's noun to the builder, then allows subclasses to add adjectives. </summary>
+        /// <remarks> Subclasses that override this method should call <c>base.Contribute(builder)</c> to preserve the kind's noun claim unless they deliberately supersede it. </remarks>
         /// <param name="builder"> The builder assembling the owning entity's name. </param>
         public virtual void Contribute(NameBuilder builder)
         {
-            if (Kind is not null)
-            {
-                builder.Noun(Kind.Noun);
-            }
+            builder.Noun(Kind.Noun);
         }
 
 
