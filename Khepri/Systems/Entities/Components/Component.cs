@@ -40,9 +40,9 @@ namespace Khepri.Entities.Components
         }
 
 
-        /// <summary> Contributes this component's claim to its entity's name — a noun (with salience) and/or decorating adjectives. The default is a no-op, for components that do not bear on what the entity is called. </summary>
+        /// <summary> Contributes this component's claim to its entity's name — a noun and/or decorating adjectives. The default is a no-op, for components that do not bear on what the entity is called. </summary>
         /// <param name="builder"> The builder assembling the owning entity's name. </param>
-        public virtual void Contribute(NameBuilder builder)
+        public virtual void Contribute(NameBuilder builder) // TODO - Why two contribures. Does everything give a name?
         {
         }
     }

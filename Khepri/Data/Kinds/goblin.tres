@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="EntityKind" format=3 uid="uid://dsubtypegoblin1"]
+
+[ext_resource type="Script" uid="uid://centitysubtype1" path="res://Khepri/Systems/Entities/EntityKind.cs" id="1_kind"]
+
+[resource]
+script = ExtResource("1_kind")
+Noun = "goblin"

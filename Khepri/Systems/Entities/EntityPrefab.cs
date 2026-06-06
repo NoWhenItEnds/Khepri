@@ -6,10 +6,6 @@ using Khepri.Entities.Components;
 namespace Khepri.Entities.Definitions
 {
     /// <summary> A reusable, designer-authored template describing the component set of an entity, saved as a <c>.tres</c> resource and instantiated into a live <see cref="Entity"/> on demand. </summary>
-    /// <remarks>
-    /// The prefab holds template <see cref="Component"/> resources directly — there is no separate definition layer. Instantiation <see cref="Resource.Duplicate(bool)"/>s each template so every entity gets its own components, then binds the owner and calls <see cref="Component.OnInstantiate"/> to resolve spawn-time state.
-    /// Nested containers reference their contents as direct <see cref="EntityPrefab"/> resources (see <see cref="InventoryComponent.Contents"/>), so population is plain recursion through <see cref="Instantiate(ISet{EntityPrefab})"/>.
-    /// </remarks>
     [GlobalClass]
     public partial class EntityPrefab : Resource
     {

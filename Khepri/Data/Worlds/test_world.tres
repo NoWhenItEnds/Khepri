@@ -91,7 +91,6 @@ metadata/_custom_type_script = "uid://qcuq8b45m1m"
 [sub_resource type="Resource" id="Placement_chest"]
 script = ExtResource("3_gaev2")
 Prefab = ExtResource("6_chest")
-Position = 4
 metadata/_custom_type_script = "uid://hafab63ok3l6"
 
 [sub_resource type="Resource" id="Resource_ol74h"]

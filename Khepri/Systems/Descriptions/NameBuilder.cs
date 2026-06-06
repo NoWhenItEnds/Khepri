@@ -4,37 +4,28 @@ using System.Linq;
 
 namespace Khepri.Descriptions
 {
-    /// <summary> Assembles an entity's display name from the claims its components contribute: the highest-salience noun, preceded by the adjectives in the order they were added. </summary>
-    /// <remarks>
-    /// A name is the shortest form of an entity describing itself, and like its description it emerges from whatever components are currently present — so a transformation that swaps components renames the entity for free.
-    /// Exactly one noun survives (the most salient claim); adjectives are recorded verbatim in the order given, leaving their English ordering to the caller, just as <see cref="DescriptionBuilder"/> leaves prose order to its contributors.
-    /// </remarks>
+    /// <summary> Assembles an entity's display name from the noun a contributor claims, preceded by adjectives in the order they were added. </summary>
     public sealed class NameBuilder
     {
         /// <summary> The label used when no component claimed a noun. </summary>
         private const String Fallback = "something";
 
 
-        /// <summary> The winning noun so far, or <c>null</c> until one is claimed. </summary>
+        /// <summary> The first non-empty noun claimed, or <c>null</c> until one is accepted. </summary>
         private String? _noun;
-
-        /// <summary> The salience of the winning noun; a later claim must exceed this to take over. </summary>
-        private Int32 _salience = Int32.MinValue;
 
         /// <summary> The adjectives decorating the noun, in the order they were added. </summary>
         private readonly List<String> _adjectives = new List<String>();
 
 
-        /// <summary> Claims the entity's noun, taking over only if it is strictly more salient than any noun claimed so far. </summary>
+        /// <summary> Claims the entity's noun; the first non-empty claim wins and later claims are silently ignored. Arbitrating between differing nouns when multiple parts compete is the caller's responsibility, not this assembler's. </summary>
         /// <param name="noun"> The noun to claim; blank claims are ignored. </param>
-        /// <param name="salience"> How strongly this noun defines the entity; the highest salience wins. </param>
         /// <returns> This builder, for chaining. </returns>
-        public NameBuilder Noun(String noun, Int32 salience = 0)
+        public NameBuilder Noun(String noun)
         {
-            if (!String.IsNullOrEmpty(noun) && salience > _salience)
+            if (!String.IsNullOrEmpty(noun) && _noun is null)
             {
                 _noun = noun;
-                _salience = salience;
             }
             return this;
         }
@@ -54,15 +45,13 @@ namespace Khepri.Descriptions
 
 
         /// <summary> Composes the accumulated claims into a display name. </summary>
-        /// <returns> The ordered adjectives followed by the noun, or a fallback label when no noun was claimed. </returns>
+        /// <returns> The ordered adjectives followed by the noun, or the fallback label when no noun was claimed. </returns>
         public String Build()
         {
-            if (_noun is null)
-            {
-                return Fallback;
-            }
-
-            return String.Join(" ", _adjectives.Append(_noun));
+            String result = _noun is null
+                ? Fallback
+                : String.Join(" ", _adjectives.Append(_noun));
+            return result;
         }
     }
 }

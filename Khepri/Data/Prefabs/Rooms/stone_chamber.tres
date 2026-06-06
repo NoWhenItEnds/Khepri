@@ -2,9 +2,9 @@
 
 [ext_resource type="Script" uid="uid://dqias8m1ucccw" path="res://Khepri/Systems/Rooms/Features/Feature.cs" id="1_feature"]
 [ext_resource type="Script" uid="uid://dvo54q23dri4x" path="res://Khepri/Systems/Rooms/Definitions/RoomPrefab.cs" id="2_roomprefab"]
-[ext_resource type="Script" path="res://Khepri/Systems/Rooms/Features/AtmosphereFeature.cs" id="3_atmosphere"]
-[ext_resource type="Script" path="res://Khepri/Systems/Rooms/Features/CarvingsFeature.cs" id="4_carvings"]
-[ext_resource type="Script" path="res://Khepri/Systems/Rooms/Features/BrazierFeature.cs" id="5_brazier"]
+[ext_resource type="Script" uid="uid://bq7atmosf3x2k" path="res://Khepri/Systems/Rooms/Features/AtmosphereFeature.cs" id="3_atmosphere"]
+[ext_resource type="Script" uid="uid://c2carvngs8m4p" path="res://Khepri/Systems/Rooms/Features/CarvingsFeature.cs" id="4_carvings"]
+[ext_resource type="Script" uid="uid://vvoxk472r6ak" path="res://Khepri/Systems/Rooms/Features/BrazierFeature.cs" id="5_brazier"]
 
 [sub_resource type="Resource" id="Atmosphere_stone"]
 script = ExtResource("3_atmosphere")

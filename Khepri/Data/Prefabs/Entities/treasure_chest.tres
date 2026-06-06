@@ -1,31 +1,39 @@
 [gd_resource type="Resource" script_class="EntityPrefab" format=3 uid="uid://dnhtehckrpag6"]
 
-[ext_resource type="Script" uid="uid://cbi02cr1yhpc7" path="res://Khepri/Systems/Entities/Definitions/EntityPrefab.cs" id="1_entityprefab"]
+[ext_resource type="Script" uid="uid://cbi02cr1yhpc7" path="res://Khepri/Systems/Entities/EntityPrefab.cs" id="1_entityprefab"]
 [ext_resource type="Script" uid="uid://b0a61lq1a6mfd" path="res://Khepri/Systems/Entities/Components/Component.cs" id="1_m3dj5"]
-[ext_resource type="Script" uid="uid://dds2sq2padbsr" path="res://Khepri/Systems/Entities/Components/InventoryComponent.cs" id="2_inventory"]
-[ext_resource type="Resource" uid="uid://c3dvok1i67o0e" path="res://Khepri/Data/Prefabs/Entities/goblin.tres" id="3_goblin"]
-[ext_resource type="Script" uid="uid://ckindcmp00001" path="res://Khepri/Systems/Entities/Components/KindComponent.cs" id="4_kind"]
-[ext_resource type="Script" uid="uid://cmaterialcmp01" path="res://Khepri/Systems/Entities/Components/MaterialComponent.cs" id="5_material"]
-[ext_resource type="Script" uid="uid://cconditcmp0001" path="res://Khepri/Systems/Entities/Components/ConditionComponent.cs" id="6_condition"]
-
-[sub_resource type="Resource" id="Kind_chest"]
-script = ExtResource("4_kind")
-Noun = "chest"
-Salience = 100
+[ext_resource type="Script" uid="uid://dds2sq2padbsr" path="res://Khepri/Systems/Entities/Components/InventoryComponent.cs" id="5_inventory"]
+[ext_resource type="Resource" uid="uid://c3dvok1i67o0e" path="res://Khepri/Data/Prefabs/Entities/goblin.tres" id="6_goblin"]
+[ext_resource type="Script" uid="uid://c3rsvv2kxuiwd" path="res://Khepri/Systems/Entities/Components/Parts/PartComponent.cs" id="7_5y738"]
+[ext_resource type="Script" uid="uid://cynyydvj1k7uq" path="res://Khepri/Systems/Entities/Components/MaterialComponent.cs" id="7_material"]
+[ext_resource type="Script" uid="uid://4bovsr3keaea" path="res://Khepri/Systems/Entities/Components/ConditionComponent.cs" id="8_condition"]
+[ext_resource type="Resource" uid="uid://bxpc8ok7lf53a" path="res://Khepri/Data/Kinds/chest.tres" id="8_opkio"]
+[ext_resource type="Script" uid="uid://c0njvrr4ou3it" path="res://Khepri/Systems/Entities/Components/Parts/TorsoPart.cs" id="9_8x8oc"]
+[ext_resource type="Script" uid="uid://c18w7atoe7ygq" path="res://Khepri/Systems/Entities/Components/IdentityComponent.cs" id="10_oovc5"]
 
 [sub_resource type="Resource" id="Material_chest"]
-script = ExtResource("5_material")
+script = ExtResource("7_material")
 Word = "iron"
 
 [sub_resource type="Resource" id="Condition_chest"]
-script = ExtResource("6_condition")
+script = ExtResource("8_condition")
 Word = "battered"
 
 [sub_resource type="Resource" id="Inventory_chest"]
-script = ExtResource("2_inventory")
-Contents = Array[ExtResource("1_entityprefab")]([ExtResource("3_goblin")])
+script = ExtResource("5_inventory")
+Contents = Array[ExtResource("1_entityprefab")]([ExtResource("6_goblin")])
+
+[sub_resource type="Resource" id="Resource_gpusl"]
+script = ExtResource("9_8x8oc")
+Kind = ExtResource("8_opkio")
+metadata/_custom_type_script = "uid://c0njvrr4ou3it"
+
+[sub_resource type="Resource" id="Resource_fwt17"]
+script = ExtResource("10_oovc5")
+Parts = Array[ExtResource("7_5y738")]([SubResource("Resource_gpusl")])
+metadata/_custom_type_script = "uid://c18w7atoe7ygq"
 
 [resource]
 script = ExtResource("1_entityprefab")
 Name = "treasure_chest"
-Components = Array[ExtResource("1_m3dj5")]([SubResource("Kind_chest"), SubResource("Material_chest"), SubResource("Condition_chest"), SubResource("Inventory_chest")])
+Components = Array[ExtResource("1_m3dj5")]([SubResource("Material_chest"), SubResource("Condition_chest"), SubResource("Inventory_chest"), SubResource("Resource_fwt17")])

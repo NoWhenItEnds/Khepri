@@ -29,7 +29,7 @@ namespace Khepri.Managers
         private readonly Dictionary<Entity, EntityController?> _entities = new Dictionary<Entity, EntityController?>();
 
 
-        /// <summary> Loads every entity prefab resource from the configured directories and registers it by name. </summary>
+        /// <inheritdoc/>
         public override void _Ready()
         {
             foreach (String path in _prefabPaths)
