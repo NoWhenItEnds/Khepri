@@ -1,5 +1,5 @@
 using Godot;
-using Khepri.Entities.Definitions;
+using Khepri.Entities;
 using Khepri.Rooms;
 
 namespace Khepri.Worlds.Definitions

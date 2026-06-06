@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Microsoft.Extensions.Logging;
 using Jaypen.Utilities.Extensions;
+using Jaypen.Utilities.Logging;
 using Jaypen.Utilities.Singletons;
 using Khepri.Entities;
 using Khepri.Rooms;
-using Khepri.Rooms.Definitions;
 
 namespace Khepri.Managers
 {
@@ -28,6 +29,9 @@ namespace Khepri.Managers
         /// <summary> All rooms that currently exist within the game world. </summary>
         private readonly HashSet<Room> _rooms = new HashSet<Room>();
 
+        /// <summary> The logger instance the manager uses. </summary>
+        private static readonly ILogger Logger = Log.For<RoomManager>();
+
 
         /// <summary> Loads every room prefab resource from the configured directories and registers each by name. </summary>
         public override void _Ready()
@@ -46,14 +50,8 @@ namespace Khepri.Managers
         /// <remarks> This is the seam passed to <see cref="Rooms.WorldBuilder"/> as its <c>roomFactory</c> delegate, so rooms are registered as they are built during world construction. </remarks>
         /// <param name="prefab"> The room prefab to instantiate; must not be null. </param>
         /// <returns> The newly constructed, registered room. </returns>
-        /// <exception cref="ArgumentNullException"> Thrown when <paramref name="prefab"/> is null. </exception>
         public Room CreateRoom(RoomPrefab prefab)
         {
-            if (prefab is null)
-            {
-                throw new ArgumentNullException(nameof(prefab), "Cannot create a room from a null prefab.");
-            }
-
             Room room = prefab.Instantiate();
             _rooms.Add(room);
 
@@ -116,15 +114,15 @@ namespace Khepri.Managers
 
         /// <summary> Returns the room that contains the given entity, searching the full <see cref="IEntityContainer"/> hierarchy. </summary>
         /// <param name="entity"> The entity to locate. </param>
-        /// <returns> The room whose containment tree includes <paramref name="entity"/> at any depth. </returns>
-        /// <exception cref="InvalidOperationException"> Thrown when <paramref name="entity"/> cannot be found in any room. </exception>
-        public Room GetCurrentRoom(Entity entity)
+        /// <returns> The room whose containment tree includes <paramref name="entity"/> at any depth, or <c>null</c> if the entity occupies no tracked room. </returns>
+        /// <remarks> An entity belonging to no room is abnormal, so this logs a warning and returns <c>null</c>, letting callers degrade gracefully rather than crashing the game. </remarks>
+        public Room? GetCurrentRoom(Entity entity)
         {
             Room? result = _rooms.FirstOrDefault(room => ((IEntityContainer)room).Contains(entity));
 
-            if (result == null)
+            if (result is null)
             {
-                throw new InvalidOperationException($"The given entity <{entity.UId}> doesn't exist within this plane of reality! This shouldn't be possible.");
+                Logger.LogWarning("Entity ({Uid}) could not be located in any room.", entity.UId);
             }
 
             return result;
@@ -141,53 +139,49 @@ namespace Khepri.Managers
         /// </remarks>
         /// <param name="entity"> The entity to move; must currently occupy a tracked room. </param>
         /// <param name="destination"> The room to move the entity into. </param>
-        /// <returns> <c>true</c> if the move happened; <c>false</c> if the entity is already there or no connection links the two rooms. </returns>
-        /// <exception cref="InvalidOperationException"> Propagated from <see cref="GetCurrentRoom"/> when the entity occupies no room. </exception>
+        /// <returns> <c>true</c> if the move happened; <c>false</c> if the entity occupies no room, is already there, or no connection links the two rooms. </returns>
         public Boolean MoveEntity(Entity entity, Room destination)
         {
-            Room current = GetCurrentRoom(entity);
+            Boolean moved   = false;
+            Room?   current = GetCurrentRoom(entity);
 
-            if (current.Equals(destination))
+            if (current is not null && !current.Equals(destination))
             {
-                return false;
+                Connection? link = current.GetConnections()
+                    .FirstOrDefault(connection => connection.GetRooms().Any(room => room.Equals(destination)));
+
+                if (link is not null)
+                {
+                    RoomPosition arrival = link.GetPositions(destination).FirstOrDefault();
+
+                    current.RemoveEntity(entity);
+                    destination.AddEntity(entity, arrival);
+                    moved = true;
+                }
             }
 
-            Connection? link = current.GetConnections()
-                .FirstOrDefault(connection => connection.GetRooms().Any(room => room.Equals(destination)));
-
-            if (link is null)
-            {
-                return false;
-            }
-
-            RoomPosition arrival = link.GetPositions(destination).FirstOrDefault();
-
-            current.RemoveEntity(entity);
-            destination.AddEntity(entity, arrival);
-
-            return true;
+            return moved;
         }
 
 
-        /// <summary> Registers a single room prefab by its name, rejecting blanks and duplicates. </summary>
+        /// <summary> Registers a single room prefab by its name. </summary>
+        /// <remarks> A blank or duplicate name is a single-file authoring slip, so it is logged and skipped rather than crashing the boot; the first prefab registered under a name wins. </remarks>
         /// <param name="prefab"> The loaded prefab to register. </param>
-        /// <param name="resourcePath"> The resource path, used only to enrich error messages. </param>
-        /// <exception cref="InvalidOperationException"> Thrown when <see cref="RoomPrefab.Name"/> is blank or already registered. </exception>
+        /// <param name="resourcePath"> The resource path, used to enrich the skip log. </param>
         private void Register(RoomPrefab prefab, String resourcePath)
         {
             if (String.IsNullOrWhiteSpace(prefab.Name))
             {
-                throw new InvalidOperationException($"Room prefab '{resourcePath}' has a blank Name.");
+                Logger.LogError("Skipping room prefab '{Path}': it has a blank Name.", resourcePath);
             }
-
-            Boolean duplicate = _prefabsByName.ContainsKey(prefab.Name);
-
-            if (duplicate)
+            else if (_prefabsByName.ContainsKey(prefab.Name))
             {
-                throw new InvalidOperationException($"Duplicate room prefab name '{prefab.Name}' (from '{resourcePath}').");
+                Logger.LogError("Skipping duplicate room prefab name '{Name}' (from '{Path}'); keeping the one already registered.", prefab.Name, resourcePath);
             }
-
-            _prefabsByName[prefab.Name] = prefab;
+            else
+            {
+                _prefabsByName[prefab.Name] = prefab;
+            }
         }
     }
 }

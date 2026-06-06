@@ -2,7 +2,7 @@ using System;
 using Godot;
 using Khepri.Rooms.Features;
 
-namespace Khepri.Rooms.Definitions
+namespace Khepri.Rooms
 {
     /// <summary> A reusable, designer-authored template describing the feature set of a room, saved as a <c>.tres</c> resource and instantiated into a live <see cref="Room"/> on demand. </summary>
     /// <remarks> Holds template <see cref="Feature"/> resources directly; instantiation duplicates each so every room gets its own features, then binds the owner and calls <see cref="Feature.OnInstantiate"/>. </remarks>

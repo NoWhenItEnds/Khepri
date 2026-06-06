@@ -1,7 +1,5 @@
 using Khepri.Entities;
-using Khepri.Entities.Definitions;
 using Khepri.Rooms;
-using Khepri.Rooms.Definitions;
 using Khepri.Worlds.Definitions;
 using System;
 using System.Collections.Generic;

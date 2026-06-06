@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using Khepri.Entities.Components;
 
-namespace Khepri.Entities.Definitions
+namespace Khepri.Entities
 {
     /// <summary> A reusable, designer-authored template describing the component set of an entity, saved as a <c>.tres</c> resource and instantiated into a live <see cref="Entity"/> on demand. </summary>
     [GlobalClass]

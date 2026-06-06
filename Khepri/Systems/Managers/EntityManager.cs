@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using Microsoft.Extensions.Logging;
 using Jaypen.Utilities.Extensions;
+using Jaypen.Utilities.Logging;
 using Jaypen.Utilities.Singletons;
 using Khepri.Entities;
 using Khepri.Entities.Components;
 using Khepri.Entities.Controllers;
-using Khepri.Entities.Definitions;
 
 namespace Khepri.Managers
 {
@@ -28,6 +29,9 @@ namespace Khepri.Managers
         /// <summary> All entities currently registered in the game world and their associated controller (if they have one). </summary>
         /// <remarks> A null controller indicates that the entity doesn't currently have an associated controller. </remarks>
         private readonly Dictionary<Entity, EntityController?> _entities = new Dictionary<Entity, EntityController?>();
+
+        /// <summary> The logger instance the manager uses. </summary>
+        private static readonly ILogger Logger = Log.For<EntityManager>();
 
 
         /// <inheritdoc/>
@@ -82,30 +86,50 @@ namespace Khepri.Managers
 
 
         /// <summary> Registers a single prefab by its name, rejecting blanks and duplicates. </summary>
+        /// <summary> Registers a single entity prefab by its name, after verifying its authored components. </summary>
+        /// <remarks> Any single-file authoring slip — a blank name, a duplicate name, or a component that fails validation — is logged and skipped rather than crashing the boot, so one bad file reports loudly without taking the whole game down and every other prefab still loads. The first prefab registered under a name wins. </remarks>
         /// <param name="prefab"> The loaded prefab to register. </param>
-        /// <param name="resourcePath"> The resource path, used only to enrich error messages. </param>
-        /// <exception cref="InvalidOperationException"> Thrown when <see cref="EntityPrefab.Name"/> is blank or already registered, or when a component fails its authoring validation. </exception>
+        /// <param name="resourcePath"> The resource path, used to enrich the skip log. </param>
         private void Register(EntityPrefab prefab, String resourcePath)
         {
             if (String.IsNullOrWhiteSpace(prefab.Name))
             {
-                throw new InvalidOperationException($"Entity prefab '{resourcePath}' has a blank Name.");
+                Logger.LogError("Skipping entity prefab '{Path}': it has a blank Name.", resourcePath);
             }
-
-            Boolean duplicate = _prefabsByName.ContainsKey(prefab.Name);
-
-            if (duplicate)
+            else if (_prefabsByName.ContainsKey(prefab.Name))
             {
-                throw new InvalidOperationException($"Duplicate entity prefab name '{prefab.Name}' (from '{resourcePath}').");
+                Logger.LogError("Skipping duplicate entity prefab name '{Name}' (from '{Path}'); keeping the one already registered.", prefab.Name, resourcePath);
             }
-
-            // Verify each authored template up front, so authoring mistakes fail fast at boot rather than when an entity first spawns.
-            foreach (Component component in prefab.Components)
+            else if (ComponentsValid(prefab, resourcePath))
             {
-                component.Validate(prefab);
+                _prefabsByName[prefab.Name] = prefab;
+            }
+        }
+
+
+        /// <summary> Verifies every authored component on the prefab up front, so authoring mistakes surface at boot rather than when an entity first spawns. </summary>
+        /// <remarks> A component that fails validation is logged and reported as invalid rather than throwing, so one bad prefab is skipped without taking the whole boot down. </remarks>
+        /// <param name="prefab"> The prefab whose components are validated. </param>
+        /// <param name="resourcePath"> The resource path, used to enrich the skip log. </param>
+        /// <returns> <c>true</c> when every component validates; <c>false</c> when any one fails. </returns>
+        private static Boolean ComponentsValid(EntityPrefab prefab, String resourcePath)
+        {
+            Boolean valid = true;
+
+            try
+            {
+                foreach (Component component in prefab.Components)
+                {
+                    component.Validate(prefab);
+                }
+            }
+            catch (Exception error)
+            {
+                Logger.LogError(error, "Skipping entity prefab '{Name}' (from '{Path}'): it failed component validation.", prefab.Name, resourcePath);
+                valid = false;
             }
 
-            _prefabsByName[prefab.Name] = prefab;
+            return valid;
         }
     }
 }

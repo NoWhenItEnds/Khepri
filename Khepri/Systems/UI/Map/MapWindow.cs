@@ -37,10 +37,14 @@ namespace Khepri.UI.Map
         public void ForceUpdate()
         {
             Entity player = GameManager.Instance!.PlayerEntity;
-            Room room     = RoomManager.Instance!.GetCurrentRoom(player);
+            Room? room    = RoomManager.Instance!.GetCurrentRoom(player);
 
-            _roomPanel.ForceUpdate(room);
-            _overworldPanel.ForceUpdate(room);
+            // A null room means the player is in none (already logged); nothing to render this frame.
+            if (room is not null)
+            {
+                _roomPanel.ForceUpdate(room);
+                _overworldPanel.ForceUpdate(room);
+            }
         }
     }
 }

@@ -2,7 +2,6 @@ using System;
 using Godot;
 using Khepri.Descriptions;
 using Khepri.Entities.Components.Parts;
-using Khepri.Entities.Definitions;
 
 namespace Khepri.Entities.Components
 {

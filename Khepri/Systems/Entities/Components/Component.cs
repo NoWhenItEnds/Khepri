@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Godot;
-using Khepri.Entities.Definitions;
 
 namespace Khepri.Entities.Components
 {

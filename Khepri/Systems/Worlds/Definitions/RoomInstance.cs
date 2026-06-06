@@ -1,6 +1,6 @@
 using System;
 using Godot;
-using Khepri.Rooms.Definitions;
+using Khepri.Rooms;
 
 namespace Khepri.Worlds.Definitions
 {

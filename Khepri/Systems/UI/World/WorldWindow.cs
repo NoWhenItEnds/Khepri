@@ -24,11 +24,15 @@ namespace Khepri.UI.World
         public void ForceUpdate()
         {
             Entity player = GameManager.Instance!.PlayerEntity;
-            Room room = RoomManager.Instance!.GetCurrentRoom(player);
+            Room? room = RoomManager.Instance!.GetCurrentRoom(player);
 
-            _statusBar.ForceUpdate();
-            _textPanel.ForceUpdate(room);
-            _displayPanel.ForceUpdate();   // TODO - How do we know which entity to display? Do we even have the display update here?
+            // A null room means the player is in none (already logged); nothing to render this frame.
+            if (room is not null)
+            {
+                _statusBar.ForceUpdate();
+                _textPanel.ForceUpdate(room);
+                _displayPanel.ForceUpdate();   // TODO - How do we know which entity to display? Do we even have the display update here?
+            }
         }
     }
 }
