@@ -3,6 +3,7 @@ using Jaypen.Utilities.Extensions;
 using Jaypen.Utilities.Logging;
 using Jaypen.Utilities.Singletons;
 using Khepri.Entities;
+using Khepri.Entities.Controllers;
 using Khepri.Rooms;
 using Khepri.Worlds;
 using Khepri.Worlds.Definitions;
@@ -46,6 +47,9 @@ namespace Khepri.Managers
             EntityManager entityManager = EntityManager.Instance
                 ?? throw new InvalidOperationException("GameManager._Ready requires EntityManager to be initialised first. Ensure the Entities node precedes the GameManager root node in Game.tscn.");
 
+            TurnManager turnManager = TurnManager.Instance
+                ?? throw new InvalidOperationException("GameManager._Ready requires TurnManager to be initialised first. Ensure the Turns node precedes the GameManager root node in Game.tscn.");
+
             List<WorldDefinition> worldDefinitions = new List<WorldDefinition>();
 
             foreach (String path in _worldDefinitionPaths)
@@ -71,10 +75,14 @@ namespace Khepri.Managers
             Logger.LogInformation("Spawning player...");
 
             Entity player = entityManager.CreateEntity("goblin");
+            PlayerController playerController = new PlayerController(player);
+            entityManager.SetController(player, playerController);
             SetPlayerEntity(player);
 
             Room startingRoom = roomManager.GetRooms().First();
             startingRoom.AddEntity(player, RoomPosition.Center);
+
+            turnManager.Initialise(entityManager.GetControllers(), playerController);
         }
 
 

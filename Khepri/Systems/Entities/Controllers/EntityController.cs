@@ -1,3 +1,4 @@
+using System;
 using Khepri.Entities.Actions;
 using Khepri.Rooms;
 
@@ -9,6 +10,11 @@ namespace Khepri.Entities.Controllers
     {
         /// <summary> The entity this controller drives. </summary>
         public Entity Entity { get; }
+
+
+        /// <summary> Whether this controller is ready to take its turn right now. </summary>
+        /// <remarks> Synchronous brains (such as AI) are always ready; an input-driven brain like <see cref="PlayerController"/> is ready only once the player has chosen an action, which lets the <see cref="Managers.TurnManager"/> pause the turn order on the player's turn until input arrives. </remarks>
+        public virtual Boolean IsReady => true;
 
 
         /// <summary> Initialises a new controller bound to the entity it will drive. </summary>

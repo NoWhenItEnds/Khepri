@@ -23,13 +23,12 @@ namespace Khepri.UI.Map
         }
 
 
-        /// <summary> Moves the player into the room they selected on the overworld map. </summary>
-        /// <remarks> Routes the player's choice through the same <see cref="RoomManager.MoveEntity"/> primitive the AI uses; the move is a no-op when the chosen room is not directly connected to the player's current one. </remarks>
+        /// <summary> Hands the room the player selected to their controller as a move request. </summary>
+        /// <remarks> The controller turns the click into an action the <see cref="TurnManager"/> performs on the player's next turn, rather than the UI mutating the world directly; selecting a room that is not directly connected yields a move that simply fails when performed, leaving the player free to choose again. </remarks>
         /// <param name="destination"> The room the player clicked. </param>
         private void OnRoomSelected(Room destination)
         {
-            Entity player = GameManager.Instance!.PlayerEntity;
-            RoomManager.Instance!.MoveEntity(player, destination);
+            TurnManager.Instance!.Player.Select(destination);
         }
 
 

@@ -85,6 +85,35 @@ namespace Khepri.Managers
         }
 
 
+        /// <summary> Replaces the controller driving <paramref name="entity"/>. </summary>
+        /// <remarks> Used during bootstrap to hand the player's entity a <see cref="PlayerController"/> in place of the default <see cref="AiController"/> wired at creation. </remarks>
+        /// <param name="entity"> The entity whose controller is being set. </param>
+        /// <param name="controller"> The controller that should drive the entity. </param>
+        public void SetController(Entity entity, EntityController controller)
+        {
+            _entities[entity] = controller;
+        }
+
+
+        /// <summary> Returns every controller currently driving a registered entity. </summary>
+        /// <remarks> Entities with no controller are omitted; the order is unspecified, so callers that care (such as turn ordering) impose their own. </remarks>
+        /// <returns> An immutable snapshot of the live controllers; never null, but may be empty. </returns>
+        public IReadOnlyCollection<EntityController> GetControllers()
+        {
+            List<EntityController> controllers = new List<EntityController>();
+
+            foreach (EntityController? controller in _entities.Values)
+            {
+                if (controller is not null)
+                {
+                    controllers.Add(controller);
+                }
+            }
+
+            return controllers;
+        }
+
+
         /// <summary> Registers a single prefab by its name, rejecting blanks and duplicates. </summary>
         /// <summary> Registers a single entity prefab by its name, after verifying its authored components. </summary>
         /// <remarks> Any single-file authoring slip — a blank name, a duplicate name, or a component that fails validation — is logged and skipped rather than crashing the boot, so one bad file reports loudly without taking the whole game down and every other prefab still loads. The first prefab registered under a name wins. </remarks>
