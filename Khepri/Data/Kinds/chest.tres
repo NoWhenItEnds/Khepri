@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="EntityKind" format=3 uid="uid://dkindchest00001"]
+[gd_resource type="Resource" script_class="EntityKind" format=3 uid="uid://bxpc8ok7lf53a"]
 
-[ext_resource type="Script" uid="uid://centitysubtype1" path="res://Khepri/Systems/Entities/EntityKind.cs" id="1_kind"]
+[ext_resource type="Script" uid="uid://blauqlnd738tr" path="res://Khepri/Systems/Entities/EntityKind.cs" id="1_kind"]
 
 [resource]
 script = ExtResource("1_kind")

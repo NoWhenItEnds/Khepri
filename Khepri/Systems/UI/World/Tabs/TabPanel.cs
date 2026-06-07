@@ -17,6 +17,9 @@ namespace Khepri.UI.World.Tabs
         /// <summary> The panel that shows a map of the game world. </summary>
         [Export] private OverworldPanel _overworldPanel = null!;
 
+        /// <summary> A panel used to show the currently selected entity's character sheet. </summary>
+        [Export] private CharacterPanel _characterPanel = null!;
+
         /// <summary> Force the UI element to reflect the current game's state. </summary>
         /// <param name="playerEntity"> The currently controlled player entity. </param>
         /// <param name="playerRoom"> The room the player currently inhabits. </param>
@@ -25,6 +28,7 @@ namespace Khepri.UI.World.Tabs
             //_displayPanel.ForceUpdate(room);  // TODO - Not sure what to do here.
             _localPanel.ForceUpdate(playerRoom);
             _overworldPanel.ForceUpdate(playerRoom);
+            _characterPanel.ForceUpdate(playerEntity);
         }
     }
 }

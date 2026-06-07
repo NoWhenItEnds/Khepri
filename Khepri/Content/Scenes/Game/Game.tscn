@@ -15,6 +15,7 @@
 [ext_resource type="PackedScene" uid="uid://dwm6nmpkyteg1" path="res://Khepri/Systems/UI/World/Tabs/RoomNode.tscn" id="13_6tkqx"]
 [ext_resource type="Script" uid="uid://csp0inj532x1g" path="res://Khepri/Systems/UI/World/Tabs/DisplayPanel.cs" id="14_2tx8i"]
 [ext_resource type="Texture2D" uid="uid://4q335xxs2p" path="res://icon.svg" id="15_ls0br"]
+[ext_resource type="Script" uid="uid://c0lq0wtmllnx8" path="res://Khepri/Systems/UI/World/Tabs/CharacterPanel.cs" id="16_y6cuv"]
 
 [node name="Game" type="Node" unique_id=1801120431]
 script = ExtResource("1_th0kd")
@@ -101,27 +102,28 @@ _roomLabel = NodePath("Room Label")
 layout_mode = 2
 bbcode_enabled = true
 
-[node name="Tab Panel" type="TabContainer" parent="UI/World Window/Display Window" unique_id=1023374034 node_paths=PackedStringArray("_displayPanel", "_localPanel", "_overworldPanel")]
+[node name="Tab Panel" type="TabContainer" parent="UI/World Window/Display Window" unique_id=1023374034 node_paths=PackedStringArray("_displayPanel", "_localPanel", "_overworldPanel", "_characterPanel")]
 layout_mode = 2
 size_flags_horizontal = 3
 current_tab = 0
 script = ExtResource("10_th0kd")
-_displayPanel = NodePath("Display Panel")
-_localPanel = NodePath("Local Panel")
-_overworldPanel = NodePath("Overworld Panel")
+_displayPanel = NodePath("Display")
+_localPanel = NodePath("Local")
+_overworldPanel = NodePath("Overworld")
+_characterPanel = NodePath("Character")
 
-[node name="Display Panel" type="AspectRatioContainer" parent="UI/World Window/Display Window/Tab Panel" unique_id=1517190859 node_paths=PackedStringArray("_entityTexture")]
+[node name="Display" type="AspectRatioContainer" parent="UI/World Window/Display Window/Tab Panel" unique_id=1517190859 node_paths=PackedStringArray("_entityTexture")]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("14_2tx8i")
 _entityTexture = NodePath("Entity Texture")
 metadata/_tab_index = 0
 
-[node name="Entity Texture" type="TextureRect" parent="UI/World Window/Display Window/Tab Panel/Display Panel" unique_id=1460714512]
+[node name="Entity Texture" type="TextureRect" parent="UI/World Window/Display Window/Tab Panel/Display" unique_id=1460714512]
 layout_mode = 2
 texture = ExtResource("15_ls0br")
 
-[node name="Local Panel" type="AspectRatioContainer" parent="UI/World Window/Display Window/Tab Panel" unique_id=2022613893 node_paths=PackedStringArray("_grid")]
+[node name="Local" type="AspectRatioContainer" parent="UI/World Window/Display Window/Tab Panel" unique_id=2022613893 node_paths=PackedStringArray("_grid")]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
@@ -129,13 +131,19 @@ script = ExtResource("11_e166j")
 _grid = NodePath("Grid")
 metadata/_tab_index = 1
 
-[node name="Grid" type="GridContainer" parent="UI/World Window/Display Window/Tab Panel/Local Panel" unique_id=156620766]
+[node name="Grid" type="GridContainer" parent="UI/World Window/Display Window/Tab Panel/Local" unique_id=156620766]
 layout_mode = 2
 
-[node name="Overworld Panel" type="Control" parent="UI/World Window/Display Window/Tab Panel" unique_id=942326569]
+[node name="Overworld" type="Control" parent="UI/World Window/Display Window/Tab Panel" unique_id=942326569]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("12_jh433")
 _roomNodeScene = ExtResource("13_6tkqx")
 metadata/_tab_index = 2
+
+[node name="Character" type="Control" parent="UI/World Window/Display Window/Tab Panel" unique_id=1410045097]
+visible = false
+layout_mode = 2
+script = ExtResource("16_y6cuv")
+metadata/_tab_index = 3
