@@ -1,5 +1,6 @@
 using Godot;
 using Jaypen.Utilities.Pooling;
+using Khepri.Managers;
 using Khepri.Rooms;
 using System;
 using System.Collections.Generic;
@@ -86,10 +87,6 @@ namespace Khepri.UI.World.Tabs
 
         /// <summary> The active edge lines and the room pair each spans, so they can be repositioned without rebuilding. </summary>
         private readonly List<(Line2D Line, Room A, Room B)> _edges = new List<(Line2D, Room, Room)>();
-
-
-        /// <summary> Raised when the player clicks a room marker, carrying the room they chose. </summary>
-        public event Action<Room>? RoomSelected;
 
 
         /// <inheritdoc/>
@@ -360,7 +357,7 @@ namespace Khepri.UI.World.Tabs
 
 
         /// <summary> Instantiates a room marker and subscribes to its selection event; used as the room pool's factory. </summary>
-        /// <returns> A new marker wired to relay clicks through <see cref="RoomSelected"/>. </returns>
+        /// <returns> A new marker wired to route clicks through <see cref="OnMarkerSelected"/>. </returns>
         private RoomNode CreateMarker()
         {
             RoomNode marker = _roomNodeScene.Instantiate<RoomNode>();
@@ -369,9 +366,10 @@ namespace Khepri.UI.World.Tabs
         }
 
 
-        /// <summary> Relays a marker's selection up through this panel's <see cref="RoomSelected"/> event. </summary>
+        /// <summary> Hands the clicked room to the player's controller as a move request. </summary>
+        /// <remarks> The controller turns the click into an action the <see cref="TurnManager"/> performs on the player's next turn, rather than the panel mutating the world directly; selecting a room that is not directly connected yields a move that simply fails when performed, leaving the player free to choose again. </remarks>
         /// <param name="room"> The room whose marker was clicked. </param>
-        private void OnMarkerSelected(Room room) => RoomSelected?.Invoke(room);
+        private void OnMarkerSelected(Room room) => TurnManager.Instance!.Player.Select(room);
 
 
         /// <summary> Creates a fresh, antialiased <see cref="Line2D"/> for use as an edge. </summary>
