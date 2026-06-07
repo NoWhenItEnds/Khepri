@@ -38,6 +38,10 @@ namespace Khepri.UI.World.Tabs
             // offset against.
             Size = CustomMinimumSize;
 
+            // Pivot scaling around the marker's centre so OverworldPanel can zoom it without shifting where
+            // CenterOn places it.
+            PivotOffset = Size / 2f;
+
             _button.Pressed += OnButtonPressed;
         }
 

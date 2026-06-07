@@ -36,8 +36,8 @@ namespace Khepri.UI.World.Tabs
         /// <summary> Logical distance between a room and a directly-connected neighbour, before scaling to the panel. </summary>
         private const Single StepLength = 1f;
 
-        /// <summary> Pixels one <see cref="StepLength"/> spans at unit zoom. </summary>
-        private const Single PixelsPerStep = 120f;
+        /// <summary> A neighbour is placed this many marker footprints away, so adjacent markers always keep a gap regardless of zoom. </summary>
+        private const Single MarkerSpacing = 1.15f;
 
         /// <summary> Total angular spread, in radians, across which neighbours sharing one exit direction are fanned. </summary>
         private const Single FanSpread = Mathf.Pi / 2f;
@@ -67,11 +67,14 @@ namespace Khepri.UI.World.Tabs
         /// <summary> Pool of reusable edge lines, parented to <see cref="_edgeLayer"/>. </summary>
         private NodePool<Line2D> _edgePool = null!;
 
-        /// <summary> Player-controlled pan, in pixels, added to the current room's centred position. Persists across rebuilds. </summary>
+        /// <summary> Player-controlled pan, in pixels, added to the current room's centred position. Reset on a room change so the view re-centres on the player after a move. </summary>
         private Vector2 _panOffset = Vector2.Zero;
 
-        /// <summary> Player-controlled zoom factor multiplying <see cref="PixelsPerStep"/>. </summary>
+        /// <summary> Player-controlled zoom factor multiplying <see cref="_stepPixels"/>. </summary>
         private Single _zoom = 1f;
+
+        /// <summary> Pixels one <see cref="StepLength"/> spans at unit zoom, derived from the marker footprint so neighbours never overlap. </summary>
+        private Single _stepPixels;
 
         /// <summary> Whether a pan-drag is currently in progress. </summary>
         private Boolean _isPanning;
@@ -79,14 +82,11 @@ namespace Khepri.UI.World.Tabs
         /// <summary> The room the graph was last built for; used to skip rebuilding when nothing has changed. Null until the first build. </summary>
         private Room? _builtRoom;
 
-        /// <summary> Logical (pre-scaling) positions of the rooms in the current build, reused by <see cref="Reproject"/>. </summary>
-        private Dictionary<Room, Vector2> _logical = new Dictionary<Room, Vector2>();
+        /// <summary> The active markers paired with their logical (pre-scaling) position, so they can be repositioned without rebuilding. </summary>
+        private readonly List<(RoomNode Node, Vector2 Logical)> _markers = new List<(RoomNode, Vector2)>();
 
-        /// <summary> The active markers and the room each represents, so they can be repositioned without rebuilding. </summary>
-        private readonly List<(RoomNode Node, Room Room)> _markers = new List<(RoomNode, Room)>();
-
-        /// <summary> The active edge lines and the room pair each spans, so they can be repositioned without rebuilding. </summary>
-        private readonly List<(Line2D Line, Room A, Room B)> _edges = new List<(Line2D, Room, Room)>();
+        /// <summary> The active edge lines paired with the logical (pre-scaling) endpoints they span, so they can be repositioned without rebuilding. </summary>
+        private readonly List<(Line2D Line, Vector2 A, Vector2 B)> _edges = new List<(Line2D, Vector2, Vector2)>();
 
 
         /// <inheritdoc/>
@@ -103,6 +103,20 @@ namespace Khepri.UI.World.Tabs
             // reuse across rebuilds does not stack duplicate handlers.
             _roomPool = new NodePool<RoomNode>(this, CreateMarker);
             _edgePool = new NodePool<Line2D>(_edgeLayer, CreateEdge);
+
+            _stepPixels = MeasureStepPixels();
+        }
+
+
+        /// <summary> Derives the pixel distance between adjacent rooms from the marker prefab's footprint, so spacing tracks the marker size rather than a fixed constant. </summary>
+        /// <returns> The number of pixels one <see cref="StepLength"/> spans at unit zoom. </returns>
+        private Single MeasureStepPixels()
+        {
+            RoomNode probe   = _roomNodeScene.Instantiate<RoomNode>();
+            Single footprint = probe.CustomMinimumSize.Length();
+            probe.Free();
+
+            return footprint * MarkerSpacing;
         }
 
 
@@ -121,8 +135,8 @@ namespace Khepri.UI.World.Tabs
                     AcceptEvent();
                     break;
 
-                case InputEventMouseButton { ButtonIndex: MouseButton.Left } leftButton:
-                    _isPanning = leftButton.Pressed;
+                case InputEventMouseButton { ButtonIndex: MouseButton.Middle } middleButton:
+                    _isPanning = middleButton.Pressed;
                     AcceptEvent();
                     break;
 
@@ -152,25 +166,27 @@ namespace Khepri.UI.World.Tabs
         /// <param name="currentRoom"> The room to centre the graph on. </param>
         private void Rebuild(Room currentRoom)
         {
-            _logical = BuildLayout(currentRoom, out IReadOnlyList<(Room A, Room B)> edges);
+            Dictionary<Room, Vector2> logical = BuildLayout(currentRoom, out IReadOnlyList<(Room A, Room B)> edges);
 
             _edgePool.ReleaseAll();
             _edges.Clear();
             foreach ((Room a, Room b) in edges)
             {
                 Line2D line = _edgePool.Acquire();
-                _edges.Add((line, a, b));
+                _edges.Add((line, logical[a], logical[b]));
             }
 
             _roomPool.ReleaseAll();
             _markers.Clear();
-            foreach (KeyValuePair<Room, Vector2> entry in _logical)
+            foreach (KeyValuePair<Room, Vector2> entry in logical)
             {
                 RoomNode node = _roomPool.Acquire();
                 node.SetRoom(entry.Key, entry.Key.Equals(currentRoom));
-                _markers.Add((node, entry.Key));
+                _markers.Add((node, entry.Value));
             }
 
+            // The new current room sits at the origin; clear any pan so the view re-centres on the player.
+            _panOffset = Vector2.Zero;
             _builtRoom = currentRoom;
         }
 
@@ -178,17 +194,21 @@ namespace Khepri.UI.World.Tabs
         /// <summary> Repositions the existing markers and edges for the current pan, zoom, and panel size, without touching the pools. </summary>
         private void Reproject()
         {
-            Single scale   = PixelsPerStep * _zoom;
+            Single scale   = _stepPixels * _zoom;
             Vector2 origin = (Size / 2f) + _panOffset;
 
-            foreach ((RoomNode node, Room room) in _markers)
+            foreach ((RoomNode node, Vector2 logical) in _markers)
             {
-                node.CenterOn(origin + (_logical[room] * scale));
+                // Scale markers with the zoom so their size stays in proportion to their spacing; they pivot
+                // around their own centre, so CenterOn still lands them correctly.
+                node.Scale = Vector2.One * _zoom;
+                node.CenterOn(origin + (logical * scale));
             }
 
-            foreach ((Line2D line, Room a, Room b) in _edges)
+            foreach ((Line2D line, Vector2 a, Vector2 b) in _edges)
             {
-                line.Points = new Vector2[] { origin + (_logical[a] * scale), origin + (_logical[b] * scale) };
+                line.Width  = EdgeWidth * _zoom;
+                line.Points = new Vector2[] { origin + (a * scale), origin + (b * scale) };
             }
         }
 
@@ -306,9 +326,9 @@ namespace Khepri.UI.World.Tabs
         /// <param name="factor"> Multiplier applied to the current zoom before clamping. </param>
         private void ZoomAt(Vector2 anchor, Single factor)
         {
-            Single oldScale = PixelsPerStep * _zoom;
+            Single oldScale = _stepPixels * _zoom;
             _zoom           = Mathf.Clamp(_zoom * factor, MinZoom, MaxZoom);
-            Single newScale = PixelsPerStep * _zoom;
+            Single newScale = _stepPixels * _zoom;
 
             Vector2 origin  = (Size / 2f) + _panOffset;
             Vector2 logical = (anchor - origin) / oldScale;
@@ -361,15 +381,21 @@ namespace Khepri.UI.World.Tabs
         private RoomNode CreateMarker()
         {
             RoomNode marker = _roomNodeScene.Instantiate<RoomNode>();
-            marker.Selected += OnMarkerSelected;
+            marker.Selected += room => OnMarkerSelected(marker, room);
             return marker;
         }
 
 
-        /// <summary> Hands the clicked room to the player's controller as a move request. </summary>
-        /// <remarks> The controller turns the click into an action the <see cref="TurnManager"/> performs on the player's next turn, rather than the panel mutating the world directly; selecting a room that is not directly connected yields a move that simply fails when performed, leaving the player free to choose again. </remarks>
-        /// <param name="room"> The room whose marker was clicked. </param>
-        private void OnMarkerSelected(Room room) => TurnManager.Instance!.Player.Select(room);
+        /// <summary> Centres the view on the clicked marker and hands its room to the player's controller as a move request. </summary>
+        /// <remarks> The controller turns the click into an action the <see cref="TurnManager"/> performs on the player's next turn, rather than the panel mutating the world directly; selecting a room that is not directly connected yields a move that simply fails when performed, leaving the player free to choose again. Centring shifts the pan so the marker's centre lands on the panel centre; once the move resolves, <see cref="Rebuild"/> re-centres on the room directly. </remarks>
+        /// <param name="marker"> The marker that was clicked. </param>
+        /// <param name="room"> The room the marker represents. </param>
+        private void OnMarkerSelected(RoomNode marker, Room room)
+        {
+            Vector2 markerCenter = marker.Position + (marker.Size / 2f);
+            _panOffset += (Size / 2f) - markerCenter;
+            TurnManager.Instance!.Player.Select(room);
+        }
 
 
         /// <summary> Creates a fresh, antialiased <see cref="Line2D"/> for use as an edge. </summary>
