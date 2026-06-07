@@ -1,7 +1,6 @@
 using System;
 using Godot;
 using Jaypen.Utilities.Singletons;
-using Khepri.UI.Map;
 using Khepri.UI.World;
 
 namespace Khepri.Managers
@@ -18,15 +17,11 @@ namespace Khepri.Managers
         [ExportSubgroup("Windows")]
         [Export] private WorldWindow _worldWindow = null!;
 
-        /// <summary> The window the player uses to navigate the game world. </summary>
-        [Export] private MapWindow _mapWindow = null!;
-
 
         /// <inheritdoc/>
         public override void _Process(Double delta)
         {
             _worldWindow.ForceUpdate();
-            _mapWindow.ForceUpdate();
         }
     }
 }

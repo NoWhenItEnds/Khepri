@@ -1,5 +1,7 @@
 using Godot;
+using Khepri.Entities;
 using Khepri.Managers;
+using Khepri.Rooms;
 using System;
 
 namespace Khepri.UI.World
@@ -20,8 +22,10 @@ namespace Khepri.UI.World
         private const String DATETIME_FORMAT = "dddd, dd MMMM yyyy HH:mm";
 
 
-        /// <summary> Force the status bar to reflect the current game's state. </summary>
-        public void ForceUpdate()
+        /// <summary> Force the UI element to reflect the current game's state. </summary>
+        /// <param name="playerEntity"> The currently controlled player entity. </param>
+        /// <param name="playerRoom"> The room the player currently inhabits. </param>
+        public void ForceUpdate(Entity playerEntity, Room playerRoom)
         {
             _dateTimeLabel.Text = GameManager.Instance!.GameTime.ToString(DATETIME_FORMAT);
             // TODO - Add other states. Weather, temp, etc.

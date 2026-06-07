@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Khepri.Descriptions;
 
-namespace Khepri.UI.World
+namespace Khepri.UI.World.Rooms
 {
     /// <summary> Translates a <see cref="Description"/> into BBCode for a <c>RichTextLabel</c>. </summary>
     /// <remarks> Interactive renders wrap each <see cref="NoteSpan"/> in a <c>[url]</c> meta and record the id-to-source map, so the panel can resolve a hovered meta back to its <see cref="INoteSource"/>; inert renders (for a tooltip body) style notes but leave them non-interactive. </remarks>

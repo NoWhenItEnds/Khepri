@@ -2,6 +2,8 @@ using Godot;
 using Khepri.Entities;
 using Khepri.Managers;
 using Khepri.Rooms;
+using Khepri.UI.World.Rooms;
+using Khepri.UI.World.Tabs;
 
 namespace Khepri.UI.World
 {
@@ -13,11 +15,11 @@ namespace Khepri.UI.World
         [ExportGroup("Nodes")]
         [Export] private StatusBar _statusBar = null!;
 
-        /// <summary> Window displaying a description about the world, along with the player's means to interact with said world. </summary>
-        [Export] private TextPanel _textPanel = null!;
+        /// <summary> The panel displaying a description about the current room the player inhabits. </summary>
+        [Export] private RoomPanel _roomPanel = null!;
 
-        /// <summary> A window used to render characters, or display images of important objects that the player is examining. Also can render scenes of ongoing action. </summary>
-        [Export] private DisplayPanel _displayPanel = null!;
+        /// <summary> The panel holding optional tabs the user can click between. </summary>
+        [Export] private TabPanel _tabPanel = null!;
 
 
         /// <summary> Force the window to update. </summary>
@@ -27,11 +29,11 @@ namespace Khepri.UI.World
             Room? room = RoomManager.Instance!.GetCurrentRoom(player);
 
             // A null room means the player is in none (already logged); nothing to render this frame.
-            if (room is not null)
+            if (room != null)
             {
-                _statusBar.ForceUpdate();
-                _textPanel.ForceUpdate(room);
-                _displayPanel.ForceUpdate();   // TODO - How do we know which entity to display? Do we even have the display update here?
+                _statusBar.ForceUpdate(player, room);
+                _roomPanel.ForceUpdate(player, room);
+                _tabPanel.ForceUpdate(player, room);
             }
         }
     }

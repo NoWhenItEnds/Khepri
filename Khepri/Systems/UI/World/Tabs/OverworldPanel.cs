@@ -4,7 +4,7 @@ using Khepri.Rooms;
 using System;
 using System.Collections.Generic;
 
-namespace Khepri.UI.Map
+namespace Khepri.UI.World.Tabs
 {
     /// <summary> Panel displaying the game world as a node-link graph centred on the current room. </summary>
     /// <remarks>

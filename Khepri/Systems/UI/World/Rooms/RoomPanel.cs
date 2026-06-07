@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using Khepri.Descriptions;
+using Khepri.Entities;
 using Khepri.Rooms;
 
-namespace Khepri.UI.World
+namespace Khepri.UI.World.Rooms
 {
-    /// <summary> Panel displaying a description about the world, along with the player's means to interact with said world. </summary>
-    public partial class TextPanel : Control
+    /// <summary> The panel displaying a description about the current room the player inhabits. </summary>
+    public partial class RoomPanel : Control
     {
         /// <summary> The label to show a description of the currently selected room. </summary>
         [ExportGroup("Nodes")]
@@ -53,19 +54,20 @@ namespace Khepri.UI.World
         }
 
 
-        /// <summary> Force the text panel to display the current description / state of the given room. </summary>
-        /// <param name="room"> The room to see the state of. </param>
-        public void ForceUpdate(Room room)
+        /// <summary> Force the UI element to reflect the current game's state. </summary>
+        /// <param name="playerEntity"> The currently controlled player entity. </param>
+        /// <param name="playerRoom"> The room the player currently inhabits. </param>
+        public void ForceUpdate(Entity playerEntity, Room playerRoom)
         {
-            String bbcode = DescriptionRenderer.ToBbcode(room.BuildDescription(), _notes);
+            String incoming = DescriptionRenderer.ToBbcode(playerRoom.BuildDescription(), _notes);
 
-            // Called every frame: only disturb the label (and dismiss the tooltip) when the
-            // description has actually changed, so an open tooltip survives across frames.
-            if (bbcode == _rendered) { return; }
-
-            _rendered       = bbcode;
-            _roomLabel.Text = bbcode;
-            _tooltip.HideTooltip();
+            // If the incoming is different from what we're currently showing.
+            if(incoming != _rendered)
+            {
+                _rendered = incoming;
+                _roomLabel.Text = incoming;
+                _tooltip.HideTooltip();
+            }
         }
 
 

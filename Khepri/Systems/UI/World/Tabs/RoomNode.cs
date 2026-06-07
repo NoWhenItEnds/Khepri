@@ -2,7 +2,7 @@ using Godot;
 using Khepri.Rooms;
 using System;
 
-namespace Khepri.UI.Map
+namespace Khepri.UI.World.Tabs
 {
     /// <summary> A single room marker on the overworld node graph: a label-bearing control positioned and recycled by <see cref="OverworldPanel"/>. </summary>
     public partial class RoomNode : Control

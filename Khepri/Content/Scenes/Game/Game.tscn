@@ -1,0 +1,141 @@
+[gd_scene format=3 uid="uid://hbqoxdwuv0ar"]
+
+[ext_resource type="Script" uid="uid://b3lads64wa673" path="res://Khepri/Systems/Managers/GameManager.cs" id="1_th0kd"]
+[ext_resource type="Script" uid="uid://bci17fk46gdy2" path="res://Khepri/Systems/Managers/EntityManager.cs" id="2_y6cuv"]
+[ext_resource type="Script" uid="uid://cf3rog520qia5" path="res://Khepri/Systems/Managers/RoomManager.cs" id="3_wy5p6"]
+[ext_resource type="Script" uid="uid://dgh6cgnkio07b" path="res://Khepri/Systems/Managers/TurnManager.cs" id="4_4fw45"]
+[ext_resource type="Script" uid="uid://pl2ebw306jyj" path="res://Khepri/Systems/Managers/UIManager.cs" id="5_uonxy"]
+[ext_resource type="Texture2D" uid="uid://d4j6cd0c7tlok" path="res://Khepri/Data/Textures/World/Backgrounds/background_placeholder.png" id="6_tktbe"]
+[ext_resource type="Script" uid="uid://dlyccmqrg6rf0" path="res://Khepri/Systems/UI/World/WorldWindow.cs" id="7_ylxcb"]
+[ext_resource type="Script" uid="uid://elr6gga1cvgg" path="res://Khepri/Systems/UI/World/StatusBar.cs" id="8_2uw02"]
+[ext_resource type="Script" uid="uid://b2oyghlof3i7x" path="res://Khepri/Systems/UI/World/Rooms/RoomPanel.cs" id="9_th0kd"]
+[ext_resource type="Script" uid="uid://cqcakjtyjk7an" path="res://Khepri/Systems/UI/World/Tabs/TabPanel.cs" id="10_th0kd"]
+[ext_resource type="Script" uid="uid://bduigns4wshda" path="res://Khepri/Systems/UI/World/Tabs/LocalPanel.cs" id="11_e166j"]
+[ext_resource type="Script" uid="uid://bquawc3o67bad" path="res://Khepri/Systems/UI/World/Tabs/OverworldPanel.cs" id="12_jh433"]
+[ext_resource type="PackedScene" uid="uid://dwm6nmpkyteg1" path="res://Khepri/Systems/UI/World/Tabs/RoomNode.tscn" id="13_6tkqx"]
+[ext_resource type="Script" uid="uid://csp0inj532x1g" path="res://Khepri/Systems/UI/World/Tabs/DisplayPanel.cs" id="14_2tx8i"]
+[ext_resource type="Texture2D" uid="uid://4q335xxs2p" path="res://icon.svg" id="15_ls0br"]
+
+[node name="Game" type="Node" unique_id=1801120431]
+script = ExtResource("1_th0kd")
+
+[node name="Entities" type="Node" parent="." unique_id=458040416]
+script = ExtResource("2_y6cuv")
+
+[node name="Rooms" type="Node" parent="." unique_id=1764317755]
+script = ExtResource("3_wy5p6")
+
+[node name="Turns" type="Node" parent="." unique_id=1888458739]
+script = ExtResource("4_4fw45")
+
+[node name="UI" type="Control" parent="." unique_id=939978527 node_paths=PackedStringArray("_background", "_worldWindow")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_uonxy")
+_background = NodePath("Background")
+_worldWindow = NodePath("World Window")
+
+[node name="Background" type="TextureRect" parent="UI" unique_id=59822985]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("6_tktbe")
+expand_mode = 5
+
+[node name="World Window" type="VBoxContainer" parent="UI" unique_id=1611766729 node_paths=PackedStringArray("_statusBar", "_roomPanel", "_tabPanel")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("7_ylxcb")
+_statusBar = NodePath("Status Bar")
+_roomPanel = NodePath("Display Window/Room Panel")
+_tabPanel = NodePath("Display Window/Tab Panel")
+
+[node name="Status Bar" type="PanelContainer" parent="UI/World Window" unique_id=1313488816 node_paths=PackedStringArray("_dateTimeLabel", "_weatherLabel")]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+script = ExtResource("8_2uw02")
+_dateTimeLabel = NodePath("HBoxContainer/DateTime Label")
+_weatherLabel = NodePath("HBoxContainer/Weather Label")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/World Window/Status Bar" unique_id=1447167897]
+layout_mode = 2
+
+[node name="DateTime Label" type="RichTextLabel" parent="UI/World Window/Status Bar/HBoxContainer" unique_id=1837193243]
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+text = "Friday, 29 May 2015 05:50"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Weather Label" type="RichTextLabel" parent="UI/World Window/Status Bar/HBoxContainer" unique_id=1684546565]
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+text = "Dizzle"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Display Window" type="HBoxContainer" parent="UI/World Window" unique_id=1145008148]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Room Panel" type="PanelContainer" parent="UI/World Window/Display Window" unique_id=1601855850 node_paths=PackedStringArray("_roomLabel")]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("9_th0kd")
+_roomLabel = NodePath("Room Label")
+
+[node name="Room Label" type="RichTextLabel" parent="UI/World Window/Display Window/Room Panel" unique_id=1647581864]
+layout_mode = 2
+bbcode_enabled = true
+
+[node name="Tab Panel" type="TabContainer" parent="UI/World Window/Display Window" unique_id=1023374034 node_paths=PackedStringArray("_displayPanel", "_localPanel", "_overworldPanel")]
+layout_mode = 2
+size_flags_horizontal = 3
+current_tab = 0
+script = ExtResource("10_th0kd")
+_displayPanel = NodePath("Display Panel")
+_localPanel = NodePath("Local Panel")
+_overworldPanel = NodePath("Overworld Panel")
+
+[node name="Display Panel" type="AspectRatioContainer" parent="UI/World Window/Display Window/Tab Panel" unique_id=1517190859 node_paths=PackedStringArray("_entityTexture")]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("14_2tx8i")
+_entityTexture = NodePath("Entity Texture")
+metadata/_tab_index = 0
+
+[node name="Entity Texture" type="TextureRect" parent="UI/World Window/Display Window/Tab Panel/Display Panel" unique_id=1460714512]
+layout_mode = 2
+texture = ExtResource("15_ls0br")
+
+[node name="Local Panel" type="AspectRatioContainer" parent="UI/World Window/Display Window/Tab Panel" unique_id=2022613893 node_paths=PackedStringArray("_grid")]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("11_e166j")
+_grid = NodePath("Grid")
+metadata/_tab_index = 1
+
+[node name="Grid" type="GridContainer" parent="UI/World Window/Display Window/Tab Panel/Local Panel" unique_id=156620766]
+layout_mode = 2
+
+[node name="Overworld Panel" type="Control" parent="UI/World Window/Display Window/Tab Panel" unique_id=942326569]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("12_jh433")
+_roomNodeScene = ExtResource("13_6tkqx")
+metadata/_tab_index = 2

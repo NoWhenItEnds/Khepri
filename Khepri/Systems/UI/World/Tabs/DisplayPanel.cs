@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Khepri.UI.World
+namespace Khepri.UI.World.Tabs
 {
     /// <summary> A panel used to render characters, or display images of important objects that the player is examining. Also can render scenes of ongoing action. </summary>
     public partial class DisplayPanel : Control

@@ -2,7 +2,7 @@ using System;
 using Godot;
 using Khepri.Descriptions;
 
-namespace Khepri.UI.World
+namespace Khepri.UI.World.Rooms
 {
     /// <summary> A floating panel that shows a note source's description — and its image, if any — while one of its notes is hovered. </summary>
     /// <remarks> Built entirely in code, so it needs no scene file. Runs as a <see cref="Control.TopLevel"/> control positioned in global space, with mouse input ignored so it never interrupts the hover it is reacting to. </remarks>

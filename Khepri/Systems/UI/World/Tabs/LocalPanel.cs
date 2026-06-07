@@ -3,7 +3,7 @@ using Khepri.Rooms;
 using System;
 using System.Collections.Generic;
 
-namespace Khepri.UI.Map
+namespace Khepri.UI.World.Tabs
 {
     /// <summary> Panel displaying a 3×3 spatial grid of the current room, one cell per <see cref="RoomPosition"/>. </summary>
     /// <remarks>
@@ -13,7 +13,7 @@ namespace Khepri.UI.Map
     /// └── Grid : GridContainer   ← assign to _grid; set Columns = 3 in the editor
     /// </code>
     /// </remarks>
-    public partial class RoomPanel : Control
+    public partial class LocalPanel : Control
     {
         /// <summary> The 3×3 container whose children are rebuilt on each <see cref="ForceUpdate"/>. </summary>
         /// <remarks> Set Columns = 3 in the Godot editor to produce the correct layout. </remarks>
