@@ -1,6 +1,7 @@
 using Godot;
 using Khepri.Entities;
 using Khepri.Rooms;
+using Khepri.UI.World.Tabs.Character;
 
 namespace Khepri.UI.World.Tabs
 {

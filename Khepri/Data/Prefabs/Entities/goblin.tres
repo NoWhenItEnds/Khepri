@@ -8,6 +8,9 @@
 [ext_resource type="Script" uid="uid://4bovsr3keaea" path="res://Khepri/Systems/Entities/Components/ConditionComponent.cs" id="6_condition"]
 [ext_resource type="Script" uid="uid://bi5aq8dt0bs0e" path="res://Khepri/Systems/Entities/Components/Parts/HeadPart.cs" id="6_rms6p"]
 [ext_resource type="Script" uid="uid://c18w7atoe7ygq" path="res://Khepri/Systems/Entities/Components/IdentityComponent.cs" id="7_tuatf"]
+[ext_resource type="Script" uid="uid://be45gpvegxlgi" path="res://Khepri/Systems/Entities/Components/Skills/EntitySkill.cs" id="8_rms6p"]
+[ext_resource type="Resource" uid="uid://gyfuebqs7pfg" path="res://Khepri/Data/Skills/skill_persuasion.tres" id="9_tuatf"]
+[ext_resource type="Script" uid="uid://dpy0r6xjligso" path="res://Khepri/Systems/Entities/Components/Skills/SkillComponent.cs" id="10_lylli"]
 
 [sub_resource type="Resource" id="Condition_goblin"]
 script = ExtResource("6_condition")
@@ -28,7 +31,19 @@ script = ExtResource("7_tuatf")
 Parts = Array[ExtResource("3_28ejg")]([SubResource("Resource_lylli"), SubResource("Resource_0csav")])
 metadata/_custom_type_script = "uid://c18w7atoe7ygq"
 
+[sub_resource type="Resource" id="Resource_sjugb"]
+script = ExtResource("8_rms6p")
+Kind = ExtResource("9_tuatf")
+TheoreticalLevel = 4.0
+PracticalLevel = 3.0
+metadata/_custom_type_script = "uid://be45gpvegxlgi"
+
+[sub_resource type="Resource" id="Resource_cjy0v"]
+script = ExtResource("10_lylli")
+Skills = Array[ExtResource("8_rms6p")]([SubResource("Resource_sjugb")])
+metadata/_custom_type_script = "uid://dpy0r6xjligso"
+
 [resource]
 script = ExtResource("1_entityprefab")
 Name = "goblin"
-Components = Array[ExtResource("1_yvolf")]([SubResource("Condition_goblin"), SubResource("Resource_8iugf")])
+Components = Array[ExtResource("1_yvolf")]([SubResource("Condition_goblin"), SubResource("Resource_8iugf"), SubResource("Resource_cjy0v")])

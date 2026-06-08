@@ -15,7 +15,10 @@
 [ext_resource type="PackedScene" uid="uid://dwm6nmpkyteg1" path="res://Khepri/Systems/UI/World/Tabs/RoomNode.tscn" id="13_6tkqx"]
 [ext_resource type="Script" uid="uid://csp0inj532x1g" path="res://Khepri/Systems/UI/World/Tabs/DisplayPanel.cs" id="14_2tx8i"]
 [ext_resource type="Texture2D" uid="uid://4q335xxs2p" path="res://icon.svg" id="15_ls0br"]
-[ext_resource type="Script" uid="uid://c0lq0wtmllnx8" path="res://Khepri/Systems/UI/World/Tabs/CharacterPanel.cs" id="16_y6cuv"]
+[ext_resource type="Script" uid="uid://c0lq0wtmllnx8" path="res://Khepri/Systems/UI/World/Tabs/Character/CharacterPanel.cs" id="16_y6cuv"]
+[ext_resource type="Script" uid="uid://bnp4w76h4jc5o" path="res://Khepri/Systems/UI/World/Tabs/Character/ConditionElement.cs" id="17_4fw45"]
+[ext_resource type="Script" uid="uid://ctb0dfrujwix6" path="res://Khepri/Systems/UI/World/Tabs/Character/SkillElement.cs" id="18_uonxy"]
+[ext_resource type="Script" uid="uid://dy25a1b6dwdd8" path="res://Khepri/Systems/UI/World/Tabs/Character/InventoryElement.cs" id="19_uonxy"]
 
 [node name="Game" type="Node" unique_id=1801120431]
 script = ExtResource("1_th0kd")
@@ -105,7 +108,7 @@ bbcode_enabled = true
 [node name="Tab Panel" type="TabContainer" parent="UI/World Window/Display Window" unique_id=1023374034 node_paths=PackedStringArray("_displayPanel", "_localPanel", "_overworldPanel", "_characterPanel")]
 layout_mode = 2
 size_flags_horizontal = 3
-current_tab = 0
+current_tab = 3
 script = ExtResource("10_th0kd")
 _displayPanel = NodePath("Display")
 _localPanel = NodePath("Local")
@@ -113,6 +116,7 @@ _overworldPanel = NodePath("Overworld")
 _characterPanel = NodePath("Character")
 
 [node name="Display" type="AspectRatioContainer" parent="UI/World Window/Display Window/Tab Panel" unique_id=1517190859 node_paths=PackedStringArray("_entityTexture")]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("14_2tx8i")
@@ -142,8 +146,95 @@ script = ExtResource("12_jh433")
 _roomNodeScene = ExtResource("13_6tkqx")
 metadata/_tab_index = 2
 
-[node name="Character" type="Control" parent="UI/World Window/Display Window/Tab Panel" unique_id=1410045097]
-visible = false
+[node name="Character" type="ScrollContainer" parent="UI/World Window/Display Window/Tab Panel" unique_id=963838911 node_paths=PackedStringArray("_column", "_headingLabel", "_conditionElement", "_skillElement", "_inventoryElement")]
 layout_mode = 2
+horizontal_scroll_mode = 0
 script = ExtResource("16_y6cuv")
+_column = NodePath("VBoxContainer")
+_headingLabel = NodePath("VBoxContainer/Heading Label")
+_conditionElement = NodePath("VBoxContainer/Condition Container")
+_skillElement = NodePath("VBoxContainer/Skills Container")
+_inventoryElement = NodePath("VBoxContainer/Inventory Container")
 metadata/_tab_index = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/World Window/Display Window/Tab Panel/Character" unique_id=1321651680]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Heading Label" type="RichTextLabel" parent="UI/World Window/Display Window/Tab Panel/Character/VBoxContainer" unique_id=50063482]
+layout_mode = 2
+bbcode_enabled = true
+text = "HEADING"
+fit_content = true
+
+[node name="Condition Container" type="VBoxContainer" parent="UI/World Window/Display Window/Tab Panel/Character/VBoxContainer" unique_id=1928255884 node_paths=PackedStringArray("_healthProgressBar")]
+layout_mode = 2
+script = ExtResource("17_4fw45")
+_healthProgressBar = NodePath("HBoxContainer/Health ProgressBar")
+
+[node name="HSeparator" type="HSeparator" parent="UI/World Window/Display Window/Tab Panel/Character/VBoxContainer/Condition Container" unique_id=1947815347]
+layout_mode = 2
+
+[node name="Condition Header" type="RichTextLabel" parent="UI/World Window/Display Window/Tab Panel/Character/VBoxContainer/Condition Container" unique_id=424808680]
+layout_mode = 2
+bbcode_enabled = true
+text = "[center]Condition[/center]"
+fit_content = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/World Window/Display Window/Tab Panel/Character/VBoxContainer/Condition Container" unique_id=647143565]
+layout_mode = 2
+
+[node name="Health ProgressBar" type="ProgressBar" parent="UI/World Window/Display Window/Tab Panel/Character/VBoxContainer/Condition Container/HBoxContainer" unique_id=1973685069]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Health Label" type="RichTextLabel" parent="UI/World Window/Display Window/Tab Panel/Character/VBoxContainer/Condition Container/HBoxContainer" unique_id=1489399146]
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+text = "Health"
+fit_content = true
+
+[node name="Skills Container" type="VBoxContainer" parent="UI/World Window/Display Window/Tab Panel/Character/VBoxContainer" unique_id=419693826]
+layout_mode = 2
+script = ExtResource("18_uonxy")
+_categoryContainerPaths = {
+0: NodePath("Academic Skills"),
+1: NodePath("Arcane Skills"),
+2: NodePath("Social Skills"),
+3: NodePath("Physical Skills")
+}
+
+[node name="HSeparator" type="HSeparator" parent="UI/World Window/Display Window/Tab Panel/Character/VBoxContainer/Skills Container" unique_id=80756585]
+layout_mode = 2
+
+[node name="Skill Header" type="RichTextLabel" parent="UI/World Window/Display Window/Tab Panel/Character/VBoxContainer/Skills Container" unique_id=671942897]
+layout_mode = 2
+bbcode_enabled = true
+text = "[center]Skills[/center]"
+fit_content = true
+
+[node name="Academic Skills" type="VBoxContainer" parent="UI/World Window/Display Window/Tab Panel/Character/VBoxContainer/Skills Container" unique_id=1583031390]
+layout_mode = 2
+
+[node name="Arcane Skills" type="VBoxContainer" parent="UI/World Window/Display Window/Tab Panel/Character/VBoxContainer/Skills Container" unique_id=363334825]
+layout_mode = 2
+
+[node name="Social Skills" type="VBoxContainer" parent="UI/World Window/Display Window/Tab Panel/Character/VBoxContainer/Skills Container" unique_id=1856587517]
+layout_mode = 2
+
+[node name="Physical Skills" type="VBoxContainer" parent="UI/World Window/Display Window/Tab Panel/Character/VBoxContainer/Skills Container" unique_id=289610530]
+layout_mode = 2
+
+[node name="Inventory Container" type="VBoxContainer" parent="UI/World Window/Display Window/Tab Panel/Character/VBoxContainer" unique_id=1329876395]
+layout_mode = 2
+script = ExtResource("19_uonxy")
+
+[node name="HSeparator" type="HSeparator" parent="UI/World Window/Display Window/Tab Panel/Character/VBoxContainer/Inventory Container" unique_id=1516494037]
+layout_mode = 2
+
+[node name="Inventory Header" type="RichTextLabel" parent="UI/World Window/Display Window/Tab Panel/Character/VBoxContainer/Inventory Container" unique_id=798531441]
+layout_mode = 2
+bbcode_enabled = true
+text = "[center]Inventory[/center]"
+fit_content = true
