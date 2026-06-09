@@ -4,14 +4,21 @@ using System.Collections.Generic;
 namespace Khepri.Descriptions
 {
     /// <summary> Accumulates spans into a <see cref="Description"/>. Passed to each contributing part (a feature, a component) so it can append its own prose and notes. </summary>
-    /// <remarks> The append methods return the builder so contributions can be chained fluently. The builder records spans verbatim and in order; <see cref="Compose"/> handles joining several parts' contributions with a separator. </remarks>
+    /// <remarks> The append methods return the builder so contributions can be chained fluently. The builder records spans verbatim and in order. Parts that should read as separate clauses request a <see cref="Separator"/> (or a <see cref="Paragraph"/>) between them: it materialises only when real content follows, so a contribution that adds nothing leaves no stray separator around it. </remarks>
     public sealed class DescriptionBuilder
     {
+        /// <summary> The text that joins consecutive contributions in running prose: a single word gap. </summary>
+        private const String WordGap = " ";
+
+        /// <summary> The text that sets one contribution apart from the next as its own paragraph: a blank line. </summary>
+        private const String ParagraphGap = "\n\n";
+
+
         /// <summary> The spans accumulated so far, in the order they were appended. </summary>
         private readonly List<DescriptionSpan> _spans = new List<DescriptionSpan>();
 
 
-        /// <summary> Whether nothing has been appended yet. </summary>
+        /// <summary> Whether no real content has been appended yet. A merely pending separator does not count. </summary>
         public Boolean IsEmpty => _spans.Count == 0;
 
 
@@ -20,6 +27,7 @@ namespace Khepri.Descriptions
         /// <returns> This builder, for chaining. </returns>
         public DescriptionBuilder Text(String text)
         {
+            FlushSeparator();
             _spans.Add(new TextSpan(text));
             return this;
         }
@@ -31,6 +39,7 @@ namespace Khepri.Descriptions
         /// <returns> This builder, for chaining. </returns>
         public DescriptionBuilder Note(String text, INoteSource source)
         {
+            FlushSeparator();
             _spans.Add(new NoteSpan(text, source));
             return this;
         }
@@ -41,7 +50,12 @@ namespace Khepri.Descriptions
         /// <returns> This builder, for chaining. </returns>
         public DescriptionBuilder Append(Description description)
         {
-            _spans.AddRange(description.Spans);
+            // An empty description adds nothing, so it must not trigger a pending separator.
+            if (description.Spans.Count > 0)
+            {
+                FlushSeparator();
+                _spans.AddRange(description.Spans);
+            }
             return this;
         }
 
@@ -49,30 +63,5 @@ namespace Khepri.Descriptions
         /// <summary> Produces an immutable <see cref="Description"/> from the spans appended so far. </summary>
         /// <returns> The assembled description. </returns>
         public Description Build() => new Description(_spans.ToArray());
-
-
-        /// <summary> Runs each contribution into its own builder and joins the non-empty results with a separator. </summary>
-        /// <remarks> The shared assembly step behind a room composing its features and entities, and an entity composing its components: a contribution that adds nothing is skipped, so no stray separators appear around it. </remarks>
-        /// <param name="contributions"> The contributing callbacks, in the order they should appear. </param>
-        /// <param name="separator"> The text inserted between consecutive non-empty contributions. </param>
-        /// <returns> The joined description. </returns>
-        public static Description Compose(IEnumerable<Action<DescriptionBuilder>> contributions, String separator = " ")
-        {
-            DescriptionBuilder result = new DescriptionBuilder();
-
-            foreach (Action<DescriptionBuilder> contribute in contributions)
-            {
-                DescriptionBuilder part = new DescriptionBuilder();
-                contribute(part);
-
-                if (!part.IsEmpty)
-                {
-                    if (!result.IsEmpty) { result.Text(separator); }
-                    result.Append(part.Build());
-                }
-            }
-
-            return result.Build();
-        }
     }
 }

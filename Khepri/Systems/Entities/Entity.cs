@@ -73,20 +73,13 @@ namespace Khepri.Entities
         {
             DescriptionBuilder builder = new DescriptionBuilder();
 
-            // Open by naming what the entity is, then let its components add detail.
+            // Open by naming what the entity is, then let its components add detail, each fold separated from the last.
             builder.Text(GetName().ToCapitalised() + ".");
-
-            List<Action<DescriptionBuilder>> contributions = new List<Action<DescriptionBuilder>>();
 
             foreach (IDescriptionContributor contributor in _components.Values.OfType<IDescriptionContributor>())
             {
-                contributions.Add(contributor.Contribute);
-            }
-
-            Description detail = DescriptionBuilder.Compose(contributions);
-            if (detail.Spans.Count > 0)
-            {
-                builder.Text(" ").Append(detail);
+                builder.Separator();
+                contributor.Contribute(builder);
             }
 
             return builder.Build();

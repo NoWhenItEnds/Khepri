@@ -50,23 +50,23 @@ namespace Khepri.Rooms
         /// <returns> The assembled description of the room's current state. </returns>
         public Description BuildDescription()
         {
-            List<Action<DescriptionBuilder>> contributions = new List<Action<DescriptionBuilder>>();
+            DescriptionBuilder builder = new DescriptionBuilder();
 
             foreach (Feature feature in _features.Values.OrderBy(feature => feature.Order))
             {
-                contributions.Add(feature.Contribute);
+                builder.Separator();
+                feature.Contribute(builder);
             }
 
             foreach (Entity entity in GetEntities())
             {
-                contributions.Add(entity.Contribute);
+                builder.Separator();
+                entity.Contribute(builder);
             }
 
-            Description description = DescriptionBuilder.Compose(contributions);
-
-            return description.Spans.Count > 0
-                ? description
-                : new DescriptionBuilder().Text("This is a room.").Build();
+            return builder.IsEmpty
+                ? new DescriptionBuilder().Text("This is a room.").Build()
+                : builder.Build();
         }
 
 
