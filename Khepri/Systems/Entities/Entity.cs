@@ -107,15 +107,17 @@ namespace Khepri.Entities
         /// <returns> The composed name, or a fallback label when no component claims a noun. </returns>
         public String GetName()
         {
-            NameBuilder builder = new NameBuilder();
-
             // The noun comes solely from the identity component; absent one, the builder falls back.
-            GetComponent<IdentityComponent>()?.ResolveNoun(builder);
+            IdentityComponent? identityComponent = GetComponent<IdentityComponent>();
+            String noun = identityComponent != null
+                ? identityComponent.GetNoun()
+                : "something";
 
-            // Decorating adjectives follow, in the royal order of their kinds, so the name reads naturally.
-            foreach (AdjectiveComponent adjective in _components.Values.OfType<AdjectiveComponent>().OrderBy(a => a.RoyalIndex))
+            NameBuilder builder = NameBuilder.Create(noun);
+
+            foreach (AdjectiveComponent adjective in _components.Values.OfType<AdjectiveComponent>())
             {
-                adjective.Contribute(builder);
+                builder.WithAdjective(adjective.RoyalIndex,adjective.GetAdjective());
             }
 
             return builder.Build();

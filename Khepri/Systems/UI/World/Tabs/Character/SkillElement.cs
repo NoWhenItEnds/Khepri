@@ -9,12 +9,16 @@ namespace Khepri.UI.World.Tabs.Character
 {
     public partial class SkillElement : VBoxContainer
     {
+        /// <summary> The node paths for the containers associated with each skill category. </summary>
         [ExportGroup("Nodes")]
         [Export] private Godot.Collections.Dictionary<SkillCategory, NodePath> _categoryContainerPaths = null!;
 
+
         /// <summary> The category containers resolved from <see cref="_categoryContainerPaths"/>, built once when the scene is ready. </summary>
+        /// <remarks> This is due to a quirk in Godot's node path resolution. </remarks>
         private readonly Dictionary<SkillCategory, VBoxContainer> _categoryContainers = new Dictionary<SkillCategory, VBoxContainer>();
 
+        /// <summary> The labels for each skill, indexed by their kind. </summary>
         private readonly Dictionary<SkillKind, RichTextLabel> _skillLabels = new Dictionary<SkillKind, RichTextLabel>();
 
 

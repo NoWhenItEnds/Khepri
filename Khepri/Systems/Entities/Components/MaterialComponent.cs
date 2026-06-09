@@ -6,5 +6,10 @@ namespace Khepri.Entities.Components
     [GlobalClass]
     public partial class MaterialComponent : AdjectiveComponent
     {
+        /// <inheritdoc/>
+        public override string GetAdjective()
+        {
+            return "unknownium";
+        }
     }
 }

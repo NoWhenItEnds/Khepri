@@ -25,21 +25,5 @@ namespace Khepri.Entities.Components.Skills
 
         /// <summary> The whole-dot rating (0–5) of <see cref="PracticalLevel"/>, for display. </summary>
         public Int32 PracticalDots => (Int32)Math.Floor(PracticalLevel);
-
-
-        /// <summary> Advances the entity's theoretical knowledge, clamped to <c>0..</c><see cref="MaxLevel"/>. </summary>
-        /// <param name="amount"> The amount to add; may be negative to represent forgetting. </param>
-        public void Study(Single amount)
-        {
-            TheoreticalLevel = Math.Clamp(TheoreticalLevel + amount, 0f, MaxLevel);
-        }
-
-
-        /// <summary> Advances the entity's practical knowledge, clamped to <c>0..</c><see cref="MaxLevel"/>. </summary>
-        /// <param name="amount"> The amount to add; may be negative. </param>
-        public void Practise(Single amount)
-        {
-            PracticalLevel = Math.Clamp(PracticalLevel + amount, 0f, MaxLevel);
-        }
     }
 }

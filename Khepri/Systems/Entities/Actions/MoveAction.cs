@@ -21,7 +21,7 @@ namespace Khepri.Entities.Actions
 
 
         /// <inheritdoc/>
-        public override ActionResult Perform()
+        public override ActionResult Perform(Room room)
         {
             Boolean moved = RoomManager.Instance!.MoveEntity(Actor, _destination);
 

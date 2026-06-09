@@ -1,11 +1,9 @@
 using System;
 using Godot;
-using Khepri.Descriptions;
 
 namespace Khepri.Entities.Components
 {
     /// <summary> A component that decorates its entity's name with a single adjective. The concrete kind <em>is</em> the adjective's category, and its place in <see cref="RoyalOrder"/> fixes where the word sits before the noun. </summary>
-    /// <remarks> Modelling each adjective category as its own component (a material, a colour, a size) means there is no separate taxonomy to keep in step with the components — the components are the taxonomy. The English "royal order of adjectives" is then simply the order of these kinds. </remarks>
     [GlobalClass]
     public abstract partial class AdjectiveComponent : Component
     {
@@ -15,10 +13,6 @@ namespace Khepri.Entities.Components
             typeof(ConditionComponent),   // opinion
             typeof(MaterialComponent),    // material
         };
-
-
-        /// <summary> The adjective this component contributes, for example <c>"iron"</c>. </summary>
-        [Export] public String Word { get; set; } = String.Empty;
 
 
         /// <summary> This kind's position in the royal order; later positions sit closer to the noun. </summary>
@@ -32,11 +26,8 @@ namespace Khepri.Entities.Components
         }
 
 
-        /// <summary> Contributes this component's adjective to its entity's name. </summary>
-        /// <param name="builder"> The builder assembling the owning entity's name. </param>
-        public virtual void Contribute(NameBuilder builder)
-        {
-            builder.Adjective(Word);
-        }
+        /// <summary> Gets the adjective this component contributes. </summary>
+        /// <returns> The adjective as a string. </returns>
+        public abstract String GetAdjective();
     }
 }

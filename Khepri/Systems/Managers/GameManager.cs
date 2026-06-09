@@ -47,9 +47,6 @@ namespace Khepri.Managers
             EntityManager entityManager = EntityManager.Instance
                 ?? throw new InvalidOperationException("GameManager._Ready requires EntityManager to be initialised first. Ensure the Entities node precedes the GameManager root node in Game.tscn.");
 
-            TurnManager turnManager = TurnManager.Instance
-                ?? throw new InvalidOperationException("GameManager._Ready requires TurnManager to be initialised first. Ensure the Turns node precedes the GameManager root node in Game.tscn.");
-
             List<WorldDefinition> worldDefinitions = new List<WorldDefinition>();
 
             foreach (String path in _worldDefinitionPaths)
@@ -81,8 +78,6 @@ namespace Khepri.Managers
 
             Room startingRoom = roomManager.GetRooms().First();
             startingRoom.AddEntity(player, RoomPosition.Center);
-
-            turnManager.Initialise(entityManager.GetControllers(), playerController);
         }
 
 
@@ -92,5 +87,8 @@ namespace Khepri.Managers
         {
             PlayerEntity = entity;
         }
+
+
+        // TODO - Add turns that advance time.
     }
 }

@@ -26,15 +26,6 @@ namespace Khepri.Entities.Components.Parts
         }
 
 
-        /// <summary> Submits the kind's noun to the builder, then allows subclasses to add adjectives. </summary>
-        /// <remarks> Subclasses that override this method should call <c>base.Contribute(builder)</c> to preserve the kind's noun claim unless they deliberately supersede it. </remarks>
-        /// <param name="builder"> The builder assembling the owning entity's name. </param>
-        public virtual void Contribute(NameBuilder builder)
-        {
-            builder.Noun(Kind.Noun);
-        }
-
-
         /// <summary> Appends this part's contribution to its entity's description. The default is a no-op, for parts that have no prose to add. </summary>
         /// <param name="builder"> The builder assembling the owning entity's description. </param>
         public virtual void Contribute(DescriptionBuilder builder)

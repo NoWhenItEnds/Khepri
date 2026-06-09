@@ -7,6 +7,7 @@ namespace Khepri.UI.World.Tabs.Character
 {
     public partial class ConditionElement : VBoxContainer
     {
+        /// <summary> The progress bar that displays the character's health. </summary>
         [ExportGroup("Nodes")]
         [Export] private ProgressBar _healthProgressBar = null!;
 
@@ -21,8 +22,8 @@ namespace Khepri.UI.World.Tabs.Character
 
             if (isVisible)
             {
-                _healthProgressBar.MaxValue = condition!.Max;   // Can't be null here.
-                _healthProgressBar.Value = condition.Current;
+                _healthProgressBar.MaxValue = condition!.StaminaMaximum;   // Can't be null here.
+                _healthProgressBar.Value = condition.StaminaCurrent;
             }
         }
     }

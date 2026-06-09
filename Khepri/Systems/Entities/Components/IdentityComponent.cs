@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using Khepri.Descriptions;
 using Khepri.Entities.Components.Parts;
@@ -29,14 +31,20 @@ namespace Khepri.Entities.Components
         }
 
 
-        /// <summary> Resolves the entity's noun by letting each part stake its claim; the first non-empty noun wins, per <see cref="NameBuilder.Noun"/>. As the sole owner of the entity's identity, this is the only source of the noun. </summary>
-        /// <param name="builder"> The builder assembling the owning entity's name. </param>
-        public void ResolveNoun(NameBuilder builder)
+        /// <summary> Resolves the entity's noun by letting each part stake its claim. </summary>
+        /// <returns> The resolved noun, or a fallback label when no part claims one. </returns>
+        public String GetNoun()
         {
-            foreach (PartComponent part in Parts)
+            // Take the most popular claim as the winner.
+            Dictionary<String, Int32> claims = new Dictionary<String, Int32>(); // TODO - Kind should use a map or something. Something slightly more complected.
+            Parts.GroupBy(part => part.Kind.Noun).ToList().ForEach(group =>
             {
-                part.Contribute(builder);
-            }
+                String claim = group.Key;
+                Int32 count = group.Count();
+                claims[claim] = count;
+            });
+
+            return claims.Keys.Count > 0 ? claims.OrderBy(x => x.Value).Last().Key : "something";
         }
 
 

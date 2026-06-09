@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using Khepri.Descriptions;
 
 namespace Khepri.Entities.Components
 {
@@ -10,13 +9,14 @@ namespace Khepri.Entities.Components
     [GlobalClass]
     public partial class ConditionComponent : AdjectiveComponent
     {
-        /// <summary> The maximum health for this entity. </summary>
-        [Export] public Single Max { get; set; } = 1f;
+        /// <summary> The maximum stamina for this entity. </summary>
+        [ExportGroup("Stamina")]
+        [Export] public Single StaminaMaximum { get; set; } = 1f;
 
-        /// <summary> The current health for this entity. </summary>
-        [Export] public Single Current { get; set; } = 1f;
+        /// <summary> The current stamina for this entity. </summary>
+        [Export] public Single StaminaCurrent { get; set; } = 1f;
 
-        /// <summary> Designer-authored health bands mapping a minimum fraction threshold to a condition adjective. </summary>
+        /// <summary> Designer-authored stamina bands mapping a minimum fraction threshold to a condition adjective. </summary>
         [Export] public Godot.Collections.Dictionary<Single, String> DescriptionBands { get; set; } = new Godot.Collections.Dictionary<Single, String>()
         {
             { 0.00f, "Gravely Wounded" },
@@ -27,32 +27,43 @@ namespace Khepri.Entities.Components
         };
 
 
-        /// <summary> The entity's health as a fraction of its maximum (0.0 = none, 1.0 = full). </summary>
-        public Single Percentage => Current / Max;
+        /// <summary> The maximum willpower for this entity. </summary>
+        [ExportGroup("Willpower")]
+        [Export] public Single WillpowerMaximum { get; set; } = 1f;
 
-        /// <summary> Whether entity has health configured. </summary>
-        public Boolean HasHealth => Current > 0f;
+        /// <summary> The current willpower for this entity. </summary>
+        [Export] public Single WillpowerCurrent { get; set; } = 1f;
 
 
-        /// <summary> Set the entity's current health. </summary>
-        /// <param name="health"> The new value to set the entity's health to. </param>
-        public void SetCurrentHealth(Single health)
+        /// <summary> The entity's stamina as a fraction of its maximum (0.0 = none, 1.0 = full). </summary>
+        public Single StaminaPercentage => StaminaCurrent / StaminaMaximum;
+
+        /// <summary> The entity's willpower as a fraction of its maximum (0.0 = none, 1.0 = full). </summary>
+        public Single WillpowerPercentage => WillpowerCurrent / WillpowerMaximum;
+
+
+        /// <summary> Set the entity's current stamina. </summary>
+        /// <param name="stamina"> The new value to set the entity's stamina to. </param>
+        public void SetCurrentStamina(Single stamina)
         {
-            Current = Math.Clamp(health, 0, Max);
+            StaminaCurrent = Math.Clamp(stamina, 0, StaminaMaximum);
+        }
+
+
+        /// <summary> Set the entity's current willpower. </summary>
+        /// <param name="willpower"> The new value to set the entity's willpower to. </param>
+        public void SetCurrentWillpower(Single willpower)
+        {
+            WillpowerCurrent = Math.Clamp(willpower, 0, WillpowerMaximum);
         }
 
 
         /// <inheritdoc/>
-        public override void Contribute(NameBuilder builder) => builder.Adjective(ResolveHealthWord());
-
-
-        /// <summary> Resolves the condition word from <see cref="_sortedBands"/> for the current <see cref="_healthFraction"/>. </summary>
-        /// <returns> The word from the winning band; never empty when bands are present. </returns>
-        private String ResolveHealthWord()
+        public override String GetAdjective()
         {
-            String resolved = Word; // Default to the authored word when no health bands are configured.
+            String resolved = "unknown";
             IOrderedEnumerable<KeyValuePair<Single, String>> sortedDescriptions = DescriptionBands.OrderBy(pair => pair.Key);
-            Single percentage = Percentage;
+            Single percentage = StaminaPercentage;
 
             foreach (KeyValuePair<Single, String> band in sortedDescriptions)
             {

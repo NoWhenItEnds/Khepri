@@ -394,7 +394,7 @@ namespace Khepri.UI.World.Tabs
         {
             Vector2 markerCenter = marker.Position + (marker.Size / 2f);
             _panOffset += (Size / 2f) - markerCenter;
-            TurnManager.Instance!.Player.Select(room);
+            // TODO - Move player.
         }
 
 
