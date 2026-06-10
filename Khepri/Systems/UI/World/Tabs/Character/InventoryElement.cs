@@ -11,19 +11,21 @@ namespace Khepri.UI.World.Tabs.Character
         /// <param name="selectedEntity"> The entity whose character sheet is shown; when null the sheet is left blank. </param>
         public void ForceUpdate(Entity selectedEntity)
         {
-            InventoryComponent? inventory = selectedEntity.GetComponent<InventoryComponent>();
-            Boolean isVisible = inventory != null && inventory.GetEntities().Count > 0;
-            Visible = isVisible;
-
-            if (isVisible)
+            if (selectedEntity.TryGetComponent(out InventoryComponent inventory) && inventory.GetEntities().Count > 0)
             {
-                foreach (Entity item in inventory!.GetEntities())
+                Visible = true;
+
+                foreach (Entity item in inventory.GetEntities())
                 {
                     // TODO - Add.
                     //Label row = new Label();
                     //row.Text = item.GetName().ToCapitalised();
                     //_column.AddChild(row);
                 }
+            }
+            else
+            {
+                Visible = false;
             }
         }
     }

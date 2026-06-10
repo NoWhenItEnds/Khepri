@@ -26,10 +26,10 @@ namespace Khepri.Rooms
             foreach (Feature template in Features)
             {
                 Feature instance = (Feature)template.Duplicate(false);
-                instance.Bind(room);
+                instance.Initialise(room);
                 instance.OnInstantiate();
 
-                Boolean added = room.AddFeature(instance);
+                Boolean added = room.AddComponent(instance);
 
                 if (!added)
                 {

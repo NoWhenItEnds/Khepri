@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using Jaypen.Utilities.ECS;
 using Khepri.Descriptions;
 
 namespace Khepri.Rooms.Features
@@ -7,10 +8,10 @@ namespace Khepri.Rooms.Features
     /// <summary> A single aspect or characteristic of a room. A room's properties are defined by the features attached to it. </summary>
     /// <remarks>
     /// A feature is a Godot <see cref="Resource"/>: the same class is the designer-authored template, the live runtime instance, and the save payload.
-    /// <c>RoomPrefab</c> instantiates a room by <see cref="Resource.Duplicate(bool)"/>-ing each template feature, calling <see cref="Bind"/>, then <see cref="OnInstantiate"/>. A room holds at most one feature of each concrete type.
+    /// <c>RoomPrefab</c> instantiates a room by <see cref="Resource.Duplicate(bool)"/>-ing each template feature, calling <see cref="Initialise"/>, then <see cref="OnInstantiate"/>. A room holds at most one feature of each concrete type.
     /// </remarks>
     [GlobalClass]
-    public abstract partial class Feature : Resource, INoteSource
+    public abstract partial class Feature : Resource, INoteSource, IComponent
     {
         /// <summary> This feature's descriptive text. Read as prose in the room's description by the default <see cref="Contribute"/>; a feature that instead reads as a hoverable note (overriding <see cref="Contribute"/>) shows this as the note's tooltip via the default <see cref="BuildDescription"/>. </summary>
         [Export(PropertyHint.MultilineText)] public String Description { get; set; } = String.Empty;
@@ -19,15 +20,38 @@ namespace Khepri.Rooms.Features
         [Export] public Int32 Order { get; set; } = 0;
 
 
-        /// <summary> The room this feature is attached to. Wired by <see cref="Bind"/> at instantiation; not exported, so neither authored nor serialised. </summary>
-        public Room Owner { get; private set; } = null!;
+        /// <summary>
+        /// The room this feature is attached to. <c>null</c> before <see cref="Initialise"/> is called and again after
+        /// <see cref="Detach"/> completes. Not exported — neither authored nor serialised.
+        /// </summary>
+        public Room? Owner { get; private set; }
 
 
-        /// <summary> Attaches this feature to its owning room. Called once immediately after duplication and before <see cref="OnInstantiate"/>. </summary>
-        /// <param name="owner"> The room that owns this feature. </param>
-        internal void Bind(Room owner)
+        /// <summary>
+        /// Sets <see cref="Owner"/> to <paramref name="owner"/>. Safe to call when <see cref="Owner"/> is already
+        /// <paramref name="owner"/> (no-op). Throws if <see cref="Owner"/> is already bound to a <em>different</em>
+        /// room, because a feature instance belongs to exactly one room.
+        /// </summary>
+        /// <param name="owner"> The room to bind this feature to. </param>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when this feature is already bound to a different room — rebinding across rooms is not permitted.
+        /// </exception>
+        internal void Initialise(Room owner)
         {
+            if (Owner is not null && !ReferenceEquals(Owner, owner))
+            {
+                throw new InvalidOperationException(
+                    $"Feature '{GetType().Name}' is already bound to a different room and cannot be rebound.");
+            }
+
             Owner = owner;
+        }
+
+
+        /// <summary> Clears <see cref="Owner"/>, leaving it <c>null</c>. Called by <see cref="Room"/> on a successful remove. </summary>
+        internal void Detach()
+        {
+            Owner = null;
         }
 
 

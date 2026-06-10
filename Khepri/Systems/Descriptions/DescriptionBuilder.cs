@@ -27,7 +27,6 @@ namespace Khepri.Descriptions
         /// <returns> This builder, for chaining. </returns>
         public DescriptionBuilder Text(String text)
         {
-            FlushSeparator();
             _spans.Add(new TextSpan(text));
             return this;
         }
@@ -39,7 +38,6 @@ namespace Khepri.Descriptions
         /// <returns> This builder, for chaining. </returns>
         public DescriptionBuilder Note(String text, INoteSource source)
         {
-            FlushSeparator();
             _spans.Add(new NoteSpan(text, source));
             return this;
         }
@@ -53,7 +51,6 @@ namespace Khepri.Descriptions
             // An empty description adds nothing, so it must not trigger a pending separator.
             if (description.Spans.Count > 0)
             {
-                FlushSeparator();
                 _spans.AddRange(description.Spans);
             }
             return this;

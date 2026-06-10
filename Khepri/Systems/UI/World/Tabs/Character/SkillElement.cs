@@ -36,12 +36,10 @@ namespace Khepri.UI.World.Tabs.Character
         /// <param name="selectedEntity"> The entity whose character sheet is shown; when null the sheet is left blank. </param>
         public void ForceUpdate(Entity selectedEntity)
         {
-            SkillComponent? skills = selectedEntity.GetComponent<SkillComponent>();
-            Boolean isVisible = skills != null && skills.Skills.Count > 0;
-            Visible = isVisible;
-
-            if (isVisible)
+            if (selectedEntity.TryGetComponent(out SkillComponent skills) && skills.Skills.Count > 0)
             {
+                Visible = true;
+
                 // Consider every label dirty.
                 Dictionary<SkillKind, RichTextLabel> dirtySkillLabels = new Dictionary<SkillKind, RichTextLabel>(_skillLabels);
                 _skillLabels.Clear();
@@ -50,7 +48,7 @@ namespace Khepri.UI.World.Tabs.Character
                 {
                     if (_categoryContainers.TryGetValue(category, out VBoxContainer? container))
                     {
-                        foreach (EntitySkill skill in skills!.Skills.Where(s => s.Kind.Category == category))
+                        foreach (EntitySkill skill in skills.Skills.Where(s => s.Kind.Category == category))
                         {
                             dirtySkillLabels.TryGetValue(skill.Kind, out RichTextLabel? label);
                             if (label == null)  // If we don't find one, we need to create one
@@ -74,6 +72,10 @@ namespace Khepri.UI.World.Tabs.Character
                 {
                     dirty.Value.QueueFree();
                 }
+            }
+            else
+            {
+                Visible = false;
             }
         }
 

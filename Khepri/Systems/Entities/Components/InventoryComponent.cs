@@ -20,9 +20,12 @@ namespace Khepri.Entities.Components
 
 
         /// <inheritdoc/>
-        /// <exception cref="InvalidOperationException"> Thrown when a contained entity cannot be added (a duplicate instance or a runtime containment cycle), or when a content prefab transitively contains itself. </exception>
+        /// <exception cref="InvalidOperationException"> Thrown when the component is not yet bound to an owning entity, when a contained entity cannot be added (a duplicate instance or a runtime containment cycle), or when a content prefab transitively contains itself. </exception>
         public override void OnInstantiate(ISet<EntityPrefab> ancestry)
         {
+            Entity owner = Owner ?? throw new InvalidOperationException(
+                "InventoryComponent.OnInstantiate called before the component was bound to an owning entity.");
+
             foreach (EntityPrefab prefab in Contents)
             {
                 Entity  child = prefab.Instantiate(ancestry);   // Cycle-aware: shares the recursion-stack set so a self-containing prefab fails fast.
@@ -31,7 +34,7 @@ namespace Khepri.Entities.Components
                 if (!added)
                 {
                     throw new InvalidOperationException(
-                        $"Could not add '{prefab.Name}' to the inventory on entity '{Owner.UId}' (duplicate instance or containment cycle).");
+                        $"Could not add '{prefab.Name}' to the inventory on entity '{owner.UId}' (duplicate instance or containment cycle).");
                 }
             }
         }
@@ -40,10 +43,14 @@ namespace Khepri.Entities.Components
         /// <summary> Attempt to add an entity to the entities currently within the container. </summary>
         /// <param name="entity"> The entity to move into the container. </param>
         /// <returns> <c>true</c> if the entity was successfully added; <c>false</c> if it was already present or if adding it would create a containment cycle (e.g. placing the owning entity, or any ancestor in its container tree, into this container). </returns>
+        /// <exception cref="InvalidOperationException"> Thrown when the component is not yet bound to an owning entity. </exception>
         public Boolean AddEntity(Entity entity)
         {
-            Boolean wouldCycle = entity.Equals(Owner)
-                || entity.GetContainers().Any(c => c.Contains(Owner));
+            Entity owner = Owner ?? throw new InvalidOperationException(
+                "InventoryComponent.AddEntity called before the component was bound to an owning entity.");
+
+            Boolean wouldCycle = entity.Equals(owner)
+                || entity.GetContainers().Any(c => c.Contains(owner));
             Boolean result = !wouldCycle && _entities.Add(entity);
             return result;
         }

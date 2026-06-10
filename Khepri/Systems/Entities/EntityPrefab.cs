@@ -45,7 +45,7 @@ namespace Khepri.Entities
             foreach (Component template in Components)
             {
                 Component instance = (Component)template.Duplicate(false);   // Per-entity copy; share any referenced resources rather than deep-cloning prefab references.
-                instance.Bind(entity);
+                instance.Initialise(entity);
                 instance.OnInstantiate(ancestry);
 
                 Boolean added = entity.AddComponent(instance);

@@ -16,14 +16,15 @@ namespace Khepri.UI.World.Tabs.Character
         /// <param name="selectedEntity"> The entity whose character sheet is shown; when null the sheet is left blank. </param>
         public void ForceUpdate(Entity selectedEntity)
         {
-            ConditionComponent? condition = selectedEntity.GetComponent<ConditionComponent>();
-            Boolean isVisible = condition != null;
-            Visible = isVisible;
-
-            if (isVisible)
+            if (selectedEntity.TryGetComponent(out ConditionComponent condition))
             {
-                _healthProgressBar.MaxValue = condition!.StaminaMaximum;   // Can't be null here.
+                Visible = true;
+                _healthProgressBar.MaxValue = condition.StaminaMaximum;
                 _healthProgressBar.Value = condition.StaminaCurrent;
+            }
+            else
+            {
+                Visible = false;
             }
         }
     }
