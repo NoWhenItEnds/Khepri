@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Khepri.Entities.Abilities;
 using Khepri.Entities.Actions;
 using Khepri.Rooms;
 
@@ -11,6 +13,10 @@ namespace Khepri.Entities.Controllers
         /// <summary> The entity this controller drives. </summary>
         public Entity Entity { get; }
 
+
+        /// <summary> All the abilities, and the logic therein, that the controller can take. An entity holds at most one component of each concrete type. </summary>
+        /// <remarks> Keying by <see cref="Type"/> rather than relying on component equality keeps the uniqueness rule explicit and avoids overriding equality on the Godot <c>Resource</c> base. </remarks>
+        private readonly Dictionary<Type, EntityAbility> _abilities = new Dictionary<Type, EntityAbility>();
 
         /// <summary> The action the controller has chosen but not yet taken, or <c>null</c> while awaiting input. </summary>
         private EntityAction? _pendingAction;
