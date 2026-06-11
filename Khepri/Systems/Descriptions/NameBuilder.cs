@@ -6,7 +6,7 @@ namespace Khepri.Descriptions
     /// <summary> Assembles an entity's display name from a noun and adjectives. </summary>
     public sealed class NameBuilder
     {
-        /// <summary> The first non-empty noun claimed, or <c>null</c> until one is accepted. </summary>
+        /// <summary> The noun the name is built around. </summary>
         private String _noun;
 
         /// <summary> The adjectives decorating the noun. Their order is determined by the royal order of their kinds. </summary>
@@ -52,17 +52,17 @@ namespace Khepri.Descriptions
         }
 
 
-        /// <summary> Claims the entity's noun; the first non-empty claim wins and later claims are silently ignored. Arbitrating between differing nouns when multiple parts compete is the caller's responsibility, not this assembler's. </summary>
-        /// <param name="noun"> The noun to claim; blank claims are ignored. </param>
-        /// <returns> This builder, for chaining. </returns>
+        /// <summary> Starts a name around the given noun. Arbitrating between differing nouns when multiple parts compete is the caller's responsibility, not this assembler's. </summary>
+        /// <param name="noun"> The noun the name is built around. </param>
+        /// <returns> A fresh builder, for chaining. </returns>
         public static NameBuilder Create(String noun)
         {
             return new NameBuilder(noun);
         }
 
 
-        /// <summary> Adds an adjective that decorates the noun. Adjectives appear in the order added, so the caller is responsible for any English ordering. </summary>
-        /// <param name="royalOrder"> The royal order of the adjective. </param>
+        /// <summary> Adds an adjective that decorates the noun, slotted by its royal order. A later claim on an occupied slot replaces the earlier one. </summary>
+        /// <param name="royalOrder"> The royal order of the adjective; claims with an invalid order are ignored. </param>
         /// <param name="adjective"> The adjective to add; blank adjectives are ignored. </param>
         /// <returns> This builder, for chaining. </returns>
         public NameBuilder WithAdjective(Int32 royalOrder, String adjective)

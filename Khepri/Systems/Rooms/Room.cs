@@ -63,11 +63,13 @@ namespace Khepri.Rooms
 
             foreach (Feature feature in GetComponents().OrderBy(feature => feature.Order))
             {
+                builder.Separator();
                 feature.Contribute(builder);
             }
 
             foreach (Entity entity in GetEntities())
             {
+                builder.Separator();
                 entity.Contribute(builder);
             }
 

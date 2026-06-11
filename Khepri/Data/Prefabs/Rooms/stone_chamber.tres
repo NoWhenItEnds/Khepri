@@ -8,15 +8,17 @@
 
 [sub_resource type="Resource" id="Atmosphere_stone"]
 script = ExtResource("3_atmosphere")
-Description = "A cold stone chamber, its walls slick with moisture. The damp air swallows sound."
+Prose = "A cold stone chamber, its walls slick with moisture. The damp air swallows sound."
 
 [sub_resource type="Resource" id="Carvings_stone"]
 script = ExtResource("4_carvings")
+Prose = "Ancient {carvings} spiral across every surface."
 Description = "Worn reliefs depict a procession of jackal-headed figures bearing a sarcophagus toward a rayed sun."
 Order = 1
 
 [sub_resource type="Resource" id="Brazier_stone"]
 script = ExtResource("5_brazier")
+Prose = "A {bronze brazier} smoulders against the far wall, breathing dim orange light."
 Description = "The brazier is wrought as a coiled serpent, its eyes chips of garnet that catch the coals' glow."
 Order = 2
 

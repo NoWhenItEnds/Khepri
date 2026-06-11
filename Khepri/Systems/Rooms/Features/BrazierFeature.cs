@@ -1,17 +1,11 @@
 using Godot;
-using Khepri.Descriptions;
 
 namespace Khepri.Rooms.Features
 {
-    /// <summary> A standing brazier that lights the room; reads as a hoverable note whose tooltip describes it more closely. </summary>
+    /// <summary> A standing brazier that lights the room. </summary>
+    /// <remarks> Carries no behaviour of its own: its room prose (with the brazier brace-marked as a hoverable note) is authored in <see cref="Feature.Prose"/>, and the note's tooltip in <see cref="Feature.Description"/>. </remarks>
     [GlobalClass]
     public partial class BrazierFeature : Feature
     {
-        /// <summary> Weaves the brazier into the room's prose as a hoverable note pointing back at this feature. </summary>
-        /// <param name="builder"> The builder assembling the owning room's description. </param>
-        public override void Contribute(DescriptionBuilder builder)
-        {
-            builder.Text("A ").Note("bronze brazier", this).Text(" smoulders against the far wall, breathing dim orange light.");
-        }
     }
 }

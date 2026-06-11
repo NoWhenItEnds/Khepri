@@ -13,6 +13,9 @@ namespace Khepri.Entities.Components.Parts
         /// <summary> The entity kind this part belongs to — the data-bearing identity it claims for its entity, for example a goblin <see cref="EntityKind"/> on a core part. Required: the non-nullable type declares the contract, and <see cref="Validate"/> verifies the Inspector slot was filled once at load, so everything downstream may treat it as set. </summary>
         [Export] public EntityKind Kind { get; set; } = null!;
 
+        /// <summary> The prose this part contributes to its entity's description, authored in the Inspector. May be left empty for a part with nothing to say. </summary>
+        [Export(PropertyHint.MultilineText)] public String Prose { get; set; } = String.Empty;
+
 
         /// <summary> Verifies this part's authored data once at load, before any entity is built. </summary>
         /// <param name="prefab"> The prefab being validated, named in any error raised. </param>
@@ -27,10 +30,14 @@ namespace Khepri.Entities.Components.Parts
         }
 
 
-        /// <summary> Appends this part's contribution to its entity's description. The default is a no-op, for parts that have no prose to add. </summary>
+        /// <summary> Appends this part's contribution to its entity's description: the authored <see cref="Prose"/>, when there is any. Override only when the prose is genuinely dynamic — authored text belongs in <see cref="Prose"/>, not code. </summary>
         /// <param name="builder"> The builder assembling the owning entity's description. </param>
         public virtual void Contribute(DescriptionBuilder builder)
         {
+            if (!String.IsNullOrEmpty(Prose))
+            {
+                builder.Text(Prose);
+            }
         }
     }
 }

@@ -141,6 +141,7 @@ namespace Khepri.Entities.Components
         {
             foreach (PartComponent part in Parts)
             {
+                builder.Separator();
                 part.Contribute(builder);
             }
         }

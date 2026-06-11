@@ -17,9 +17,34 @@ namespace Khepri.Descriptions
         /// <summary> The spans accumulated so far, in the order they were appended. </summary>
         private readonly List<DescriptionSpan> _spans = new List<DescriptionSpan>();
 
+        /// <summary> The gap text requested but not yet materialised, or <c>null</c> when none is pending. It is written out only when real content follows it. </summary>
+        private String? _pendingGap;
+
 
         /// <summary> Whether no real content has been appended yet. A merely pending separator does not count. </summary>
         public Boolean IsEmpty => _spans.Count == 0;
+
+
+        /// <summary> Requests a word gap before whatever content comes next. The gap materialises only when content follows it, and never opens the description. </summary>
+        /// <returns> This builder, for chaining. </returns>
+        public DescriptionBuilder Separator()
+        {
+            // Never downgrade an already-requested paragraph to a word gap.
+            if (_pendingGap is null)
+            {
+                _pendingGap = WordGap;
+            }
+            return this;
+        }
+
+
+        /// <summary> Requests a paragraph break before whatever content comes next. The break materialises only when content follows it, and never opens the description. </summary>
+        /// <returns> This builder, for chaining. </returns>
+        public DescriptionBuilder Paragraph()
+        {
+            _pendingGap = ParagraphGap;
+            return this;
+        }
 
 
         /// <summary> Appends a run of plain prose. </summary>
@@ -27,6 +52,7 @@ namespace Khepri.Descriptions
         /// <returns> This builder, for chaining. </returns>
         public DescriptionBuilder Text(String text)
         {
+            CommitPendingGap();
             _spans.Add(new TextSpan(text));
             return this;
         }
@@ -38,7 +64,45 @@ namespace Khepri.Descriptions
         /// <returns> This builder, for chaining. </returns>
         public DescriptionBuilder Note(String text, INoteSource source)
         {
+            CommitPendingGap();
             _spans.Add(new NoteSpan(text, source));
+            return this;
+        }
+
+
+        /// <summary> Appends authored prose, weaving any brace-marked phrases in as notes. Text wrapped in braces — <c>"A {bronze brazier} smoulders…"</c> — becomes a hoverable <see cref="NoteSpan"/> backed by <paramref name="source"/>; everything else is appended as plain prose. A brace without a closing partner renders literally. </summary>
+        /// <param name="text"> The authored prose, with optional <c>{…}</c> note markers. </param>
+        /// <param name="source"> The live object that backs every marked note's tooltip. </param>
+        /// <returns> This builder, for chaining. </returns>
+        public DescriptionBuilder Prose(String text, INoteSource source)
+        {
+            Int32 position = 0;
+            while (position < text.Length)
+            {
+                Int32 open  = text.IndexOf('{', position);
+                Int32 close = open >= 0 ? text.IndexOf('}', open + 1) : -1;
+
+                if (close < 0)
+                {
+                    // No further well-formed marker; the remainder (including any stray brace) is plain prose.
+                    Text(text.Substring(position));
+                    position = text.Length;
+                }
+                else
+                {
+                    if (open > position)
+                    {
+                        Text(text.Substring(position, open - position));
+                    }
+
+                    String noteText = text.Substring(open + 1, close - open - 1);
+                    if (noteText.Length > 0)
+                    {
+                        Note(noteText, source);
+                    }
+                    position = close + 1;
+                }
+            }
             return this;
         }
 
@@ -48,12 +112,27 @@ namespace Khepri.Descriptions
         /// <returns> This builder, for chaining. </returns>
         public DescriptionBuilder Append(Description description)
         {
-            // An empty description adds nothing, so it must not trigger a pending separator.
+            // An empty description adds nothing, so it must not consume a pending separator.
             if (description.Spans.Count > 0)
             {
+                CommitPendingGap();
                 _spans.AddRange(description.Spans);
             }
             return this;
+        }
+
+
+        /// <summary> Writes out any pending gap before content lands. A gap at the very start of the description is discarded rather than written. </summary>
+        private void CommitPendingGap()
+        {
+            if (_pendingGap is not null)
+            {
+                if (_spans.Count > 0)
+                {
+                    _spans.Add(new TextSpan(_pendingGap));
+                }
+                _pendingGap = null;
+            }
         }
 
 

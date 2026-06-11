@@ -13,7 +13,10 @@ namespace Khepri.Rooms.Features
     [GlobalClass]
     public abstract partial class Feature : Resource, INoteSource, IComponent
     {
-        /// <summary> This feature's descriptive text. Read as prose in the room's description by the default <see cref="Contribute"/>; a feature that instead reads as a hoverable note (overriding <see cref="Contribute"/>) shows this as the note's tooltip via the default <see cref="BuildDescription"/>. </summary>
+        /// <summary> The prose this feature contributes to its room's description. Phrases wrapped in braces — <c>A {bronze brazier} smoulders…</c> — become hoverable notes whose tooltip body is <see cref="Description"/>. </summary>
+        [Export(PropertyHint.MultilineText)] public String Prose { get; set; } = String.Empty;
+
+        /// <summary> This feature's close-up text: the tooltip body shown when one of its brace-marked notes in <see cref="Prose"/> is hovered. May be left empty for a feature with no notes. </summary>
         [Export(PropertyHint.MultilineText)] public String Description { get; set; } = String.Empty;
 
         /// <summary> Orders this feature's prose within the room's description; lower values appear first. Features sharing an order fall back to an unspecified but stable order. </summary>
@@ -84,13 +87,13 @@ namespace Khepri.Rooms.Features
         }
 
 
-        /// <summary> Appends this feature's contribution to its room's description. By default, contributes <see cref="Description"/> as plain prose; a feature that reads as a hoverable item of note overrides this to weave a <see cref="DescriptionBuilder.Note"/> into the prose instead. </summary>
+        /// <summary> Appends this feature's contribution to its room's description: the authored <see cref="Prose"/>, with any brace-marked phrases woven in as hoverable notes pointing back at this feature. Override only when the prose is genuinely dynamic — authored text belongs in <see cref="Prose"/>, not code. </summary>
         /// <param name="builder"> The builder assembling the owning room's description. </param>
         public virtual void Contribute(DescriptionBuilder builder)
         {
-            if (!String.IsNullOrEmpty(Description))
+            if (!String.IsNullOrEmpty(Prose))
             {
-                builder.Text(Description);
+                builder.Prose(Prose, this);
             }
         }
 

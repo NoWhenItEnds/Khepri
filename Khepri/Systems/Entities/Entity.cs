@@ -50,6 +50,7 @@ namespace Khepri.Entities
 
             foreach (IDescriptionContributor contributor in GetComponents().OfType<IDescriptionContributor>())
             {
+                builder.Separator();
                 contributor.Contribute(builder);
             }
 
