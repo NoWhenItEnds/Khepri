@@ -38,14 +38,37 @@ namespace Khepri.Entities.Abilities
                     $"Ability '{GetType().Name}' is already bound to a different controller and cannot be rebound.");
             }
 
+            Boolean newlyBound = Owner is null;
             Owner = owner;
+            if (newlyBound)
+            {
+                OnAttached();
+            }
         }
 
 
         /// <summary> Clears <see cref="Owner"/>, leaving it <c>null</c>. Called by <see cref="EntityController"/> on a successful remove. </summary>
         internal void Detach()
         {
+            if (Owner is not null)
+            {
+                OnDetached();
+            }
             Owner = null;
+        }
+
+
+        /// <summary> Called once when this ability is bound to a controller, after <see cref="Owner"/> is set. The default is a no-op. </summary>
+        /// <remarks> Override to react to attachment — for example subscribing to the owner's events. Runs before the controller raises its <c>ComponentAdded</c> event. </remarks>
+        protected virtual void OnAttached()
+        {
+        }
+
+
+        /// <summary> Called once when this ability is removed from its controller, while <see cref="Owner"/> is still set. The default is a no-op. </summary>
+        /// <remarks> Override to undo whatever <see cref="OnAttached"/> established — <see cref="Owner"/> remains available here so subscriptions can be released, and is cleared immediately afterwards. Runs before the controller raises its <c>ComponentRemoved</c> event. </remarks>
+        protected virtual void OnDetached()
+        {
         }
 
 

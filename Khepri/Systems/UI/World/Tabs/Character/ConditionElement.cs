@@ -16,7 +16,7 @@ namespace Khepri.UI.World.Tabs.Character
         /// <param name="selectedEntity"> The entity whose character sheet is shown; when null the sheet is left blank. </param>
         public void ForceUpdate(Entity selectedEntity)
         {
-            if (selectedEntity.TryGetComponent(out ConditionComponent condition))
+            if (selectedEntity.TryGetComponent(out ConditionComponent? condition))
             {
                 Visible = true;
                 _healthProgressBar.MaxValue = condition.StaminaMaximum;

@@ -10,7 +10,7 @@ namespace Jaypen.Utilities.ECS
     /// Cardinality rules are defined by the sub-interfaces <see cref="ISingleComponentHolder{T}"/> and
     /// <see cref="IMultiComponentHolder{T}"/>.
     /// </remarks>
-    public interface IComponentHolder<T> where T : IComponent
+    public interface IComponentHolder<T> where T : class, IComponent
     {
         /// <summary> Raised after a component is successfully attached to this holder; the argument is the component that was just added. </summary>
         /// <remarks> Handlers receive a reference to the attached component. They are invoked synchronously after the holder's internal collection has already been mutated, so the holder's state already reflects the change when handlers run. </remarks>
@@ -36,9 +36,10 @@ namespace Jaypen.Utilities.ECS
         /// <returns> A read-only snapshot of every attached component. </returns>
         public IReadOnlyCollection<T> GetComponents();
 
-        /// <summary> Checks whether at least one component whose concrete runtime type is exactly <typeparamref name="TComponent"/> is currently attached. </summary>
-        /// <typeparam name="TComponent"> The exact concrete component type to test for; must satisfy <typeparamref name="T"/>. </typeparam>
-        /// <returns> <c>true</c> if at least one component of that exact type is attached; <c>false</c> otherwise. </returns>
+        /// <summary> Checks whether at least one component matching <typeparamref name="TComponent"/> is currently attached. </summary>
+        /// <remarks> The matching semantics follow the implementing cardinality contract: exact-type for <see cref="ISingleComponentHolder{T}"/>, assignability for <see cref="IMultiComponentHolder{T}"/>. </remarks>
+        /// <typeparam name="TComponent"> The component type to test for; must satisfy <typeparamref name="T"/>. </typeparam>
+        /// <returns> <c>true</c> if at least one matching component is attached; <c>false</c> otherwise. </returns>
         public Boolean HasComponent<TComponent>() where TComponent : T;
 
         /// <summary> Removes a specific component instance from this holder. </summary>

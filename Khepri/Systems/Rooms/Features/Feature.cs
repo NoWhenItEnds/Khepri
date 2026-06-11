@@ -44,14 +44,37 @@ namespace Khepri.Rooms.Features
                     $"Feature '{GetType().Name}' is already bound to a different room and cannot be rebound.");
             }
 
+            Boolean newlyBound = Owner is null;
             Owner = owner;
+            if (newlyBound)
+            {
+                OnAttached();
+            }
         }
 
 
         /// <summary> Clears <see cref="Owner"/>, leaving it <c>null</c>. Called by <see cref="Room"/> on a successful remove. </summary>
         internal void Detach()
         {
+            if (Owner is not null)
+            {
+                OnDetached();
+            }
             Owner = null;
+        }
+
+
+        /// <summary> Called once when this feature is bound to a room, after <see cref="Owner"/> is set. The default is a no-op. </summary>
+        /// <remarks> Override to react to attachment — for example subscribing to the owner's events. Runs before the room raises its <c>ComponentAdded</c> event. </remarks>
+        protected virtual void OnAttached()
+        {
+        }
+
+
+        /// <summary> Called once when this feature is removed from its room, while <see cref="Owner"/> is still set. The default is a no-op. </summary>
+        /// <remarks> Override to undo whatever <see cref="OnAttached"/> established — <see cref="Owner"/> remains available here so subscriptions can be released, and is cleared immediately afterwards. Runs before the room raises its <c>ComponentRemoved</c> event. </remarks>
+        protected virtual void OnDetached()
+        {
         }
 
 

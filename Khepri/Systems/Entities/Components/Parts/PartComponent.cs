@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using Jaypen.Utilities.ECS;
 using Khepri.Descriptions;
 
 namespace Khepri.Entities.Components.Parts
@@ -7,7 +8,7 @@ namespace Khepri.Entities.Components.Parts
     /// <summary> A single anatomical or structural part belonging to an entity — for example a head, an arm, or a door. </summary>
     /// <remarks> Parts are held only inside an <see cref="IdentityComponent"/>. Every part must carry a <see cref="Kind"/>; the non-nullable type declares that contract and <see cref="IdentityComponent.Validate"/> enforces it once at load, so the spawn and naming paths may treat it as guaranteed. </remarks>
     [GlobalClass]
-    public abstract partial class PartComponent : Resource
+    public abstract partial class PartComponent : Resource, IComponent
     {
         /// <summary> The entity kind this part belongs to — the data-bearing identity it claims for its entity, for example a goblin <see cref="EntityKind"/> on a core part. Required: the non-nullable type declares the contract, and <see cref="Validate"/> verifies the Inspector slot was filled once at load, so everything downstream may treat it as set. </summary>
         [Export] public EntityKind Kind { get; set; } = null!;

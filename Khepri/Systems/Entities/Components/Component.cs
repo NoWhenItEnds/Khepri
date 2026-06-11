@@ -33,14 +33,37 @@ namespace Khepri.Entities.Components
                     $"Component '{GetType().Name}' is already bound to a different entity and cannot be rebound.");
             }
 
+            Boolean newlyBound = Owner is null;
             Owner = owner;
+            if (newlyBound)
+            {
+                OnAttached();
+            }
         }
 
 
         /// <summary> Clears <see cref="Owner"/>, leaving it <c>null</c>. Called by <see cref="Entity"/> on a successful remove. </summary>
         internal void Detach()
         {
+            if (Owner is not null)
+            {
+                OnDetached();
+            }
             Owner = null;
+        }
+
+
+        /// <summary> Called once when this component is bound to an entity, after <see cref="Owner"/> is set. The default is a no-op. </summary>
+        /// <remarks> Override to react to attachment — for example subscribing to the owner's events or caching a sibling component. Runs before the entity raises its <c>ComponentAdded</c> event. </remarks>
+        protected virtual void OnAttached()
+        {
+        }
+
+
+        /// <summary> Called once when this component is removed from its entity, while <see cref="Owner"/> is still set. The default is a no-op. </summary>
+        /// <remarks> Override to undo whatever <see cref="OnAttached"/> established — <see cref="Owner"/> remains available here so subscriptions can be released, and is cleared immediately afterwards. Runs before the entity raises its <c>ComponentRemoved</c> event. </remarks>
+        protected virtual void OnDetached()
+        {
         }
 
 

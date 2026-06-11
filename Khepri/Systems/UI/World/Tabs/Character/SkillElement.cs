@@ -36,7 +36,7 @@ namespace Khepri.UI.World.Tabs.Character
         /// <param name="selectedEntity"> The entity whose character sheet is shown; when null the sheet is left blank. </param>
         public void ForceUpdate(Entity selectedEntity)
         {
-            if (selectedEntity.TryGetComponent(out SkillComponent skills) && skills.Skills.Count > 0)
+            if (selectedEntity.TryGetComponent(out SkillComponent? skills) && skills.Skills.Count > 0)
             {
                 Visible = true;
 

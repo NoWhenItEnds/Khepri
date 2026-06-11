@@ -10,14 +10,10 @@ using Khepri.Entities.Components;
 namespace Khepri.Entities
 {
     /// <summary> A thing or object that can exist within a room. All things, including players and items, are entities. </summary>
-    public class Entity : IEquatable<Entity>, INoteSource, ISingleComponentHolder<Component>
+    public class Entity : SingleComponentHolder<Component>, IEquatable<Entity>, INoteSource
     {
         /// <summary> The entity's unique identifier. Should be unique across all entities. </summary>
         public readonly Guid UId;
-
-
-        /// <summary> Delegate storage for all components attached to this entity — at most one per exact concrete type. </summary>
-        private readonly ComponentStore<Component> _components = new ComponentStore<Component>();
 
 
         /// <summary> Initialises a new instance of the <see cref="Entity"/> class. </summary>
@@ -28,94 +24,19 @@ namespace Khepri.Entities
         }
 
 
-        /// <summary> Raised after a component is successfully attached to this entity, passing the newly added component as the argument. </summary>
-        /// <remarks> Subscribers are invoked synchronously after the internal collection has already been mutated — the entity's component set already reflects the change when handlers run. </remarks>
-        public event Action<Component>? ComponentAdded;
+        /// <summary> Binds a freshly added component to this entity by setting its <see cref="Component.Owner"/>. </summary>
+        /// <param name="component"> The component that was just added. </param>
+        protected override void Bind(Component component) => component.Initialise(this);
 
 
-        /// <summary> Raised after a component is successfully detached from this entity, passing the removed component as the argument. </summary>
-        /// <remarks> Subscribers are invoked synchronously after the internal collection has already been mutated — the entity's component set already reflects the change when handlers run. </remarks>
-        public event Action<Component>? ComponentRemoved;
-
-
-        /// <summary> Adds a component instance to this entity. </summary>
-        /// <param name="component"> The component to attach. Must not be <c>null</c>. </param>
-        /// <returns> <c>true</c> if the component was added; <c>false</c> if a component of the same concrete type is already attached. </returns>
-        /// <exception cref="ArgumentNullException"> Thrown when <paramref name="component"/> is <c>null</c>. </exception>
-        /// <remarks>
-        /// On success: calls <see cref="Component.Initialise"/> (which sets <c>Owner</c>) before raising
-        /// <see cref="ComponentAdded"/>, so observers always see a fully initialised component.
-        /// </remarks>
-        public Boolean AddComponent(Component component)
-        {
-            Boolean added = _components.Add(component);
-            if (added) { component.Initialise(this); ComponentAdded?.Invoke(component); }
-            return added;
-        }
-
-
-        /// <summary> Returns all components currently attached to this entity, in unspecified order. </summary>
-        /// <remarks> The returned collection is a snapshot — mutations to it do not affect the entity's internal component set. </remarks>
-        /// <returns> A read-only snapshot of every attached component. </returns>
-        public IReadOnlyCollection<Component> GetComponents() => _components.GetAll();
-
-
-        /// <summary> Checks whether a component whose concrete runtime type is exactly <typeparamref name="TComponent"/> is currently attached. </summary>
-        /// <typeparam name="TComponent"> The exact concrete component type to test for. </typeparam>
-        /// <returns> <c>true</c> if a component of that exact type is attached; <c>false</c> otherwise. </returns>
-        public Boolean HasComponent<TComponent>() where TComponent : Component => _components.Has<TComponent>();
-
-
-        /// <summary> Attempts to retrieve the attached component whose concrete runtime type is exactly <typeparamref name="TComponent"/>. </summary>
-        /// <remarks>
-        /// Uses an exact-type dictionary lookup, not assignability scanning. A subclass of <typeparamref name="TComponent"/> stored under its
-        /// own key will not be found here.
-        /// Because <typeparamref name="TComponent"/> is constrained to a reference type in this implementation, <c>default</c> on a miss is
-        /// <c>null</c>; callers should still use the Boolean return value as the authoritative presence check.
-        /// </remarks>
-        /// <typeparam name="TComponent"> The exact concrete component type to retrieve. </typeparam>
-        /// <param name="component"> Contains the attached component when this method returns <c>true</c>; otherwise <c>default(<typeparamref name="TComponent"/>)</c>. </param>
-        /// <returns> <c>true</c> if the matching component was found; <c>false</c> if none is attached. </returns>
-        public Boolean TryGetComponent<TComponent>(out TComponent component) where TComponent : Component
-        {
-            return _components.TryGet<TComponent>(out component);
-        }
+        /// <summary> Unbinds a freshly removed component from this entity by clearing its <see cref="Component.Owner"/>. </summary>
+        /// <param name="component"> The component that was just removed. </param>
+        protected override void Unbind(Component component) => component.Detach();
 
 
         /// <summary> Returns only the components that implement <see cref="IEntityContainer"/>, allowing callers to walk the containment hierarchy without exposing the full component set. </summary>
         /// <returns> The subset of attached components that act as entity containers, in unspecified order. </returns>
-        public IReadOnlyCollection<IEntityContainer> GetContainers() => _components.GetAll().OfType<IEntityContainer>().ToList();
-
-
-        /// <summary> Removes the attached component whose runtime type is exactly <typeparamref name="T"/>. </summary>
-        /// <typeparam name="T"> The type of component to remove. </typeparam>
-        /// <returns> <c>true</c> if a component was removed; <c>false</c> if none was found. </returns>
-        /// <remarks>
-        /// On success: calls <see cref="Component.Detach"/> (which clears <c>Owner</c>) before raising
-        /// <see cref="ComponentRemoved"/>, so <c>Owner</c> is already <c>null</c> when observers see the removal.
-        /// </remarks>
-        public Boolean RemoveComponent<T>() where T : Component
-        {
-            Boolean removed = _components.Remove<T>(out Component? removedComponent);
-            if (removed) { removedComponent!.Detach(); ComponentRemoved?.Invoke(removedComponent); }
-            return removed;
-        }
-
-
-        /// <summary> Removes a specific component instance from this entity. </summary>
-        /// <param name="component"> The exact component instance to detach. Must not be <c>null</c>. </param>
-        /// <returns> <c>true</c> if the component was removed; <c>false</c> if it was not attached or a different instance of the same type is attached. </returns>
-        /// <exception cref="ArgumentNullException"> Thrown when <paramref name="component"/> is <c>null</c>. </exception>
-        /// <remarks>
-        /// On success: calls <see cref="Component.Detach"/> (which clears <c>Owner</c>) before raising
-        /// <see cref="ComponentRemoved"/>, so <c>Owner</c> is already <c>null</c> when observers see the removal.
-        /// </remarks>
-        public Boolean RemoveComponent(Component component)
-        {
-            Boolean removed = _components.Remove(component);
-            if (removed) { component.Detach(); ComponentRemoved?.Invoke(component); }
-            return removed;
-        }
+        public IReadOnlyCollection<IEntityContainer> GetContainers() => GetComponents().OfType<IEntityContainer>().ToList();
 
 
         /// <summary> Builds a dynamic description of the entity's current state — its tooltip body when it appears as a note. </summary>
@@ -127,7 +48,7 @@ namespace Khepri.Entities
             // Open by naming what the entity is, then let its components add detail, each fold separated from the last.
             builder.Text(GetName().ToCapitalised() + ".");
 
-            foreach (IDescriptionContributor contributor in _components.GetAll().OfType<IDescriptionContributor>())
+            foreach (IDescriptionContributor contributor in GetComponents().OfType<IDescriptionContributor>())
             {
                 contributor.Contribute(builder);
             }
@@ -151,15 +72,17 @@ namespace Khepri.Entities
         public String GetName()
         {
             // The noun comes solely from the identity component; absent one, the builder falls back.
+            // Found by assignability rather than exact type, so a subclassed identity component still claims the noun.
             String noun = "something";
-            if (TryGetComponent<IdentityComponent>(out IdentityComponent? identityComponent))
+            IdentityComponent? identityComponent = GetComponents().OfType<IdentityComponent>().FirstOrDefault();
+            if (identityComponent is not null)
             {
                 noun = identityComponent.GetNoun();
             }
 
             NameBuilder builder = NameBuilder.Create(noun);
 
-            foreach (AdjectiveComponent adjective in _components.GetAll().OfType<AdjectiveComponent>())
+            foreach (AdjectiveComponent adjective in GetComponents().OfType<AdjectiveComponent>())
             {
                 builder.WithAdjective(adjective.RoyalIndex,adjective.GetAdjective());
             }

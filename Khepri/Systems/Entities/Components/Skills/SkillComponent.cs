@@ -15,7 +15,7 @@ namespace Khepri.Entities.Components.Skills
         /// <summary> Finds this entity's proficiency in a given skill. </summary>
         /// <param name="kind"> The skill to look up. </param>
         /// <returns> The matching <see cref="EntitySkill"/>, or <c>null</c> if this entity has never learned that skill. </returns>
-        public EntitySkill GetSkill(SkillKind kind) => Skills.FirstOrDefault(skill => skill.Kind == kind);  // TODO - What if you don't have the skill?
+        public EntitySkill? GetSkill(SkillKind kind) => Skills.FirstOrDefault(skill => skill.Kind == kind);
 
 
         /// <inheritdoc/>

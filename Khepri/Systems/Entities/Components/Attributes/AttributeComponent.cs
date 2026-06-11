@@ -15,7 +15,7 @@ namespace Khepri.Entities.Components.Attributes
         /// <summary> Finds this entity's level in a given attribute. </summary>
         /// <param name="kind"> The attribute to look up. </param>
         /// <returns> The matching <see cref="EntityAttribute"/>, or <c>null</c> if this entity has never learned that attribute. </returns>
-        public EntityAttribute GetAttribute(AttributeKind kind) => Attributes.FirstOrDefault(attr => attr.Kind == kind);  // TODO - What if you don't have the attribute?
+        public EntityAttribute? GetAttribute(AttributeKind kind) => Attributes.FirstOrDefault(attr => attr.Kind == kind);
 
 
         /// <inheritdoc/>
