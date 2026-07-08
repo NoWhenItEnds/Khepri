@@ -19,6 +19,17 @@ namespace Khepri.Nodes
         private Entity? _entity = null;
 
 
+        /// <summary> The radius of the node's bounding circle in world units, derived from its sprite so it can be culled correctly regardless of how large the sprite is. </summary>
+        public Single Radius
+        {
+            get
+            {
+                Vector2 size = _sprite.GetRect().Size * _sprite.GlobalScale;
+                return size.Length() / 2f;
+            }
+        }
+
+
         /// <summary> Initialise the node by passing it a reference to the entity it will represent. </summary>
         /// <param name="entity"> The entity this node represents within the game world. </param>
         public void Build(Entity entity)

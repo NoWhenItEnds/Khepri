@@ -28,8 +28,11 @@ namespace Khepri.Managers
         [Export] private PackedScene _entityNodePrefab = null!;
 
 
-        /// <summary> A pool of the entity node that currently exist in the game world, and a boolean representing if it's currently being used. </summary>
-        private Dictionary<EntityNode, Boolean> _entityPool = new Dictionary<EntityNode, Boolean>();
+        /// <summary> The entity nodes currently assigned to an in-view entity, keyed by the entity they represent. </summary>
+        private Dictionary<Entity, EntityNode> _activeNodes = new Dictionary<Entity, EntityNode>();
+
+        /// <summary> The entity nodes that are cleaned up and waiting in the pool for assignment. </summary>
+        private Stack<EntityNode> _freeNodes = new Stack<EntityNode>();
 
 
         /// <summary> The logger instance the manager uses. </summary>
@@ -39,10 +42,10 @@ namespace Khepri.Managers
         /// <inheritdoc/>
         public override void _Ready()
         {
-            // Build the entity pool.
+            // Pre-seed the pool with the ideal number of free nodes.
             for (Int32 i = 0; i < _idealEntityPoolSize; i++)
             {
-                AddEntityNode();
+                _freeNodes.Push(AddEntityNode());
             }
         }
 
@@ -50,27 +53,99 @@ namespace Khepri.Managers
         /// <inheritdoc/>
         public override void _Process(Double delta)
         {
-            base._Process(delta);
+            Rect2 viewRect = _playerCamera.GetViewRect();
+            ReleaseHiddenNodes(viewRect);
+            AssignVisibleNodes(viewRect);
         }
 
 
-        /// <summary> Create and correctly instantiate a new entity node, adding it to the node pool. </summary>
-        /// <param name="entity"> The entity data object the node will represent. A null, the default, just adds an empty node to the pool. </param>
-        private void AddEntityNode(Entity? entity = null)
+        /// <summary> Return any node whose entity has left the camera's view back to the free pool, leaving still-visible nodes untouched. </summary>
+        /// <param name="viewRect"> The rectangle of the world currently visible through the camera. </param>
+        private void ReleaseHiddenNodes(Rect2 viewRect)
         {
-            EntityNode node = _entityNodePrefab.Instantiate<EntityNode>();
-            AddChild(node);
+            List<Entity> hidden = new List<Entity>();
 
-            if (entity != null)
+            foreach (KeyValuePair<Entity, EntityNode> pair in _activeNodes)
             {
-                node.Build(entity);
+                if (!IsNodeInView(viewRect, pair.Key, pair.Value))
+                {
+                    hidden.Add(pair.Key);
+                }
+            }
+
+            foreach (Entity entity in hidden)
+            {
+                EntityNode node = _activeNodes[entity];
+                node.Cleanup();
+
+                _freeNodes.Push(node);
+                _activeNodes.Remove(entity);
+            }
+        }
+
+
+        /// <summary> Assign a free node to every in-view entity that does not already have one, leaving already-represented entities untouched. </summary>
+        /// <param name="viewRect"> The rectangle of the world currently visible through the camera. </param>
+        private void AssignVisibleNodes(Rect2 viewRect)
+        {
+            IEnumerable<Entity> entities = EntityManager.Instance?.GetEntities() ?? Array.Empty<Entity>();
+
+            foreach (Entity entity in entities)
+            {
+                // No node exists yet to measure, so spawn once the entity's position enters view; its size is honoured from then on when releasing.
+                if (viewRect.HasPoint(entity.GlobalPosition) && !_activeNodes.ContainsKey(entity))
+                {
+                    EntityNode node = GetFreeNode();
+                    node.Build(entity);
+
+                    _activeNodes.Add(entity, node);
+                }
+            }
+        }
+
+
+        /// <summary> Determine whether an entity's node still overlaps the view rectangle, using the node's own sprite-derived radius so large sprites stay rendered while partially visible. </summary>
+        /// <param name="viewRect"> The rectangle of the world currently visible through the camera. </param>
+        /// <param name="entity"> The entity whose position anchors the bounds. </param>
+        /// <param name="node"> The node representing the entity, whose radius sizes the bounds. </param>
+        /// <returns> True when any part of the node's bounds falls within the view. </returns>
+        private static Boolean IsNodeInView(Rect2 viewRect, Entity entity, EntityNode node)
+        {
+            Vector2 extents = Vector2.One * node.Radius;
+            Rect2 bounds = new Rect2(entity.GlobalPosition - extents, extents * 2f);
+
+            return viewRect.Intersects(bounds);
+        }
+
+
+        /// <summary> Take a node from the free pool, growing the pool with a fresh node when none are currently available. </summary>
+        /// <returns> A cleaned-up node that is ready to be assigned to an entity. </returns>
+        private EntityNode GetFreeNode()
+        {
+            EntityNode node;
+
+            if (_freeNodes.Count > 0)
+            {
+                node = _freeNodes.Pop();
             }
             else
             {
-                node.Cleanup();
+                node = AddEntityNode();
             }
 
-            _entityPool.Add(node, entity != null);
+            return node;
+        }
+
+
+        /// <summary> Create and correctly instantiate a new empty entity node, cleaned up and ready for assignment. </summary>
+        /// <returns> The newly created node. </returns>
+        private EntityNode AddEntityNode()
+        {
+            EntityNode node = _entityNodePrefab.Instantiate<EntityNode>();
+            AddChild(node);
+            node.Cleanup();
+
+            return node;
         }
     }
 }
