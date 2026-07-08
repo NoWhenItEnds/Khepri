@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using Khepri.Data.Entities;
 
@@ -15,14 +16,15 @@ namespace Khepri.Nodes
 
 
         /// <summary> The entity this node currently represents within the game world. A null indicates that it is stashed in the pool waiting for assignment. </summary>
-        public Entity? Entity { get; private set; } = null;
+        private Entity? _entity = null;
 
 
         /// <summary> Initialise the node by passing it a reference to the entity it will represent. </summary>
         /// <param name="entity"> The entity this node represents within the game world. </param>
         public void Build(Entity entity)
         {
-            Entity = entity;
+            _entity = entity;
+            GlobalPosition = entity.GlobalPosition;
             Visible = true;
         }
 
@@ -31,7 +33,18 @@ namespace Khepri.Nodes
         public void Cleanup()
         {
             Visible = false;
-            Entity = null;
+            GlobalPosition = Vector2.Zero;
+            _entity = null;
+        }
+
+
+        /// <inheritdoc/>
+        public override void _Process(Double delta)
+        {
+            if (_entity != null)
+            {
+                GlobalPosition = _entity.GlobalPosition;
+            }
         }
     }
 }

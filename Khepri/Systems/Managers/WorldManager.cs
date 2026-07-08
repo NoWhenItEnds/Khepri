@@ -12,6 +12,11 @@ namespace Khepri.Managers
     /// <summary> The central manager for all the nodes within the player's current view. Decoupled from the entity data objects. </summary>
     public partial class WorldManager : SingletonNode2D<WorldManager>
     {
+        /// <summary> The camera node the player view the world through. </summary>
+        [ExportGroup("Nodes")]
+        [Export] private PlayerCamera _playerCamera = null!;
+
+
         /// <summary> The initial number of entity nodes in the pool, and the size it will try to shrink to. </summary>
         /// <remarks> This isn't the max size, as the pool will grow if necessary, just what it will try to hover around. </remarks>
         [ExportGroup("Settings")]
@@ -39,6 +44,13 @@ namespace Khepri.Managers
             {
                 AddEntityNode();
             }
+        }
+
+
+        /// <inheritdoc/>
+        public override void _Process(Double delta)
+        {
+            base._Process(delta);
         }
 
 
