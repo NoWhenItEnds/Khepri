@@ -1,7 +1,7 @@
 using System;
 using Godot;
 
-namespace Jaypen.Utilities.Singletons
+namespace Jaypen.Singletons
 {
     /// <summary> Provides the shared singleton lifecycle logic for all Godot singleton base classes. </summary>
     /// <typeparam name="T">The concrete singleton type whose instance is managed.</typeparam>

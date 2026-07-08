@@ -1,6 +1,6 @@
 using Godot;
-using Jaypen.Utilities.Logging;
-using Jaypen.Utilities.Singletons;
+using Jaypen.Logging;
+using Jaypen.Singletons;
 using Microsoft.Extensions.Logging;
 using System;
 

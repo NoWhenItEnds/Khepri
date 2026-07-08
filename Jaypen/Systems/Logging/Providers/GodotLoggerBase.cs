@@ -1,7 +1,7 @@
 using System;
 using Microsoft.Extensions.Logging;
 
-namespace Jaypen.Utilities.Logging.Providers
+namespace Jaypen.Logging.Providers
 {
     /// <summary> Shared base class for all Godot logging provider loggers. Implements the MEL contract members that are identical across every logger — <see cref="IsEnabled"/> and <see cref="BeginScope{TState}"/> — so subclasses only need to implement <see cref="Log{TState}"/> with their destination-specific formatting logic. </summary>
     public abstract class GodotLoggerBase : ILogger

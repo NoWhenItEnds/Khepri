@@ -2,10 +2,10 @@ using System;
 using Godot;
 using Microsoft.Extensions.Logging;
 
-namespace Jaypen.Utilities.Logging.Providers
+namespace Jaypen.Logging.Providers
 {
     /// <summary> MEL provider that creates <see cref="UILogger"/> instances, routing log output to a <see cref="RichTextLabel"/> in the game's UI. </summary>
-    /// <remarks> he target label may be set after construction via <see cref="SetTarget"/> . </remarks>
+    /// <remarks> The target label may be set after construction via <see cref="SetTarget"/>. </remarks>
     public sealed class UILoggerProvider : ILoggerProvider
     {
         /// <summary> Default maximum log line count used when no explicit limit is supplied. </summary>

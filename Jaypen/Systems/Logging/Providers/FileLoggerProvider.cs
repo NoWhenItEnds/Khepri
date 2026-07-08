@@ -1,15 +1,17 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using Microsoft.Extensions.Logging;
 
-namespace Jaypen.Utilities.Logging.Providers
+namespace Jaypen.Logging.Providers
 {
     /// <summary> MEL provider that writes log entries to a file, keeping the handle open for the lifetime of the provider so that each entry is appended efficiently. </summary>
-    /// <remarks> Flushes after every write so logs survive a crash mid-session; the per-write flush is a deliberate trade-off against throughput. Do not remove it without replacing the crash-safety guarantee. </remarks>
+    /// <remarks> Each provider instance owns one file — callers embed a session timestamp in the name (see <c>Log.BuildLogFilePath</c>) so every session writes a fresh file. On construction, older <c>.log</c> files in the same directory are pruned so at most <see cref="MaxRetainedLogs"/> remain. Flushes after every write so logs survive a crash mid-session; the per-write flush is a deliberate trade-off against throughput. Do not remove it without replacing the crash-safety guarantee. </remarks>
     public sealed class FileLoggerProvider : ILoggerProvider
     {
-        /// <summary> Virtual path to the directory that holds the log file; created on construction if absent. </summary>
-        private const String LogDirectory = "user://logs";
+        /// <summary> Maximum number of <c>.log</c> files retained in the log directory, including the current session's file; the oldest beyond this count are deleted on construction. </summary>
+        private const Int32 MaxRetainedLogs = 10;
 
         /// <summary> Object used to serialise file writes across threads. </summary>
         private readonly Object _lock = new Object();
@@ -18,7 +20,7 @@ namespace Jaypen.Utilities.Logging.Providers
         /// <remarks> Writes produce a single diagnostic error on the first attempt (see <see cref="_firstWriteWarned"/>) and are silent no-ops thereafter. </remarks>
         private FileAccess? _file;
 
-        /// <summary> Guards against double-dispose. </summary>
+        /// <summary> Guards against double-dispose, and suppresses the missing-file diagnostic for writes that arrive after shutdown. </summary>
         private Boolean _disposed;
 
         /// <summary> Ensures the "file logging disabled" warning is emitted at most once, on the first write attempt after a failed open, rather than on every subsequent write. </summary>
@@ -31,8 +33,8 @@ namespace Jaypen.Utilities.Logging.Providers
         private readonly EventHandler _processExitHandler;
 
 
-        /// <summary> Creates the log directory if absent, then opens <paramref name="filePath"/> for appending. </summary>
-        /// <param name="filePath"> Godot virtual path (e.g. <c>user://logs/Jaypen.log</c>) of the target log file. </param>
+        /// <summary> Creates the log directory if absent, opens <paramref name="filePath"/> for writing, then prunes old log files beyond <see cref="MaxRetainedLogs"/>. </summary>
+        /// <param name="filePath"> Godot virtual path (e.g. <c>user://logs/Khepri_2026-07-08_14-23-05.log</c>) of the target log file. </param>
         public FileLoggerProvider(String filePath)
         {
             _filePath = filePath;
@@ -57,7 +59,7 @@ namespace Jaypen.Utilities.Logging.Providers
                     _file.StoreString(line);
                     _file.Flush();
                 }
-                else if (!_firstWriteWarned)
+                else if (!_disposed && !_firstWriteWarned)
                 {
                     GD.PushError("[FileLoggerProvider] File logging is disabled because the log file could not be opened — see earlier error for details.");
                     _firstWriteWarned = true;
@@ -81,33 +83,29 @@ namespace Jaypen.Utilities.Logging.Providers
                         _file.Close();
                         _file = null;
                     }
-                }
 
-                _disposed = true;
+                    _disposed = true;
+                }
             }
         }
 
 
-        /// <summary> Creates <see cref="LogDirectory"/> if absent, then attempts to open the log file in <c>ReadWrite</c> mode (preserving existing content) with <c>SeekEnd</c> for appending. Falls back to <c>Write</c> mode if the file does not yet exist. </summary>
+        /// <summary> Creates the log file's parent directory if absent, opens the file in <c>Write</c> mode, then prunes stale logs via <see cref="PruneOldLogs"/>. </summary>
         private void OpenFile()
         {
-            Error mkdirError = DirAccess.MakeDirRecursiveAbsolute(LogDirectory);
+            String logDirectory = _filePath.GetBaseDir();
+            Error mkdirError = DirAccess.MakeDirRecursiveAbsolute(logDirectory);
 
             // Godot returns Error.AlreadyExists when the directory is already present — this is not a failure; the directory is ready to use.
             Boolean directoryReady = (mkdirError == Error.Ok || mkdirError == Error.AlreadyExists);
 
             if (!directoryReady)
             {
-                GD.PushError($"[FileLoggerProvider] Could not create log directory '{LogDirectory}': {mkdirError}");
+                GD.PushError($"[FileLoggerProvider] Could not create log directory '{logDirectory}': {mkdirError}");
             }
             else
             {
-                FileAccess? handle = FileAccess.Open(_filePath, FileAccess.ModeFlags.ReadWrite);
-
-                if (handle == null)
-                {
-                    handle = FileAccess.Open(_filePath, FileAccess.ModeFlags.Write);
-                }
+                FileAccess? handle = FileAccess.Open(_filePath, FileAccess.ModeFlags.Write);
 
                 if (handle == null)
                 {
@@ -116,8 +114,37 @@ namespace Jaypen.Utilities.Logging.Providers
                 }
                 else
                 {
-                    handle.SeekEnd();
                     _file = handle;
+                    PruneOldLogs(logDirectory);
+                }
+            }
+        }
+
+
+        /// <summary> Deletes the oldest <c>.log</c> files in <paramref name="logDirectory"/> until at most <see cref="MaxRetainedLogs"/> remain, so per-session files cannot accumulate without bound. </summary>
+        /// <param name="logDirectory"> The directory whose log files are pruned. </param>
+        /// <remarks> Age is determined by ordinal filename order, which is chronological because the session timestamp format is fixed-width. The current session's file is never a candidate: it sorts newest, and pruning stops well before reaching it. </remarks>
+        private void PruneOldLogs(String logDirectory)
+        {
+            using DirAccess? dir = DirAccess.Open(logDirectory);
+
+            if (dir != null)
+            {
+                List<String> logFiles = dir.GetFiles()
+                    .Where(fileName => fileName.EndsWith(".log", StringComparison.Ordinal))
+                    .OrderBy(fileName => fileName, StringComparer.Ordinal)
+                    .ToList();
+
+                Int32 excessCount = logFiles.Count - MaxRetainedLogs;
+                foreach (String fileName in logFiles.Take(Math.Max(excessCount, 0)))
+                {
+                    String stalePath = $"{logDirectory}/{fileName}";
+                    Error removeError = DirAccess.RemoveAbsolute(stalePath);
+
+                    if (removeError != Error.Ok)
+                    {
+                        GD.PushWarning($"[FileLoggerProvider] Could not delete stale log '{stalePath}': {removeError}");
+                    }
                 }
             }
         }

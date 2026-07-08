@@ -1,7 +1,7 @@
 using System;
 using Godot;
 
-namespace Jaypen.Utilities.Singletons
+namespace Jaypen.Singletons
 {
     /// <summary> Singleton base class backed by <see cref="Node3D"/>. Use this when the singleton participates in 3D scene rendering or physics. </summary>
     /// <typeparam name="T">The concrete singleton type — must derive from this class (CRTP).</typeparam>
@@ -33,17 +33,6 @@ namespace Jaypen.Utilities.Singletons
         {
             SingletonBehaviour<T>.Unregister((T)this);
             base._ExitTree();
-        }
-
-
-        /// <inheritdoc/>
-        public override void _Notification(int what)
-        {
-            if (what == NotificationWMCloseRequest && Instance == this as T)
-            {
-                SingletonBehaviour<T>.Unregister((T)this);
-                QueueFree();
-            }
         }
     }
 }

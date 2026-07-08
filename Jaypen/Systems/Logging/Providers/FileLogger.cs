@@ -1,9 +1,9 @@
 using System;
 using Microsoft.Extensions.Logging;
 
-namespace Jaypen.Utilities.Logging.Providers
+namespace Jaypen.Logging.Providers
 {
-    /// <summary> Writes log entries to the file handle owned by the parent <see cref="FileLoggerProvider"/>, prepending a UTC timestamp to each line. </summary>
+    /// <summary> Writes log entries to the file handle owned by the parent <see cref="FileLoggerProvider"/>, prepending an ISO 8601 UTC timestamp to each line. </summary>
     /// <remarks> All file operations are guarded by the provider's shared lock to ensure cross-thread safety (Godot's <c>FileAccess</c> is not documented as thread-safe). </remarks>
     public class FileLogger : GodotLoggerBase
     {
@@ -34,7 +34,9 @@ namespace Jaypen.Utilities.Logging.Providers
         {
             String message = formatter(state, exception);
             String exceptionSuffix = exception != null ? $"\n{exception}" : String.Empty;
-            String timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+
+            // ISO 8601 round-trip format ("o") — culture-invariant and carries the 'Z' UTC designator, so the timestamp cannot be misread as local time.
+            String timestamp = DateTime.UtcNow.ToString("o");
             String line = $"{timestamp} [{logLevel}] <{_categoryName}> {message}{exceptionSuffix}\n";
             _provider.WriteLine(line);
         }

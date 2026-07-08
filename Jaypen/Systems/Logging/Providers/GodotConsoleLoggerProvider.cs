@@ -1,7 +1,7 @@
 using System;
 using Microsoft.Extensions.Logging;
 
-namespace Jaypen.Utilities.Logging.Providers
+namespace Jaypen.Logging.Providers
 {
     /// <summary> MEL provider that creates <see cref="GodotConsoleLogger"/> instances, routing log output to the Godot editor console. Register this provider via <c>ILoggingBuilder.AddProvider</c> during factory configuration. </summary>
     public sealed class GodotConsoleLoggerProvider : ILoggerProvider

@@ -2,9 +2,9 @@ using System;
 using System.Threading;
 using Godot;
 using Microsoft.Extensions.Logging;
-using Jaypen.Utilities.Logging.Providers;
+using Jaypen.Logging.Providers;
 
-namespace Jaypen.Utilities.Logging
+namespace Jaypen.Logging
 {
     /// <summary> Stateless entry point for obtaining <see cref="ILogger"/> instances throughout the application. Owns a single <see cref="ILoggerFactory"/> that is initialised lazily on first use and lives for the process lifetime. </summary>
     public static class Log
@@ -51,9 +51,20 @@ namespace Jaypen.Utilities.Logging
                 builder.SetMinimumLevel(LogLevel.Information);
 #endif
                 builder.AddProvider(new GodotConsoleLoggerProvider());
-                builder.AddProvider(new FileLoggerProvider("user://logs/Jaypen.log"));
+                builder.AddProvider(new FileLoggerProvider(BuildLogFilePath()));
                 builder.AddProvider(_uiProvider);
             });
+        }
+
+
+        /// <summary> Builds the per-session log file path: the project's configured name followed by a session timestamp, under <c>user://logs</c>. </summary>
+        /// <returns> A path of the form <c>user://logs/&lt;ProjectName&gt;_&lt;yyyy-MM-dd_HH-mm-ss&gt;.log</c>. </returns>
+        /// <remarks> The timestamp is UTC to match the entries written inside the file, and uses a fixed-width, filesystem-safe format so filenames sort chronologically. </remarks>
+        private static String BuildLogFilePath()
+        {
+            String projectName = ProjectSettings.GetSetting("application/config/name").AsString();
+            String sessionTimestamp = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss");
+            return $"user://logs/{projectName}_{sessionTimestamp}.log";
         }
     }
 }

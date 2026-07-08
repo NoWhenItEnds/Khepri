@@ -1,6 +1,6 @@
 using System;
 
-namespace Jaypen.Utilities.Logging.Providers
+namespace Jaypen.Logging.Providers
 {
     /// <summary> Shared no-op scope token returned by all <see cref="GodotLoggerBase"/> subclasses' <c>BeginScope</c> implementations. Held as a singleton to avoid per-call heap allocation. </summary>
     internal sealed class NullScope : IDisposable

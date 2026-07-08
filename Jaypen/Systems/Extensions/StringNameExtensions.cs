@@ -1,7 +1,7 @@
 using System;
 using Godot;
 
-namespace Jaypen.Utilities.Extensions
+namespace Jaypen.Extensions
 {
     /// <summary> Helpful methods for working with string names. </summary>
     public static class StringNameExtensions

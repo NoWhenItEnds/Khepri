@@ -2,3 +2,14 @@ root = true
 
 [*]
 charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.cs]
+indent_style = space
+indent_size = 4
+
+# Prefer CLR type names (Int32, String, Boolean) over language keywords (int, string, bool).
+dotnet_style_predefined_type_for_locals_parameters_members = false
+dotnet_style_predefined_type_for_member_access = false
+dotnet_diagnostic.IDE0049.severity = warning
