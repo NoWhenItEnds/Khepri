@@ -1,6 +1,22 @@
 [gd_scene format=3 uid="uid://hbqoxdwuv0ar"]
 
 [ext_resource type="Script" uid="uid://b3lads64wa673" path="res://Khepri/Systems/Managers/GameManager.cs" id="1_dycg1"]
+[ext_resource type="Script" uid="uid://bsn72qu1bdkrm" path="res://Khepri/Systems/Managers/EntityManager.cs" id="2_8saus"]
+[ext_resource type="Script" uid="uid://bi7vdf7q0fuq4" path="res://Khepri/Systems/Managers/WorldManager.cs" id="3_20rvs"]
+[ext_resource type="Script" uid="uid://byigwnf0wfpw0" path="res://Khepri/Systems/Managers/UIManager.cs" id="4_20rvs"]
 
 [node name="Game" type="Node" unique_id=1801120431]
 script = ExtResource("1_dycg1")
+
+[node name="Entities" type="Node" parent="." unique_id=1520885963]
+script = ExtResource("2_8saus")
+
+[node name="World" type="Node2D" parent="." unique_id=1528710329]
+script = ExtResource("3_20rvs")
+
+[node name="UI" type="Control" parent="." unique_id=1562743180]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("4_20rvs")

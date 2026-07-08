@@ -1,8 +1,6 @@
-using Godot;
 using Jaypen.Logging;
 using Jaypen.Singletons;
 using Microsoft.Extensions.Logging;
-using System;
 
 namespace Khepri.Managers
 {
