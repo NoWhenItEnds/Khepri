@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://bwdgqn4tv3iv"]
+
+[ext_resource type="Texture2D" uid="uid://4q335xxs2p" path="res://icon.svg" id="1_242oj"]
+[ext_resource type="Script" uid="uid://dt27l0fqh7tsn" path="res://Khepri/Systems/Nodes/EntityNode.cs" id="1_kgg0e"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_a0k3w"]
+resource_local_to_scene = true
+
+[node name="EntityNode" type="Node2D" unique_id=528104448 node_paths=PackedStringArray("_bodyArea", "_sprite")]
+script = ExtResource("1_kgg0e")
+_bodyArea = NodePath("Area2D")
+_sprite = NodePath("Sprite2D")
+
+[node name="Area2D" type="Area2D" parent="." unique_id=1679439748]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1531604155]
+shape = SubResource("RectangleShape2D_a0k3w")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=904153641]
+texture = ExtResource("1_242oj")
