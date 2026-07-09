@@ -36,7 +36,20 @@ namespace Khepri.Nodes
         {
             _entity = entity;
             GlobalPosition = entity.GlobalPosition;
+            Rotation = entity.Rotation;
+            ScaleToEntity(entity);
             Visible = true;
+        }
+
+
+        /// <summary> Scale the sprite so its drawn size matches the entity's physical radius, letting the sprite's own texture size cancel out so any artwork ends up the right size in world units. </summary>
+        /// <param name="entity"> The entity whose radius the sprite should be sized to. </param>
+        private void ScaleToEntity(Entity entity)
+        {
+            Single nativeDiameter = _sprite.GetRect().Size.X;
+            Single targetDiameter = entity.Radius * 2f;
+
+            _sprite.Scale = Vector2.One * (targetDiameter / nativeDiameter);
         }
 
 
@@ -45,6 +58,7 @@ namespace Khepri.Nodes
         {
             Visible = false;
             GlobalPosition = Vector2.Zero;
+            Rotation = 0f;
             _entity = null;
         }
 
@@ -55,6 +69,7 @@ namespace Khepri.Nodes
             if (_entity != null)
             {
                 GlobalPosition = _entity.GlobalPosition;
+                Rotation = _entity.Rotation;
             }
         }
     }
