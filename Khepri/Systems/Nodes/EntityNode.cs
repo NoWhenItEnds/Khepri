@@ -1,10 +1,10 @@
 using System;
 using Godot;
-using Khepri.Data.Entities;
+using Khepri.World.Entities;
 
 namespace Khepri.Nodes
 {
-    /// <summary> The physic-simulated object representing an entity within the player's view. </summary>
+    /// <summary> The rendered stand-in for an entity within the player's view, mirroring the simulation's position and facing each frame. The simulation never touches these nodes; they only read from it. </summary>
     public partial class EntityNode : Node2D
     {
         /// <summary> The area shape used to represent the entity's physical body. </summary>
@@ -18,15 +18,14 @@ namespace Khepri.Nodes
         /// <summary> The entity this node currently represents within the game world. A null indicates that it is stashed in the pool waiting for assignment. </summary>
         private Entity? _entity = null;
 
+        /// <summary> The prefab's own placeholder texture, captured at readiness and drawn for every entity until artwork is wired back in. </summary>
+        private Texture2D _fallbackTexture = null!;
 
-        /// <summary> The radius of the node's bounding circle in world units, derived from its sprite so it can be culled correctly regardless of how large the sprite is. </summary>
-        public Single Radius
+
+        /// <inheritdoc/>
+        public override void _Ready()
         {
-            get
-            {
-                Vector2 size = _sprite.GetRect().Size * _sprite.GlobalScale;
-                return size.Length() / 2f;
-            }
+            _fallbackTexture = _sprite.Texture;
         }
 
 
@@ -35,8 +34,11 @@ namespace Khepri.Nodes
         public void Build(Entity entity)
         {
             _entity = entity;
-            GlobalPosition = entity.GlobalPosition;
+            GlobalPosition = entity.Position;
             Rotation = entity.Rotation;
+
+            // The texture must land before the scale is derived, since scaling divides by its size.
+            _sprite.Texture = _fallbackTexture;
             ScaleToEntity(entity);
             Visible = true;
         }
@@ -68,7 +70,7 @@ namespace Khepri.Nodes
         {
             if (_entity != null)
             {
-                GlobalPosition = _entity.GlobalPosition;
+                GlobalPosition = _entity.Position;
                 Rotation = _entity.Rotation;
             }
         }

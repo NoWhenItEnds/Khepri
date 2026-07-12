@@ -1,32 +1,40 @@
 [gd_scene format=3 uid="uid://hbqoxdwuv0ar"]
 
 [ext_resource type="Script" uid="uid://b3lads64wa673" path="res://Khepri/Systems/Managers/GameManager.cs" id="1_dycg1"]
-[ext_resource type="Script" uid="uid://bsn72qu1bdkrm" path="res://Khepri/Systems/Managers/EntityManager.cs" id="2_8saus"]
-[ext_resource type="Script" uid="uid://bi7vdf7q0fuq4" path="res://Khepri/Systems/Managers/WorldManager.cs" id="3_20rvs"]
+[ext_resource type="Script" uid="uid://bsn72qu1bdkrm" path="res://Khepri/Systems/Managers/SolarSystemManager.cs" id="2_8saus"]
+[ext_resource type="Script" uid="uid://52g68n6r8kj2" path="res://Khepri/Systems/Controllers/PlayerController.cs" id="2_dqkud"]
+[ext_resource type="Script" uid="uid://bxuxmys0o8ekc" path="res://Khepri/Systems/Managers/ControllerManager.cs" id="2_ryx0f"]
+[ext_resource type="Script" uid="uid://bi7vdf7q0fuq4" path="res://Khepri/Systems/Managers/NodeManager.cs" id="3_20rvs"]
 [ext_resource type="Script" uid="uid://byigwnf0wfpw0" path="res://Khepri/Systems/Managers/UIManager.cs" id="4_20rvs"]
 [ext_resource type="PackedScene" uid="uid://bwdgqn4tv3iv" path="res://Khepri/Content/Prefabs/EntityNode.tscn" id="4_40jd7"]
 [ext_resource type="Script" uid="uid://dpky6yf2w8q4s" path="res://Khepri/Systems/Nodes/PlayerCamera.cs" id="5_gnjms"]
-[ext_resource type="Script" path="res://Khepri/Systems/Controllers/PlayerController.cs" id="6_plyr"]
 
 [node name="Game" type="Node" unique_id=1801120431]
 script = ExtResource("1_dycg1")
 
-[node name="Entities" type="Node" parent="." unique_id=1520885963]
+[node name="Controllers" type="Node" parent="." unique_id=487002343 node_paths=PackedStringArray("PlayerController")]
+script = ExtResource("2_ryx0f")
+PlayerController = NodePath("Player Controller")
+
+[node name="Player Controller" type="Node" parent="Controllers" unique_id=1161588033]
+script = ExtResource("2_dqkud")
+
+[node name="Solar Systems" type="Node" parent="." unique_id=1520885963]
 script = ExtResource("2_8saus")
 
-[node name="Player" type="Node" parent="."]
-script = ExtResource("6_plyr")
-
-[node name="World" type="Node2D" parent="." unique_id=1528710329 node_paths=PackedStringArray("_playerCamera")]
+[node name="Nodes" type="Node2D" parent="." unique_id=1528710329 node_paths=PackedStringArray("_playerCamera", "_entityParent")]
 script = ExtResource("3_20rvs")
 _playerCamera = NodePath("Player Camera")
+_entityParent = NodePath("Entities")
 _entityNodePrefab = ExtResource("4_40jd7")
 
-[node name="Player Camera" type="Node2D" parent="World" unique_id=2092387487 node_paths=PackedStringArray("_mainCamera")]
+[node name="Player Camera" type="Node2D" parent="Nodes" unique_id=2092387487 node_paths=PackedStringArray("_mainCamera")]
 script = ExtResource("5_gnjms")
 _mainCamera = NodePath("Main Camera")
 
-[node name="Main Camera" type="Camera2D" parent="World/Player Camera" unique_id=748745953]
+[node name="Main Camera" type="Camera2D" parent="Nodes/Player Camera" unique_id=748745953]
+
+[node name="Entities" type="Node2D" parent="Nodes" unique_id=1796894877]
 
 [node name="UI" type="Control" parent="." unique_id=1562743180]
 layout_mode = 3

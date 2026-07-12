@@ -2,7 +2,11 @@ using System;
 using Godot;
 using Jaypen.Logging;
 using Jaypen.Singletons;
-using Khepri.Data.Entities;
+using Khepri.Controllers;
+using Khepri.Extensions;
+using Khepri.World;
+using Khepri.World.Entities;
+using Khepri.World.Orbits;
 using Microsoft.Extensions.Logging;
 
 namespace Khepri.Managers
@@ -10,15 +14,6 @@ namespace Khepri.Managers
     /// <summary> The game world's central manager. The entrypoint. Works a little like Program.cs. </summary>
     public partial class GameManager : SingletonNode<GameManager>
     {
-        /// <summary> The game world's current timescale. </summary>
-        [ExportGroup("Settings")]
-        [Export] public Single Timescale { get; private set; } = 12f;
-
-
-        /// <summary> The current, universal time across the entire galaxy. </summary>
-        public DateTime UniversalTime { get; private set; } = DateTime.UtcNow;
-
-
         /// <summary> The logger instance the manager uses. </summary>
         private static readonly ILogger Logger = Log.For<GameManager>();
 
@@ -26,52 +21,56 @@ namespace Khepri.Managers
         /// <inheritdoc/>
         public override void _Ready()
         {
-            Logger.LogInformation("Hello, World!");
-            SeedSolarSystem();
-        }
+            SolarSystemManager? systemManager = SolarSystemManager.Instance;
 
-
-        /// <summary> Seed the world with a temporary demonstration system — a heavy central star circled by a few light planets — so the simulation has something to move and draw. </summary>
-        private void SeedSolarSystem()
-        {
-            EntityManager? entities = EntityManager.Instance;
-
-            if (entities != null)
+            if (systemManager != null)
             {
-                Single starMass = 1_000_000f;
-
-                entities.AddEntity(new Body(starMass, 90f, Vector2.Zero, Vector2.Zero));
-                entities.AddEntity(OrbitingBody(starMass, 180f, 0f, 1f, 16f));
-                entities.AddEntity(OrbitingBody(starMass, 300f, Mathf.Tau / 3f, 1f, 22f));
-                entities.AddEntity(OrbitingBody(starMass, 420f, Mathf.Tau * 2f / 3f, 1f, 28f));
+                SolarSystem system = systemManager.AddSystem();
+                BuildStartingSystem(system);
+                SpawnShip(system);
             }
         }
 
 
-        /// <summary> Create a light body on a circular orbit around a central mass sitting at the origin. </summary>
-        /// <param name="centralMass"> The mass of the body being orbited, assumed to dominate and sit at the origin. </param>
-        /// <param name="radius"> The orbital radius, in world units. </param>
-        /// <param name="angle"> The starting angle around the orbit, in radians. </param>
-        /// <param name="mass"> The orbiting body's own mass. </param>
-        /// <param name="size"> The orbiting body's physical radius, in world units, driving how large it is drawn. </param>
-        /// <returns> A body positioned on the orbit and given the perpendicular speed that holds it there. </returns>
-        private static Body OrbitingBody(Single centralMass, Single radius, Single angle, Single mass, Single size)
+        /// <summary> Seed the opening system with a star and a few bodies. Test content for now — a save file or procedural generation will build this in the future — and hand-authored inline now that the resource layer is gone. </summary>
+        /// <param name="system"> The freshly created system to populate. </param>
+        private static void BuildStartingSystem(SolarSystem system)
         {
-            // A circular orbit needs speed sqrt(G*M/r) aimed perpendicular to the radius; the simulation's
-            // gravitational constant is one, so it falls out here. The handedness of Orthogonal doesn't
-            // matter — either direction of travel traces the same stable circle.
-            Vector2 direction = Vector2.Right.Rotated(angle);
-            Vector2 position = direction * radius;
-            Vector2 velocity = direction.Orthogonal() * Mathf.Sqrt(centralMass / radius);
+            Body star = new Body(100000f, 64f, Vector2.Zero);
+            system.AddCelestial(star);
 
-            return new Body(mass, size, position, velocity);
+            Body planet = new Body(800f, 20f, Vector2.Zero);
+            planet.Orbit = new StaticOrbit(planet, star, 500f, 0.25f, 0f, 0f);
+            system.AddCelestial(planet);
+
+            Body moon = new Body(20f, 6f, Vector2.Zero);
+            moon.Orbit = new StaticOrbit(moon, planet, 70f, 0.1f, 0f, 1.2f);
+            system.AddCelestial(moon);
+
+            Body outer = new Body(500f, 16f, Vector2.Zero);
+            outer.Orbit = new StaticOrbit(outer, star, 850f, 0.4f, Mathf.Pi * 0.5f, 2f);
+            system.AddCelestial(outer);
         }
 
 
-        /// <inheritdoc/>
-        public override void _Process(Double delta)
+        /// <summary> Spawn the player's ship on a circular orbit around the system's primary body. Called by the game manager once the system has been seeded, so the primary genuinely exists before the ship tries to orbit it. A system with no primary gets no ship — there is nothing to orbit. </summary>
+        /// <param name="system"> The system to spawn the ship in. </param>
+        private static void SpawnShip(SolarSystem system)
         {
-            UniversalTime += TimeSpan.FromSeconds(delta * Timescale);
+            Body? primary = system.Primary;
+
+            if (primary != null)
+            {
+                Vector2 position = primary.Position + Vector2.Right * 100f;
+                Vector2 velocity = primary.Velocity + OrbitalMechanics.CircularOrbitVelocity(primary, position);
+
+                Ship ship = new Ship(1f, 8f, 200f, 3f, position, velocity);
+                ship.Orbit = new DynamicOrbit(ship);
+
+                system.AddDynamic(ship);
+
+                ControllerManager.Instance?.PlayerController.SetEntity(ship);
+            }
         }
     }
 }
